@@ -12,16 +12,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-   return (
-     <html lang="en">
+  return (
+    <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial=scale=1.0"/>
+        <meta name="viewport" content="width=device-width, initial=scale=1.0" />
       </head>
-       <body>
-        <AppRouterCacheProvider options={{ enableCssLayer: true}}>
-           {children}
+      <body>
+        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+          <main className="w-full h-svh flex justify-center">
+            {children}
+          </main>
         </AppRouterCacheProvider>
-       </body>
-     </html>
-   );
- }
+      </body>
+    </html>
+  );
+}

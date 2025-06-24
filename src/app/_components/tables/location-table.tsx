@@ -1,17 +1,17 @@
 'use client'
 import { mockLocationTableData } from "./mockData";
-import { ChangeEvent, useState, MouseEvent } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
-// import TablePaginationActions from "@/_components/tables/table-pagination";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import { blue, green, red, yellow } from "@mui/material/colors";
-// import { TablePaginationActionsProps } from "@mui/material/TablePaginationActions";
+import { blue, green, red, yellow, grey } from "@mui/material/colors";
+import Button from "@mui/material/Button";
+import { Typography } from "@mui/material";
+import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 
 interface HeadersLocationTable {
     label: string;
@@ -54,6 +54,11 @@ const MapColor: Record<string, { [key: number]: string }> = {
     "CANCEL": red
 }
 
+const MapActionColor: Record<string, { [key: number]: string }> = {
+    "OPEN": blue,
+    "VIEW": grey,
+}
+
 type locationTableData = {
     date: string;
     documentNumber: string;
@@ -75,15 +80,20 @@ function createLocationTableCell(data: locationTableData) {
             <TableCell>
                 {location}
             </TableCell>
-            <TableCell sx={{
-                color: MapColor[status][700],
-                fontWeight: 700, bgcolor:
-                    MapColor[status][300]
-            }}>
-                {status}
+            <TableCell>
+                <Typography sx={{
+                    color: MapColor[status][700],
+                    fontWeight: 700, bgcolor: MapColor[status][300],
+                }}>
+                    {status}
+                </Typography>
             </TableCell>
             <TableCell>
-                [{action}]
+                <Button variant="text">
+                    <Typography sx={{ color: MapActionColor[action][500] }}>
+                        [{action}]
+                    </Typography>
+                </Button>
             </TableCell>
         </>
     )
@@ -96,22 +106,9 @@ export default function LocationTable() {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - mockLocationTableData.length) : 0;
 
-    const handleChangePage = (
-        event: MouseEvent<HTMLButtonElement> | null,
-        newPage: number,
-    ) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (
-        event: ChangeEvent<HTMLInputElement>,
-    ) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
     return (
         <>
-            <Table stickyHeader>
+            <Table stickyHeader size="small">
                 <TableHead>
                     <TableRow>
                         {tableHeaders.map((header) => (
@@ -123,7 +120,7 @@ export default function LocationTable() {
                 </TableHead>
                 <TableBody sx={{ overflow: 'hidden' }}>
                     {
-                        (mockLocationTableData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)).map((mockData) =>
+                        (dataPerPage(mockLocationTableData, page, rowsPerPage)).map((mockData) =>
                             <TableRow key={mockData.documentNumber}>
                                 {createLocationTableCell(mockData)}
                             </TableRow>
@@ -136,12 +133,14 @@ export default function LocationTable() {
                             showFirstButton
                             showLastButton
                             rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                            colSpan={3}
+                            colSpan={4}
                             count={mockLocationTableData.length}
                             rowsPerPage={rowsPerPage}
                             page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            onPageChange={(event, page) => handleChangePage(event, page, setPage)}
+                            onRowsPerPageChange={(event) =>
+                                handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
+                            }
                         />
                     </TableRow>
                 </TableFooter>
