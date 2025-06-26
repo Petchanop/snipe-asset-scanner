@@ -12,7 +12,7 @@ export default function TableLayout({
 }: {
     children: ReactNode
 }) {
-    const [selected, setSelected] = useState<string>("locations")
+    const [selected, setSelected] = useState<string>("reports")
 
     function addBgBlueIfClick(match: string) : string {
         return selected === match ? "bg-blue-200" : ""
@@ -47,7 +47,7 @@ export default function TableLayout({
                             outline-solid outline-offset-2 
                             outline-blue-400
                             rounded-md`}
-                        onClick={() => setSelected("reports")}
+                        onClick={() => setSelected("report")}
                     >
                         {/* <Link href="/locations"> */}
                         <span className="m-4 text-blue-400">Report</span>

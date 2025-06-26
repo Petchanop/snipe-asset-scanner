@@ -1,10 +1,7 @@
 'use client'
 
 import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
 import TableFooter from "@mui/material/TableFooter";
-import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
@@ -21,39 +18,6 @@ import ListAsset from "@/_components/tables/list-asset";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import { blue } from "@mui/material/colors";
 
-interface HeadersAssetTable {
-    label: string,
-    isSelectBox: boolean,
-    fontColor: string[]
-}
-const tableHeaders: HeadersAssetTable[] = [
-    {
-        label: "Asset code",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Asset Name",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "assigned to",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Count Check",
-        isSelectBox: true,
-        fontColor: ["black"]
-    },
-    {
-        label: "Assign Incorrect",
-        isSelectBox: true,
-        fontColor: ["black"]
-    }
-]
-
 type AssetRow = {
     assetCode: string;
     assetName: string;
@@ -61,6 +25,26 @@ type AssetRow = {
     countCheck: boolean;
     assignIncorrect: boolean;
 };
+
+function CheckAdditionalAssetButton() {
+    return (
+        <div className="flex flex-col w-1/2 pt-10">
+            <div className="flex flex-row w-full lg:pl-8 lg:space-x-8" >
+                <Button className={
+                    `hover:bg-blue-200 max-md:w-1/3
+                        max-md:text-xs max-md:font-medium`
+                }
+                >Scan</Button>
+            </div>
+            <div className="flex flex-row w-full lg:pl-8 lg:space-x-8" >
+                <Button className={
+                    `hover:bg-blue-200 max-md:w-1/3 
+                        max-md:text-xs max-md:font-medium`
+                }>Add Asset</Button>
+            </div>
+        </div>
+    )
+}
 
 function CheckAssetButton(props: {
     setIsCheckTable: (value: SetStateAction<boolean>) => void
@@ -71,7 +55,9 @@ function CheckAssetButton(props: {
             <Button className={
                 `hover:bg-blue-200 max-md:w-1/3
                         max-md:text-xs max-md:font-medium`
-            }>Scan</Button>
+            }
+                href="/locations/scanner"
+            >Scan</Button>
             <Button className={
                 `hover:bg-blue-200 max-md:w-1/3 
                         max-md:text-xs max-md:font-medium`
@@ -104,8 +90,8 @@ function SelectCountInput(props: {
         <div className="flex flex-col w-1/2 max-md:w-3/4 space-y-2">
             {
                 isCheckTable ?
-                <Typography className="">Document Number</Typography>
-                : <></>
+                    <Typography className="">Document Number</Typography>
+                    : <></>
             }
             <div className="flex flex-row items-center">
                 <Typography className="lg:w-30 w-20">Date</Typography>
@@ -116,7 +102,6 @@ function SelectCountInput(props: {
                         className="lg:w-2/3 w-3/5"
                         slotProps={{ textField: { size: 'small' } }}
                         onChange={(value) => {
-                            console.log(value?.format("DD/MM/YYYY").toString())
                             value ?
                                 setDocumentDate(value.format("DD/MM/YYYY").toString())
                                 : null
@@ -183,7 +168,6 @@ function SelectCountButton(props: {
                     max-md:text-xs max-md:font-medium
                 `}
                     onClick={() => setIsCheckTable((pre) => !pre)}
-                // href={`/locations/reports/${documentNumber.toLowerCase()}`}
                 >
                     Start
                 </Button>
@@ -198,8 +182,16 @@ export function NewCountInput(props: {
     setLocation: (value: string) => void
     isCheckTable: boolean,
     setIsCheckTable: (value: SetStateAction<boolean>) => void
+    assetTab: boolean,
 }) {
-    const { locations, location, setLocation, isCheckTable, setIsCheckTable } = props
+    const {
+        locations,
+        location,
+        setLocation,
+        isCheckTable,
+        setIsCheckTable,
+        assetTab,
+    } = props
     const [selectedLocation, setSelectedLocation] = useState<string>(location)
     const [documentDate, setDocumentDate] = useState<string>((new Date()).toDateString())
     const [documentNumber, setDocumentNumber] = useState<string>("")
@@ -227,8 +219,11 @@ export function NewCountInput(props: {
             />
             {
                 isCheckTable ?
-                    <CheckAssetButton setIsCheckTable={setIsCheckTable} />
-                    : <SelectCountButton
+                    assetTab ?
+                        <CheckAssetButton setIsCheckTable={setIsCheckTable} />
+                        : <CheckAdditionalAssetButton />
+                    :
+                    <SelectCountButton
                         selectedLocation={selectedLocation}
                         setLocation={setLocation}
                         setIsCheckTable={setIsCheckTable}
@@ -238,13 +233,15 @@ export function NewCountInput(props: {
     )
 }
 
-
-
-function AssetTable(props: { data: AssetRow[], isCheckTable: boolean }) {
-    const { data, isCheckTable } = props
+function AssetTable(props: {
+    data: AssetRow[],
+    isCheckTable: boolean,
+    assetTab: boolean,
+    setAssetTab: (value: SetStateAction<boolean>) => void
+}) {
+    const { data, isCheckTable, assetTab, setAssetTab } = props
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-    const [assetTab, setAssetTab] = useState<boolean>(true);
     return (
         <>
             <ButtonGroup >
@@ -268,6 +265,7 @@ function AssetTable(props: { data: AssetRow[], isCheckTable: boolean }) {
                 </Button>
             </ButtonGroup>
             <Table stickyHeader size="small" sx={{
+                minWidth: 650,
                 border: 'solid',
                 borderLeft: 'none',
                 borderRight: 'none',
@@ -275,18 +273,7 @@ function AssetTable(props: { data: AssetRow[], isCheckTable: boolean }) {
                 borderWidth: 1,
                 borderColor: blue[400]
             }}>
-                <TableHead>
-                    <TableRow>
-                        {tableHeaders.map((header) => (
-                            <TableCell key={header.label}>
-                                {header.label}
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody sx={{ overflow: 'hidden' }}>
-                    <ListAsset data={data} isCheckTable={isCheckTable} />
-                </TableBody>
+                <ListAsset data={data} isCheckTable={isCheckTable} assetTab={assetTab} />
                 <TableFooter>
                     <TableRow>
                         {
@@ -319,8 +306,11 @@ export default function NewCountTable(props: {
     const { locations } = props
     const [location, setLocation] = useState<string>(locations[0])
     const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
+    const [assetTab, setAssetTab] = useState<boolean>(true);
 
     //use effect to fetch data from location change
+    useEffect(() => {
+    }, [])
     return (
         <>
             <NewCountInput
@@ -329,10 +319,13 @@ export default function NewCountTable(props: {
                 setLocation={setLocation}
                 isCheckTable={isCheckTable}
                 setIsCheckTable={setIsCheckTable}
+                assetTab={assetTab}
             />
             <AssetTable
                 data={mockAssetsByLocation[location]}
                 isCheckTable={isCheckTable}
+                assetTab={assetTab}
+                setAssetTab={setAssetTab}
             />
         </>
     )

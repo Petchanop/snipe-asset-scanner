@@ -9,7 +9,6 @@ export function handleChangePage(
     newPage: number,
     setPage: (number: number) => void
 ) {
-    console.log(newPage);
     setPage(newPage);
 };
 
