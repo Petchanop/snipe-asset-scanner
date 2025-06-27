@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate type": "npx openapi-typescript"
+    "generate-type": "npx openapi-typescript https://snipe-it.readme.io/openapi/683e8e40ec9619001a345ee2 -o snipe-it.schema.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -24,8 +24,10 @@
     "dayjs": "^1.11.13",
     "next": "15.3.3",
     "openapi-fetch": "^0.14.0",
+    "openapi-typescript": "^7.8.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -35,7 +37,6 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
-    "openapi-typescript": "^7.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
