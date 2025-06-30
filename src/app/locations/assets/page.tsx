@@ -1,4 +1,4 @@
-import { mockLocation } from "@/_components/tables/mockData";
+import { mockLocation } from "@/_constants/mockData";
 import NewCountTable from "@/_components/tables/new-count-table";
 
 export default function AssetsTablePage() {

@@ -1,3 +1,5 @@
+import { tableHeaders, tableHeadersAdditional } from "@/_constants/constants";
+import { TAssetRow, TAssetTab } from "@/_types/types";
 import { JSX } from "@emotion/react/jsx-runtime";
 import Checkbox from "@mui/material/Checkbox";
 import TableBody from "@mui/material/TableBody";
@@ -5,79 +7,9 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow"
 
-interface HeadersAssetTable {
-    label: string,
-    isSelectBox: boolean,
-    fontColor: string[]
-}
-
-const tableHeaders: HeadersAssetTable[] = [
-    {
-        label: "Asset code",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Asset Name",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "assigned to",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Count Check",
-        isSelectBox: true,
-        fontColor: ["black"]
-    },
-    {
-        label: "Assign Incorrect",
-        isSelectBox: true,
-        fontColor: ["black"]
-    }
-]
-
-export const tableHeadersAdditional: HeadersAssetTable[] = [
-    {
-        label: "Asset code",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Asset Name",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "assigned to",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Assign Incorrect",
-        isSelectBox: true,
-        fontColor: ["black"]
-    },
-    {
-        label: "Action",
-        isSelectBox: true,
-        fontColor: ["black"]
-    }
-]
-
-export type AssetRow = { 
-    assetCode: string;
-    assetName: string;
-    assignedTo: string;
-    countCheck: boolean;
-    assignIncorrect: boolean;
-};
-
 export function createAssetTableCell(
-    data: AssetRow, 
-    assetTab: boolean, 
+    data: TAssetRow, 
+    assetTab: TAssetTab, 
     action: JSX.Element, 
     actionLabel: string, 
     isCheckTable: boolean
@@ -118,7 +50,7 @@ export function createAssetTableCell(
     )
 }
 
-export default function ListAsset(props: { data: AssetRow[], isCheckTable: boolean, assetTab: boolean }) {
+export default function ListAsset(props: { data: TAssetRow[], isCheckTable: boolean, assetTab: TAssetTab }) {
     const { data, isCheckTable, assetTab } = props
     const headers = assetTab ? tableHeaders : tableHeadersAdditional
     return (
@@ -135,7 +67,7 @@ export default function ListAsset(props: { data: AssetRow[], isCheckTable: boole
             <TableBody sx={{ overflow: 'hidden' }} className="place-content-center">
                 {
                     data.length ?
-                        (data).map((mockData: AssetRow) =>
+                        (data).map((mockData: TAssetRow) =>
                             <TableRow key={mockData.assetCode}>
                                 {createAssetTableCell(mockData, assetTab, <Checkbox disabled={!isCheckTable} />, "[Del]", isCheckTable)}
                             </TableRow>

@@ -1,14 +1,26 @@
 
+export type TSnipeDocument = {
+    date: string;
+    documentNumber: string;
+    location: string;
+    status: string;
+    action: string;
+}
 
-// export function matchingFieldTypeConverter<TSource, TTarget>(
-//     source: TSource,
-//     keys: (keyof TTarget)[]
-// ): TTarget {
-//     const result: Partial<TTarget> = {}
-//   for (const key of keys) {
-//     if (key in source) {
-//       result[key] = source[key]
-//     }
-//   }
-//   return result as TTarget
-// }
+export type locationTableData = {
+    date: string;
+    documentNumber: string;
+    location: string;
+    status: string;
+    action: string;
+}
+
+export type TAssetRow = {
+    assetCode: string;
+    assetName: string;
+    assignedTo: string;
+    countCheck: boolean;
+    assignIncorrect: boolean;
+};
+
+export type TAssetTab = "INLOCATION" | "OUTLOCATION"

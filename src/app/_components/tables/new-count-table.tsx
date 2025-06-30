@@ -6,7 +6,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
 import { handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
-import { mockAssetsByLocation, mockLocationTableData } from "@/_components/tables/mockData";
+import { mockAssetsByLocation, mockLocationTableData } from "@/_constants/mockData";
 import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -17,14 +17,8 @@ import MenuItem from "@mui/material/MenuItem";
 import ListAsset from "@/_components/tables/list-asset";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import { blue } from "@mui/material/colors";
-
-type AssetRow = {
-    assetCode: string;
-    assetName: string;
-    assignedTo: string;
-    countCheck: boolean;
-    assignIncorrect: boolean;
-};
+import { TAssetRow, TAssetTab, TSnipeDocument } from "@/_types/types";
+import { INLOCATION, OUTLOCATION } from "@/_constants/constants";
 
 function CheckAdditionalAssetButton() {
     return (
@@ -101,11 +95,11 @@ function SelectCountInput(props: {
                         format="DD/MM/YYYY"
                         className="lg:w-2/3 w-3/5"
                         slotProps={{ textField: { size: 'small' } }}
-                        onChange={(value) => {
+                        onChange={(value) => 
                             value ?
                                 setDocumentDate(value.format("DD/MM/YYYY").toString())
                                 : null
-                        }}
+                        }
                         disabled={isCheckTable}
                     />
                 </LocalizationProvider>
@@ -129,7 +123,7 @@ function SelectCountInput(props: {
                 >
                     {
                         locations.map((loc) =>
-                            <MenuItem value={loc}>{loc}</MenuItem>
+                            <MenuItem value={loc} key={loc}>{loc}</MenuItem>
                         )
                     }
                 </Select>
@@ -182,7 +176,7 @@ export function NewCountInput(props: {
     setLocation: (value: string) => void
     isCheckTable: boolean,
     setIsCheckTable: (value: SetStateAction<boolean>) => void
-    assetTab: boolean,
+    assetTab: TAssetTab,
 }) {
     const {
         locations,
@@ -196,17 +190,17 @@ export function NewCountInput(props: {
     const [documentDate, setDocumentDate] = useState<string>((new Date()).toDateString())
     const [documentNumber, setDocumentNumber] = useState<string>("")
 
-    function findDocumentNumber(): any[] {
+    function findDocumentNumber() : TSnipeDocument[]  {
         return mockLocationTableData.filter((data) => data.location == selectedLocation && data.date == documentDate)
     }
     useEffect(() => {
         if (selectedLocation && documentDate) {
             const docNumber = findDocumentNumber();
             console.log(docNumber)
-            docNumber.length ?
-                setDocumentNumber(docNumber[0].documentNumber)
-                : null
+           if (docNumber.length)
+                setDocumentNumber((docNumber[0] as TSnipeDocument).documentNumber)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedLocation, documentDate])
     return (
         <div className="flex flex-row w-full py-2 pl-2 lg:pl-10 content-center">
@@ -234,10 +228,10 @@ export function NewCountInput(props: {
 }
 
 function AssetTable(props: {
-    data: AssetRow[],
+    data: TAssetRow[],
     isCheckTable: boolean,
-    assetTab: boolean,
-    setAssetTab: (value: SetStateAction<boolean>) => void
+    assetTab: TAssetTab,
+    setAssetTab: (value: SetStateAction<TAssetTab>) => void
 }) {
     const { data, isCheckTable, assetTab, setAssetTab } = props
     const [page, setPage] = useState<number>(0);
@@ -249,8 +243,8 @@ function AssetTable(props: {
                     borderBottom: 'none',
                     borderBottomLeftRadius: 0,
                 }}
-                    className={!assetTab ? '' : 'bg-blue-200'}
-                    onClick={() => setAssetTab((pre) => !pre)}
+                    className={assetTab === INLOCATION  ? 'bg-blue-200' : ''}
+                    onClick={() => setAssetTab("INLOCATION")}
                 >
                     Asset List in Location
                 </Button>
@@ -258,8 +252,8 @@ function AssetTable(props: {
                     borderBottom: 'none',
                     borderBottomRightRadius: 0
                 }}
-                    className={assetTab ? '' : 'bg-blue-200'}
-                    onClick={() => setAssetTab((pre) => !pre)}
+                    className={assetTab === OUTLOCATION ? 'bg-blue-200': ''}
+                    onClick={() => setAssetTab("OUTLOCATION")}
                 >
                     Additional Asset List in Location
                 </Button>
@@ -304,9 +298,9 @@ export default function NewCountTable(props: {
     locations: string[]
 }) {
     const { locations } = props
-    const [location, setLocation] = useState<string>(locations[0])
+    const [location, setLocation] = useState<string>(locations[0] as string)
     const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
-    const [assetTab, setAssetTab] = useState<boolean>(true);
+    const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
 
     //use effect to fetch data from location change
     useEffect(() => {
@@ -322,7 +316,7 @@ export default function NewCountTable(props: {
                 assetTab={assetTab}
             />
             <AssetTable
-                data={mockAssetsByLocation[location]}
+                data={mockAssetsByLocation[location] as TAssetRow[]}
                 isCheckTable={isCheckTable}
                 assetTab={assetTab}
                 setAssetTab={setAssetTab}

@@ -1,9 +1,10 @@
 'use server'
 
-import { createGateway } from "@/_apis/next.api";
+import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } from "@/_apis/next.api";
 import { TAsset } from "@/_types/snipe-it.type";
 
-export async function fetchSearchAsset(searchInput: string) : Promise<TAsset>{
+type AssetResponse = Exclude<TAsset, TStatusResponse> 
+export async function fetchSearchAsset(searchInput: string) : Promise<TResponse<AssetResponse>>{
     const client = await createGateway();
     const {data, error} = await client.GET("/hardware/bytag/{asset_tag}", {
         params: {
@@ -12,7 +13,9 @@ export async function fetchSearchAsset(searchInput: string) : Promise<TAsset>{
         }
     )
     if (error)
-        return error
-    console.log(data)
-    return data
+        return {data: null , error: error}
+    if (checkIfIsTStatusResponse(data)) {
+        return { data: null , error: data as TStatusResponse}
+    }
+    return { data: data as AssetResponse, error: null }
 }

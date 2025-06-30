@@ -12,7 +12,7 @@ export default function ReportInput(props: {
     setTableName: (v: string) => void,
     setLocation: (v: string) => void
 }) {
-    const { ref, location, setTableName, setLocation } = props
+    const { location } = props
     return (
         <>
             <div className="lg:pl-10 space-y-2 space-x-2">

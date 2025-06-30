@@ -1,3 +1,6 @@
+import { HeadersLocationTable } from "@/_types/interfaces";
+import { TAssetRow } from "@/_types/types";
+
 export const mockLocationTableData = [
   {
     "date": "01/06/2025",
@@ -75,7 +78,7 @@ export const mockLocation = [
   'IT dpt', 'HR office', 'Finance', 'Marketing', 'Legal'
 ]
 
-export const mockAssetsByLocation : Record<string, any> = {
+export const mockAssetsByLocation : Record<string, TAssetRow[]> = {
   'IT dpt': [
     {
       assetCode: "IT001",
@@ -173,3 +176,31 @@ export const mockAssetsByLocation : Record<string, any> = {
     // ...
   ]
 };
+
+export const tableHeaders: HeadersLocationTable[] = [
+    {
+        label: "Date",
+        isSelectBox: false,
+        fontColor: ["black"]
+    },
+    {
+        label: "Document No.",
+        isSelectBox: false,
+        fontColor: ["black"]
+    },
+    {
+        label: "Location",
+        isSelectBox: false,
+        fontColor: ["black"]
+    },
+    {
+        label: "Status",
+        isSelectBox: true,
+        fontColor: ["blue", "yellow", "green", "red"]
+    },
+    {
+        label: "Actions",
+        isSelectBox: true,
+        fontColor: ["black"]
+    }
+]
