@@ -1,0 +1,27 @@
+model AssetCount {
+    id  Int @id @default(autoincrement()) @db.UnsignedInt
+    document_number String  @unique
+    document_date DateTime @default(now())
+    rtd_location_id Int?
+    location_id Int?
+    state   String
+    created_by  Int?
+    created_at DateTime @default(now())
+}
+
+model AssetCountLine {
+    id  Int @id @default(autoincrement()) @db.UnsignedInt
+    count_id AssetCount @relation(fields: [asset_count_id], references: [id])
+    asset_count_id Int @db.UnsignedInt
+    asset_id    Int
+    asset_code String
+    asset_name  String
+    assigned_to   Int?
+    asset_check Boolean
+    checked_by Int?
+    checked_on  DateTime @db.Timestamp(0)
+    is_not_asset_loc Boolean
+    asset_name_not_correct Boolean
+
+    @@index([asset_count_id], map: "asset_count_line_asset_count_id_index")
+}

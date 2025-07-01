@@ -1,0 +1,1019 @@
+generator client {
+  provider               = "prisma-client-js"
+  output                 = "./generated/prisma"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model accessories {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  name            String?
+  category_id     Int?
+  created_by      Int?
+  qty             Int       @default(0)
+  requestable     Boolean   @default(false)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+  deleted_at      DateTime? @db.Timestamp(0)
+  location_id     Int?
+  purchase_date   DateTime? @db.Date
+  purchase_cost   Decimal?  @db.Decimal(20, 2)
+  order_number    String?
+  company_id      Int?      @db.UnsignedInt
+  min_amt         Int?
+  manufacturer_id Int?
+  model_number    String?
+  image           String?
+  supplier_id     Int?
+  notes           String?   @db.Text
+
+  @@index([company_id], map: "accessories_company_id_index")
+}
+
+model accessories_checkout {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  created_by    Int?
+  accessory_id  Int?
+  assigned_to   Int?
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  note          String?
+  assigned_type String?
+}
+
+model action_logs {
+  id               Int       @id @default(autoincrement()) @db.UnsignedInt
+  created_by       Int?
+  action_type      String
+  target_id        Int?
+  target_type      String?
+  location_id      Int?
+  note             String?   @db.Text
+  filename         String?   @db.Text
+  item_type        String
+  item_id          Int
+  expected_checkin DateTime? @db.Date
+  accepted_id      Int?
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+  deleted_at       DateTime? @db.Timestamp(0)
+  thread_id        Int?
+  company_id       Int?
+  accept_signature String?   @db.VarChar(100)
+  log_meta         String?   @db.Text
+  action_date      DateTime? @db.DateTime(0)
+  stored_eula      String?   @db.Text
+  action_source    String?
+  remote_ip        String?   @db.VarChar(45)
+  user_agent       String?
+
+  @@index([action_type], map: "action_logs_action_type_index")
+  @@index([company_id], map: "action_logs_company_id_index")
+  @@index([created_at], map: "action_logs_created_at_index")
+  @@index([item_type, item_id, action_type], map: "action_logs_item_type_item_id_action_type_index")
+  @@index([remote_ip], map: "action_logs_remote_ip_index")
+  @@index([target_type, target_id, action_type], map: "action_logs_target_type_target_id_action_type_index")
+  @@index([target_type, target_id], map: "action_logs_target_type_target_id_index")
+  @@index([thread_id], map: "action_logs_thread_id_index")
+}
+
+model asset_logs {
+  id               Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id          Int?
+  action_type      String
+  asset_id         Int
+  checkedout_to    Int?
+  location_id      Int?
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+  deleted_at       DateTime? @db.Timestamp(0)
+  asset_type       String?   @db.VarChar(100)
+  note             String?   @db.Text
+  filename         String?   @db.Text
+  requested_at     DateTime? @db.DateTime(0)
+  accepted_at      DateTime? @db.DateTime(0)
+  accessory_id     Int?
+  accepted_id      Int?
+  consumable_id    Int?
+  expected_checkin DateTime? @db.Date
+  component_id     Int?
+}
+
+model asset_maintenances {
+  id                     Int       @id @default(autoincrement()) @db.UnsignedInt
+  asset_id               Int       @db.UnsignedInt
+  supplier_id            Int       @db.UnsignedInt
+  asset_maintenance_type String
+  title                  String    @db.VarChar(100)
+  is_warranty            Boolean
+  start_date             DateTime  @db.Date
+  completion_date        DateTime? @db.Date
+  asset_maintenance_time Int?
+  notes                  String?   @db.LongText
+  cost                   Decimal?  @db.Decimal(20, 2)
+  deleted_at             DateTime? @db.DateTime(0)
+  created_at             DateTime? @db.Timestamp(0)
+  updated_at             DateTime? @db.Timestamp(0)
+  created_by             Int?
+}
+
+model asset_uploads {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int?
+  filename   String
+  asset_id   Int
+  filenotes  String?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+}
+
+model assets {
+  id                                                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  name                                                String?
+  asset_tag                                           String?
+  model_id                                            Int?
+  serial                                              String?
+  purchase_date                                       DateTime? @db.Date
+  asset_eol_date                                      DateTime? @db.Date
+  eol_explicit                                        Boolean   @default(false)
+  purchase_cost                                       Decimal?  @db.Decimal(20, 2)
+  order_number                                        String?
+  assigned_to                                         Int?
+  notes                                               String?   @db.Text
+  image                                               String?   @db.Text
+  created_by                                          Int?
+  created_at                                          DateTime? @db.Timestamp(0)
+  updated_at                                          DateTime? @db.Timestamp(0)
+  physical                                            Boolean   @default(true)
+  deleted_at                                          DateTime? @db.Timestamp(0)
+  status_id                                           Int?
+  archived                                            Boolean?  @default(false)
+  warranty_months                                     Int?
+  depreciate                                          Boolean?
+  supplier_id                                         Int?
+  requestable                                         Int       @default(0) @db.TinyInt
+  rtd_location_id                                     Int?
+  snipeit_mac_address_1                               String?   @map("_snipeit_mac_address_1")
+  accepted                                            String?
+  last_checkout                                       DateTime? @db.DateTime(0)
+  last_checkin                                        DateTime? @db.DateTime(0)
+  expected_checkin                                    DateTime? @db.Date
+  company_id                                          Int?      @db.UnsignedInt
+  assigned_type                                       String?
+  last_audit_date                                     DateTime? @db.DateTime(0)
+  next_audit_date                                     DateTime? @db.Date
+  location_id                                         Int?
+  checkin_counter                                     Int       @default(0)
+  checkout_counter                                    Int       @default(0)
+  requests_counter                                    Int       @default(0)
+  byod                                                Boolean?  @default(false)
+  snipeit_ip_address_2                                String?   @map("_snipeit_ip_address_2") @db.Text
+  snipeit_computer_name_3                             String?   @map("_snipeit_computer_name_3") @db.Text
+  snipeit_ram_4                                       String?   @map("_snipeit_ram_4") @db.Text
+  snipeit_hddssd_5                                    String?   @map("_snipeit_hddssd_5") @db.Text
+  snipeit_vga_6                                       String?   @map("_snipeit_vga_6") @db.Text
+  snipeit_cpu_7                                       String?   @map("_snipeit_cpu_7") @db.Text
+  snipeit_display_size_8                              String?   @map("_snipeit_display_size_8") @db.Text
+  snipeit_raid_card_9                                 String?   @map("_snipeit_raid_card_9") @db.Text
+  snipeit_department_10                               String?   @map("_snipeit_department_10") @db.Text
+  snipeit_wifi_mac_address_11                         String?   @map("_snipeit_wifi_mac_address_11") @db.Text
+  snipeit_history_12                                  String?   @map("_snipeit_history_12") @db.Text
+  snipeit_installation_location_13                    String?   @map("_snipeit_installation_location_13") @db.Text
+  snipeit_ative_resolution_14                         String?   @map("_snipeit_ative_resolution_14") @db.Text
+  snipeit_brightness_15                               String?   @map("_snipeit_brightness_15") @db.Text
+  snipeit_contrast_ratio_16                           String?   @map("_snipeit_contrast_ratio_16") @db.Text
+  snipeit_projector_technology_17                     String?   @map("_snipeit_projector_technology_17") @db.Text
+  snipeit_aspect_ratio_18                             String?   @map("_snipeit_aspect_ratio_18") @db.Text
+  snipeit_lamp_life_19                                String?   @map("_snipeit_lamp_life_19") @db.Text
+  snipeit_input_20                                    String?   @map("_snipeit_input_20") @db.Text
+  snipeit_output_21                                   String?   @map("_snipeit_output_21") @db.Text
+  snipeit_size_2                                      String?   @map("_snipeit_size_2") @db.Text
+  snipeit_color_3                                     String?   @map("_snipeit_color_3") @db.Text
+  snipeit_material_4                                  String?   @map("_snipeit_material_4") @db.Text
+  snipeit_department_6                                String?   @map("_snipeit_department_6") @db.Text
+  snipeit_type_car_7                                  String?   @map("_snipeit_type_car_7") @db.Text
+  snipeit_brand_car_8                                 String?   @map("_snipeit_brand_car_8") @db.Text
+  snipeit_generation_9                                String?   @map("_snipeit_generation_9") @db.Text
+  snipeit_a1aaaa0a1asauaaaa_10                        String?   @map("_snipeit_a1aaaa0a1asauaaaa_10") @db.Text
+  snipeit_aa0asasa1aauaaa1oe_11                       String?   @map("_snipeit_aa0asasa1aauaaa1oe_11") @db.Text
+  snipeit_aaaa2aaaua1aaaaaa1a_12                      String?   @map("_snipeit_aaaa2aaaua1aaaaaa1a_12") @db.Text
+  snipeit_aaa0aaaaaa1aa_13                            String?   @map("_snipeit_aaa0aaaaaa1aa_13") @db.Text
+  snipeit_aaa_14                                      String?   @map("_snipeit_aaa_14") @db.Text
+  snipeit_installation_location_15                    String?   @map("_snipeit_installation_location_15") @db.Text
+  snipeit_support_by_36                               String?   @map("_snipeit_support_by_36") @db.Text
+  snipeit_possessioner_37                             String?   @map("_snipeit_possessioner_37") @db.Text
+  snipeit_support_by_1                                String?   @map("_snipeit_support_by_1") @db.Text
+  snipeit_possessor_2                                 String?   @map("_snipeit_possessor_2") @db.Text
+  snipeit_installation_location_3                     String?   @map("_snipeit_installation_location_3") @db.Text
+  snipeit_department_4                                String?   @map("_snipeit_department_4") @db.Text
+  snipeit_type_asset_5                                String?   @map("_snipeit_type_asset_5") @db.Text
+  snipeit_aaa0a1a_aa1aaaa1aa_7                        String?   @map("_snipeit_aaa0a1a_aa1aaaa1aa_7") @db.Text
+  snipeit_aaaa2aaaua1aaaa1aa1asaaaazaa1oeaaaaasa3aa_9 String?   @map("_snipeit_aaaa2aaaua1aaaa1aa1asaaaazaa1oeaaaaasa3aa_9") @db.Text
+
+  @@index([assigned_type, assigned_to], map: "assets_assigned_type_assigned_to_index")
+  @@index([company_id], map: "assets_company_id_index")
+  @@index([created_at], map: "assets_created_at_index")
+  @@index([deleted_at, asset_tag], map: "assets_deleted_at_asset_tag_index")
+  @@index([deleted_at, assigned_type, assigned_to], map: "assets_deleted_at_assigned_type_assigned_to_index")
+  @@index([deleted_at, location_id], map: "assets_deleted_at_location_id_index")
+  @@index([deleted_at, model_id], map: "assets_deleted_at_model_id_index")
+  @@index([deleted_at, name], map: "assets_deleted_at_name_index")
+  @@index([deleted_at, rtd_location_id], map: "assets_deleted_at_rtd_location_id_index")
+  @@index([deleted_at, status_id], map: "assets_deleted_at_status_id_index")
+  @@index([deleted_at, supplier_id], map: "assets_deleted_at_supplier_id_index")
+  @@index([rtd_location_id], map: "assets_rtd_location_id_index")
+  @@index([serial], map: "assets_serial_index")
+}
+
+model categories {
+  id                 Int       @id @default(autoincrement()) @db.UnsignedInt
+  name               String
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+  created_by         Int?
+  deleted_at         DateTime? @db.Timestamp(0)
+  eula_text          String?   @db.LongText
+  use_default_eula   Boolean   @default(false)
+  require_acceptance Boolean   @default(false)
+  category_type      String?   @default("asset")
+  checkin_email      Boolean   @default(false)
+  image              String?
+  notes              String?   @db.Text
+}
+
+model checkout_acceptances {
+  id                 Int       @id @default(autoincrement()) @db.UnsignedInt
+  checkoutable_type  String
+  checkoutable_id    BigInt    @db.UnsignedBigInt
+  assigned_to_id     Int?
+  signature_filename String?
+  note               String?   @db.Text
+  accepted_at        DateTime? @db.Timestamp(0)
+  declined_at        DateTime? @db.Timestamp(0)
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+  deleted_at         DateTime? @db.Timestamp(0)
+  stored_eula        String?   @db.Text
+  stored_eula_file   String?
+
+  @@index([checkoutable_type, checkoutable_id], map: "checkout_acceptances_checkoutable_type_checkoutable_id_index")
+}
+
+model checkout_requests {
+  id               Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id          Int
+  requestable_id   Int
+  requestable_type String
+  quantity         Int       @default(1)
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+  canceled_at      DateTime? @db.DateTime(0)
+  fulfilled_at     DateTime? @db.DateTime(0)
+  deleted_at       DateTime? @db.DateTime(0)
+
+  @@index([user_id, requestable_id, requestable_type], map: "checkout_requests_user_id_requestable_id_requestable_type")
+}
+
+model companies {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String    @unique(map: "companies_name_unique")
+  fax        String?   @db.VarChar(20)
+  email      String?   @db.VarChar(150)
+  phone      String?   @db.VarChar(20)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  image      String?
+  created_by BigInt?   @db.UnsignedBigInt
+  notes      String?   @db.Text
+}
+
+model components {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  name            String?
+  category_id     Int?
+  location_id     Int?
+  company_id      Int?
+  created_by      Int?
+  supplier_id     Int?
+  qty             Int       @default(1)
+  order_number    String?
+  purchase_date   DateTime? @db.Date
+  purchase_cost   Decimal?  @db.Decimal(20, 2)
+  model_number    String?
+  manufacturer_id Int?
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+  deleted_at      DateTime? @db.Timestamp(0)
+  min_amt         Int?
+  serial          String?
+  image           String?
+  notes           String?   @db.Text
+
+  @@index([company_id], map: "components_company_id_index")
+}
+
+model components_assets {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  created_by   Int?
+  assigned_qty Int?      @default(1)
+  component_id Int?
+  asset_id     Int?
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+  note         String?   @db.Text
+}
+
+model consumables {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  name            String?
+  category_id     Int?
+  location_id     Int?
+  created_by      Int?
+  supplier_id     Int?
+  qty             Int       @default(0)
+  requestable     Boolean   @default(false)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+  deleted_at      DateTime? @db.Timestamp(0)
+  purchase_date   DateTime? @db.Date
+  purchase_cost   Decimal?  @db.Decimal(20, 2)
+  order_number    String?
+  company_id      Int?      @db.UnsignedInt
+  min_amt         Int?
+  model_number    String?
+  manufacturer_id Int?
+  item_no         String?
+  image           String?
+  notes           String?   @db.Text
+
+  @@index([company_id], map: "consumables_company_id_index")
+}
+
+model consumables_users {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  created_by    Int?
+  consumable_id Int?
+  assigned_to   Int?
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  note          String?   @db.Text
+}
+
+model custom_field_custom_fieldset {
+  id                 BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  custom_field_id    Int
+  custom_fieldset_id Int
+  order              Int
+  required           Boolean
+}
+
+model custom_fields {
+  id                       Int       @id @default(autoincrement()) @db.UnsignedInt
+  name                     String
+  format                   String
+  element                  String
+  created_at               DateTime? @db.Timestamp(0)
+  updated_at               DateTime? @db.Timestamp(0)
+  created_by               Int?
+  field_values             String?   @db.Text
+  field_encrypted          Boolean   @default(false)
+  db_column                String?
+  help_text                String?   @db.Text
+  show_in_email            Boolean   @default(false)
+  show_in_requestable_list Boolean?  @default(false)
+  is_unique                Boolean?  @default(false)
+  display_in_user_view     Boolean?  @default(false)
+  auto_add_to_fieldsets    Boolean?  @default(false)
+  show_in_listview         Boolean?  @default(false)
+  display_checkin          Boolean   @default(false)
+  display_checkout         Boolean   @default(false)
+  display_audit            Boolean   @default(false)
+}
+
+model custom_fieldsets {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  created_by Int?
+}
+
+model departments {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String
+  fax         String?   @db.VarChar(20)
+  phone       String?   @db.VarChar(20)
+  created_by  Int
+  company_id  Int?
+  location_id Int?
+  manager_id  Int?
+  notes       String?
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+  image       String?
+
+  @@index([company_id], map: "departments_company_id_index")
+}
+
+model depreciations {
+  id                Int       @id @default(autoincrement()) @db.UnsignedInt
+  name              String
+  months            Int
+  depreciation_min  Decimal?  @db.Decimal(8, 2)
+  depreciation_type String    @default("amount")
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+  created_by        Int?
+}
+
+model imports {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String?
+  file_path   String
+  filesize    Int
+  import_type String?
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  header_row  String?   @db.Text
+  first_row   String?   @db.Text
+  field_map   String?   @db.Text
+  created_by  BigInt?   @db.UnsignedBigInt
+}
+
+model kits {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  created_by BigInt?   @db.UnsignedBigInt
+}
+
+model kits_accessories {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  kit_id       Int?
+  accessory_id Int?
+  quantity     Int       @default(1)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+  created_by   BigInt?   @db.UnsignedBigInt
+}
+
+model kits_consumables {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  kit_id        Int?
+  consumable_id Int?
+  quantity      Int       @default(1)
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  created_by    BigInt?   @db.UnsignedBigInt
+}
+
+model kits_licenses {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  kit_id     Int?
+  license_id Int?
+  quantity   Int       @default(1)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  created_by BigInt?   @db.UnsignedBigInt
+}
+
+model kits_models {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  kit_id     Int?
+  model_id   Int?
+  quantity   Int       @default(1)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  created_by BigInt?   @db.UnsignedBigInt
+}
+
+model license_seats {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  license_id  Int?
+  assigned_to Int?
+  notes       String?   @db.Text
+  created_by  Int?
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  deleted_at  DateTime? @db.Timestamp(0)
+  asset_id    Int?
+
+  @@index([asset_id, license_id], map: "license_seats_asset_id_license_id_index")
+  @@index([assigned_to, license_id], map: "license_seats_assigned_to_license_id_index")
+  @@index([license_id], map: "license_seats_license_id_index")
+}
+
+model licenses {
+  id               Int       @id @default(autoincrement()) @db.UnsignedInt
+  name             String?
+  serial           String?   @db.Text
+  purchase_date    DateTime? @db.Date
+  purchase_cost    Decimal?  @db.Decimal(20, 2)
+  order_number     String?   @db.VarChar(50)
+  seats            Int       @default(1)
+  notes            String?   @db.Text
+  created_by       Int?
+  depreciation_id  Int?
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+  deleted_at       DateTime? @db.Timestamp(0)
+  license_name     String?   @db.VarChar(120)
+  license_email    String?
+  depreciate       Boolean?
+  supplier_id      Int?
+  expiration_date  DateTime? @db.Date
+  purchase_order   String?
+  termination_date DateTime? @db.Date
+  maintained       Boolean?
+  reassignable     Boolean   @default(true)
+  company_id       Int?      @db.UnsignedInt
+  manufacturer_id  Int?
+  category_id      Int?
+  min_amt          Int?
+
+  @@index([company_id], map: "licenses_company_id_index")
+}
+
+model locations {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String?
+  city       String?
+  state      String?
+  country    String?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  created_by Int?
+  address    String?
+  address2   String?
+  zip        String?   @db.VarChar(10)
+  fax        String?   @db.VarChar(20)
+  phone      String?   @db.VarChar(20)
+  deleted_at DateTime? @db.Timestamp(0)
+  parent_id  Int?
+  currency   String?   @db.VarChar(10)
+  ldap_ou    String?
+  manager_id Int?
+  image      String?
+  company_id Int?      @db.UnsignedInt
+  notes      String?   @db.Text
+
+  @@index([company_id], map: "locations_company_id_index")
+  @@index([manager_id, deleted_at], map: "locations_manager_id_deleted_at_index")
+  @@index([parent_id], map: "locations_parent_id_index")
+}
+
+model login_attempts {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  username   String?
+  remote_ip  String?   @db.VarChar(45)
+  user_agent String?
+  successful Boolean?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model manufacturers {
+  id                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  name                String
+  created_at          DateTime? @db.Timestamp(0)
+  updated_at          DateTime? @db.Timestamp(0)
+  created_by          Int?
+  deleted_at          DateTime? @db.Timestamp(0)
+  url                 String?
+  support_url         String?
+  warranty_lookup_url String?
+  support_phone       String?
+  support_email       String?
+  image               String?
+  notes               String?   @db.Text
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String
+  batch     Int
+}
+
+model models {
+  id                     Int       @id @default(autoincrement()) @db.UnsignedInt
+  name                   String
+  model_number           String?
+  min_amt                Int?
+  manufacturer_id        Int?
+  category_id            Int?
+  created_at             DateTime? @db.Timestamp(0)
+  updated_at             DateTime? @db.Timestamp(0)
+  depreciation_id        Int?
+  created_by             Int?
+  eol                    Int?
+  image                  String?
+  deprecated_mac_address Boolean   @default(false)
+  deleted_at             DateTime? @db.Timestamp(0)
+  fieldset_id            Int?
+  notes                  String?   @db.Text
+  requestable            Int       @default(0) @db.TinyInt
+}
+
+model models_custom_fields {
+  id              Int     @id @default(autoincrement()) @db.UnsignedInt
+  asset_model_id  Int
+  custom_field_id Int
+  default_value   String? @db.Text
+}
+
+model oauth_access_tokens {
+  id         String    @id @db.VarChar(100)
+  user_id    BigInt?   @db.UnsignedBigInt
+  client_id  BigInt    @db.UnsignedBigInt
+  name       String?
+  scopes     String?   @db.Text
+  revoked    Boolean
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  expires_at DateTime? @db.DateTime(0)
+
+  @@index([user_id], map: "oauth_access_tokens_user_id_index")
+}
+
+model oauth_auth_codes {
+  id         String    @id @db.VarChar(100)
+  user_id    BigInt    @db.UnsignedBigInt
+  client_id  BigInt    @db.UnsignedBigInt
+  scopes     String?   @db.Text
+  revoked    Boolean
+  expires_at DateTime? @db.DateTime(0)
+
+  @@index([user_id], map: "oauth_auth_codes_user_id_index")
+}
+
+model oauth_clients {
+  id                     BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id                BigInt?   @db.UnsignedBigInt
+  name                   String
+  secret                 String?   @db.VarChar(100)
+  provider               String?
+  redirect               String    @db.Text
+  personal_access_client Boolean
+  password_client        Boolean
+  revoked                Boolean
+  created_at             DateTime? @db.Timestamp(0)
+  updated_at             DateTime? @db.Timestamp(0)
+
+  @@index([user_id], map: "oauth_clients_user_id_index")
+}
+
+model oauth_personal_access_clients {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  client_id  BigInt    @db.UnsignedBigInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model oauth_refresh_tokens {
+  id              String    @id @db.VarChar(100)
+  access_token_id String    @db.VarChar(100)
+  revoked         Boolean
+  expires_at      DateTime? @db.DateTime(0)
+}
+
+model password_resets {
+  email      String
+  token      String
+  created_at DateTime @db.Timestamp(0)
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+
+  @@index([email], map: "password_resets_email_index")
+  @@index([token], map: "password_resets_token_index")
+}
+
+model permission_groups {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String
+  permissions String?   @db.Text
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  created_by  Int?
+  notes       String?   @db.Text
+}
+
+model report_templates {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  created_by Int?
+  name       String
+  options    String    @db.Text
+  deleted_at DateTime? @db.Timestamp(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([created_by], map: "report_templates_created_by_index")
+}
+
+model requested_assets {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  asset_id    Int
+  user_id     Int
+  accepted_at DateTime? @db.DateTime(0)
+  denied_at   DateTime? @db.DateTime(0)
+  notes       String
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model requests {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  asset_id     Int
+  user_id      Int?
+  request_code String    @db.Text
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+  deleted_at   DateTime? @db.Timestamp(0)
+}
+
+model saml_nonces {
+  id              BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  nonce           String
+  not_valid_after DateTime @db.DateTime(0)
+
+  @@index([nonce], map: "saml_nonces_nonce_index")
+  @@index([not_valid_after], map: "saml_nonces_not_valid_after_index")
+}
+
+model settings {
+  id                                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  created_at                          DateTime? @db.Timestamp(0)
+  updated_at                          DateTime? @db.Timestamp(0)
+  created_by                          Int?
+  per_page                            Int       @default(20)
+  site_name                           String    @default("Snipe IT Asset Management") @db.VarChar(100)
+  qr_code                             Int?
+  qr_text                             String?   @db.VarChar(32)
+  display_asset_name                  Int?
+  display_checkout_date               Int?
+  display_eol                         Int?
+  auto_increment_assets               Int       @default(0)
+  auto_increment_prefix               String?
+  load_remote                         Boolean   @default(true)
+  logo                                String?
+  header_color                        String?
+  alert_email                         String?
+  alerts_enabled                      Boolean   @default(true)
+  default_eula_text                   String?   @db.LongText
+  webhook_endpoint                    String?   @db.Text
+  webhook_channel                     String?
+  webhook_botname                     String?
+  webhook_selected                    String?   @default("slack")
+  default_currency                    String?   @db.VarChar(10)
+  custom_css                          String?   @db.Text
+  brand                               Int       @default(1) @db.TinyInt
+  ldap_enabled                        String?
+  ldap_server                         String?
+  ldap_uname                          String?
+  ldap_pword                          String?   @db.LongText
+  ldap_basedn                         String?
+  ldap_default_group                  String?
+  ldap_filter                         String?   @db.Text
+  ldap_username_field                 String?   @default("samaccountname")
+  ldap_lname_field                    String?   @default("sn")
+  ldap_fname_field                    String?   @default("givenname")
+  ldap_auth_filter_query              String?   @default("uid=")
+  ldap_version                        Int?      @default(3)
+  ldap_active_flag                    String?
+  ldap_dept                           String?
+  ldap_emp_num                        String?
+  ldap_email                          String?
+  ldap_phone_field                    String?
+  ldap_jobtitle                       String?
+  ldap_manager                        String?
+  ldap_country                        String?
+  ldap_location                       String?
+  full_multiple_companies_support     Boolean   @default(false)
+  scope_locations_fmcs                Boolean   @default(false)
+  ldap_server_cert_ignore             Boolean   @default(false)
+  locale                              String?   @default("en-US") @db.VarChar(10)
+  labels_per_page                     Int       @default(30) @db.TinyInt
+  labels_width                        Decimal   @default(2.62500) @db.Decimal(6, 5)
+  labels_height                       Decimal   @default(1.00000) @db.Decimal(6, 5)
+  labels_pmargin_left                 Decimal   @default(0.21975) @db.Decimal(6, 5)
+  labels_pmargin_right                Decimal   @default(0.21975) @db.Decimal(6, 5)
+  labels_pmargin_top                  Decimal   @default(0.50000) @db.Decimal(6, 5)
+  labels_pmargin_bottom               Decimal   @default(0.50000) @db.Decimal(6, 5)
+  labels_display_bgutter              Decimal   @default(0.07000) @db.Decimal(6, 5)
+  labels_display_sgutter              Decimal   @default(0.05000) @db.Decimal(6, 5)
+  labels_fontsize                     Int       @default(9) @db.TinyInt
+  labels_pagewidth                    Decimal   @default(8.50000) @db.Decimal(7, 5)
+  labels_pageheight                   Decimal   @default(11.00000) @db.Decimal(7, 5)
+  labels_display_name                 Int       @default(0) @db.TinyInt
+  labels_display_serial               Int       @default(1) @db.TinyInt
+  labels_display_tag                  Int       @default(1) @db.TinyInt
+  alt_barcode_enabled                 Boolean?  @default(true)
+  alert_interval                      Int?      @default(30)
+  alert_threshold                     Int?      @default(5)
+  name_display_format                 String?   @default("first_last") @db.VarChar(10)
+  email_domain                        String?
+  email_format                        String?   @default("filastname")
+  username_format                     String?   @default("filastname")
+  is_ad                               Boolean   @default(false)
+  ad_domain                           String?
+  ldap_port                           String    @default("389") @db.VarChar(5)
+  ldap_tls                            Boolean   @default(false)
+  zerofill_count                      Int       @default(5)
+  ldap_pw_sync                        Boolean   @default(true)
+  two_factor_enabled                  Int?      @db.TinyInt
+  require_accept_signature            Boolean   @default(false)
+  date_display_format                 String    @default("Y-m-d")
+  time_display_format                 String    @default("h:i A")
+  next_auto_tag_base                  BigInt    @default(1)
+  login_note                          String?   @db.Text
+  thumbnail_max_h                     Int?      @default(50)
+  pwd_secure_uncommon                 Boolean   @default(false)
+  pwd_secure_complexity               String?
+  pwd_secure_min                      Int       @default(8)
+  audit_interval                      Int?
+  audit_warning_days                  Int?
+  show_url_in_emails                  Boolean   @default(false)
+  custom_forgot_pass_url              String?
+  show_alerts_in_menu                 Boolean   @default(true)
+  labels_display_company_name         Boolean   @default(false)
+  show_archived_in_list               Boolean   @default(false)
+  dashboard_message                   String?   @db.Text
+  support_footer                      String?   @default("on") @db.Char(5)
+  footer_text                         String?   @db.Text
+  modellist_displays                  String?   @default("image,category,manufacturer,model_number") @db.Char(191)
+  login_remote_user_enabled           Boolean   @default(false)
+  login_common_disabled               Boolean   @default(false)
+  login_remote_user_custom_logout_url String    @default("")
+  skin                                String?   @db.Char(191)
+  show_images_in_email                Boolean   @default(true)
+  admin_cc_email                      String?   @db.Char(191)
+  labels_display_model                Boolean   @default(false)
+  privacy_policy_link                 String?   @db.Char(191)
+  version_footer                      String?   @default("on") @db.Char(5)
+  unique_serial                       Boolean   @default(false)
+  logo_print_assets                   Boolean   @default(false)
+  depreciation_method                 String?   @default("default") @db.Char(10)
+  favicon                             String?   @db.Char(191)
+  default_avatar                      String?   @default("default.png")
+  email_logo                          String?   @db.Char(191)
+  label_logo                          String?   @db.Char(191)
+  acceptance_pdf_logo                 String?   @db.Char(191)
+  allow_user_skin                     Boolean   @default(false)
+  show_assigned_assets                Boolean   @default(false)
+  login_remote_user_header_name       String    @default("")
+  ad_append_domain                    Boolean   @default(false)
+  saml_enabled                        Boolean   @default(false)
+  saml_idp_metadata                   String?   @db.MediumText
+  saml_attr_mapping_username          String?
+  saml_forcelogin                     Boolean   @default(false)
+  saml_slo                            Boolean   @default(false)
+  saml_sp_x509cert                    String?   @db.Text
+  saml_sp_privatekey                  String?   @db.Text
+  saml_custom_settings                String?   @db.Text
+  saml_sp_x509certNew                 String?   @db.Text
+  digit_separator                     String?   @default("1,234.56") @db.Char(191)
+  ldap_client_tls_cert                String?   @db.Text
+  ldap_client_tls_key                 String?   @db.Text
+  dash_chart_type                     String?   @default("name")
+  label2_enable                       Boolean   @default(false)
+  label2_template                     String?   @default("DefaultLabel")
+  label2_title                        String?
+  label2_asset_logo                   Boolean   @default(false)
+  label2_1d_type                      String    @default("C128")
+  label2_2d_type                      String    @default("QRCODE")
+  label2_2d_target                    String    @default("hardware_id")
+  label2_fields                       String    @default("name=name;serial=serial;model=model.name;")
+  label2_empty_row_count              Int       @default(0) @db.UnsignedInt
+  google_login                        Boolean?  @default(false)
+  google_client_id                    String?
+  google_client_secret                String?
+  profile_edit                        Boolean?  @default(true)
+  require_checkinout_notes            Boolean?  @default(false)
+  shortcuts_enabled                   Boolean   @default(false)
+  due_checkin_days                    Int?
+  ldap_invert_active_flag             Boolean   @default(false)
+}
+
+model status_labels {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  name          String?   @db.VarChar(100)
+  created_by    Int?
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+  deleted_at    DateTime? @db.Timestamp(0)
+  deployable    Boolean   @default(false)
+  pending       Boolean   @default(false)
+  archived      Boolean   @default(false)
+  notes         String?   @db.Text
+  color         String?   @db.VarChar(10)
+  show_in_nav   Boolean?  @default(false)
+  default_label Boolean?  @default(false)
+}
+
+model suppliers {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String
+  address    String?   @db.VarChar(250)
+  address2   String?   @db.VarChar(250)
+  city       String?
+  state      String?
+  country    String?   @db.VarChar(2)
+  phone      String?   @db.VarChar(35)
+  fax        String?   @db.VarChar(35)
+  email      String?   @db.VarChar(150)
+  contact    String?   @db.VarChar(100)
+  notes      String?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  created_by Int?
+  deleted_at DateTime? @db.Timestamp(0)
+  zip        String?   @db.VarChar(10)
+  url        String?   @db.VarChar(250)
+  image      String?
+}
+
+model throttle {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id         Int?      @db.UnsignedInt
+  ip_address      String?
+  attempts        Int       @default(0)
+  suspended       Boolean   @default(false)
+  banned          Boolean   @default(false)
+  last_attempt_at DateTime? @db.Timestamp(0)
+  suspended_at    DateTime? @db.Timestamp(0)
+  banned_at       DateTime? @db.Timestamp(0)
+
+  @@index([user_id], map: "throttle_user_id_index")
+}
+
+model users {
+  id                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  email               String?
+  password            String
+  permissions         String?   @db.Text
+  activated           Boolean   @default(false)
+  created_by          Int?
+  activation_code     String?
+  activated_at        DateTime? @db.Timestamp(0)
+  last_login          DateTime? @db.Timestamp(0)
+  persist_code        String?
+  reset_password_code String?
+  first_name          String?
+  last_name           String?
+  created_at          DateTime? @db.Timestamp(0)
+  updated_at          DateTime? @db.Timestamp(0)
+  deleted_at          DateTime? @db.Timestamp(0)
+  website             String?
+  country             String?
+  gravatar            String?
+  location_id         Int?
+  phone               String?
+  jobtitle            String?
+  manager_id          Int?
+  employee_num        String?   @db.Text
+  avatar              String?
+  username            String?
+  notes               String?   @db.Text
+  company_id          Int?      @db.UnsignedInt
+  remember_token      String?   @db.Text
+  ldap_import         Boolean   @default(false)
+  locale              String?   @default("en-US") @db.VarChar(10)
+  show_in_list        Boolean   @default(true)
+  two_factor_secret   String?   @db.VarChar(32)
+  two_factor_enrolled Boolean   @default(false)
+  two_factor_optin    Boolean   @default(false)
+  department_id       Int?
+  address             String?
+  city                String?
+  state               String?
+  zip                 String?   @db.VarChar(10)
+  skin                String?
+  remote              Boolean?  @default(false)
+  start_date          DateTime? @db.Date
+  end_date            DateTime? @db.Date
+  scim_externalid     String?
+  autoassign_licenses Boolean   @default(true)
+  vip                 Boolean?  @default(false)
+  enable_sounds       Boolean   @default(false)
+  enable_confetti     Boolean   @default(false)
+
+  @@index([activation_code], map: "users_activation_code_index")
+  @@index([company_id], map: "users_company_id_index")
+  @@index([manager_id, deleted_at], map: "users_manager_id_deleted_at_index")
+  @@index([reset_password_code], map: "users_reset_password_code_index")
+  @@index([username, deleted_at], map: "users_username_deleted_at_index")
+}
+
+model users_groups {
+  user_id    Int     @db.UnsignedInt
+  group_id   Int     @db.UnsignedInt
+  created_by BigInt? @db.UnsignedBigInt
+
+  @@id([user_id, group_id])
+}

@@ -20,6 +20,7 @@
     "@mui/material-nextjs": "^7.1.1",
     "@mui/x-date-pickers": "^8.5.3",
     "@next/env": "^15.3.4",
+    "@prisma/client": "^6.10.1",
     "@yudiel/react-qr-scanner": "^2.3.1",
     "dayjs": "^1.11.13",
     "next": "15.3.3",
