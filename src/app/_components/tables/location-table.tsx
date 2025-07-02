@@ -1,6 +1,6 @@
 'use client'
 import { mockLocationTableData } from "@/_constants/mockData";
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
@@ -9,11 +9,14 @@ import TablePagination from "@mui/material/TablePagination";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
 import Button from "@mui/material/Button";
-import { Typography } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { MapActionColor, MapColor } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
+import { TLocation } from "@/_types/snipe-it.type";
 
 function createLocationTableCell(data: locationTableData) {
     const { date, documentNumber, location, status, action } = data;
@@ -47,12 +50,78 @@ function createLocationTableCell(data: locationTableData) {
     )
 }
 
-export default function LocationTable() {
+function ChildrenSelectComponent(props: {
+    parent: TLocation,
+    locationByParent: TLocation[]
+}) {
+    const { parent, locationByParent } = props
+    const [childLocation, setChildLocation] = useState("")
+    const [childrenLocation, setChildrenLocatoin] = useState<TLocation[]>([])
+
+    useEffect(() => {
+        const childrenLocation = locationByParent.filter((loc) =>
+            // @ts-expect-error cause it not wrong type the object has => id in parent properties
+            loc.parent.id === parent.id
+        )
+        const setDefaultValue = () => {
+            const defaultValue = childrenLocation.length ? childrenLocation[0]!.name : "";
+            console.log(childrenLocation[0])
+            setChildLocation(defaultValue as string)
+        }
+        setDefaultValue();
+        setChildrenLocatoin(childrenLocation)
+
+        //fetch report by child location later
+    }, [locationByParent, parent])
+    return (
+        <>
+            <TextField
+                select
+                label="sub location"
+                value={childLocation}
+                className="mt-3 p-4"
+                onChange={(event) => setChildLocation(event?.target.value)}
+            >
+                {
+                    childrenLocation.map((loc) =>
+                        <MenuItem value={loc.name as unknown as string} key={loc.id}><div dangerouslySetInnerHTML={{__html: loc.name!}}></div></MenuItem>
+                    )
+                }
+            </TextField>
+        </>
+    )
+}
+
+function ParentSelectComponent(props: { parentLocation: TLocation[], setParent: (location: TLocation) => void }) {
+    const { parentLocation, setParent } = props
+    return (
+        <TextField
+            select
+            label="location"
+            defaultValue={parentLocation[0]?.name ? parentLocation[0]?.name : ""}
+            className="mt-3 p-4"
+            onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+                setParent(parentLocation.find((loc) => loc.name == event.target.value)!)}
+        >
+            {
+                parentLocation.map((loc) =>
+                    <MenuItem value={loc.name} key={loc.id}>{loc.name}</MenuItem>
+                )
+            }
+        </TextField>
+    )
+}
+
+export default function LocationTable(props: { parentLocation: TLocation[], childrenLocation: TLocation[] }) {
+    const { parentLocation, childrenLocation } = props
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+    const [parent, setParent] = useState(parentLocation[0])
 
     return (
         <>
+            <ParentSelectComponent parentLocation={parentLocation} setParent={setParent} />
+            <ChildrenSelectComponent parent={parent!} locationByParent={childrenLocation} />
             <Table stickyHeader size="small">
                 <TableHead>
                     <TableRow>

@@ -7,6 +7,8 @@ model AssetCount {
     state   String
     created_by  Int?
     created_at DateTime @default(now())
+
+    AssetCountLine AssetCountLine[]
 }
 
 model AssetCountLine {

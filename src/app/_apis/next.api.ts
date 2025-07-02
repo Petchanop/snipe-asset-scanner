@@ -11,7 +11,7 @@ export type TResponse<T> = { data : T, error: null } | { data: null, error: TSta
 
 export function checkIfIsTStatusResponse(data: unknown): data is TStatusResponse {
     return typeof data === 'object' &&
-        data != null && 
+        data != null &&
         ('status' in data) && ('messages' in data)
 }
 

@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/app/*", "./prisma/*"]
+      "@/*": ["./src/app/*"],
+      "@/prisma/*": ["./prisma/*"]
     },
     "noUncheckedIndexedAccess": true
   },
