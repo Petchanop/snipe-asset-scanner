@@ -15,10 +15,16 @@ export type locationTableData = {
     action: string;
 }
 
+export type assetUser = {
+    id: number;
+    first_name: string;
+    last_name: string;
+}
+
 export type TAssetRow = {
     assetCode: string;
     assetName: string;
-    assignedTo: string;
+    assignedTo: assetUser;
     countCheck: boolean;
     assignIncorrect: boolean;
 };

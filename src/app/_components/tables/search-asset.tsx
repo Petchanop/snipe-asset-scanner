@@ -26,7 +26,7 @@ function createSearchAssetTableCell(data: TAssetRow, action: JSX.Element,
                 {assetName}
             </TableCell>
             <TableCell>
-                {assignedTo}
+                {assignedTo.first_name} {assignedTo.last_name}
             </TableCell>
             <TableCell className="place-content-center">
                 {assignIncorrect}
@@ -83,7 +83,11 @@ export default function SearchAsset() {
                 const asset:TAssetRow = {
                     assetCode: data.asset_tag as string,
                     assetName: data.name as string,
-                    assignedTo: data.assigned_to?.name as string,
+                    assignedTo: {
+                        id: data.assigned_to?.id as unknown as number,
+                        first_name: data.assigned_to?.first_name as unknown as string,
+                        last_name: data.assigned_to?.last_name as unknown as string
+                    },
                     countCheck: false,
                     assignIncorrect: false,
                 }

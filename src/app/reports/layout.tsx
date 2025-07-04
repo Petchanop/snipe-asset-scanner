@@ -21,6 +21,7 @@ export default function TableLayout({
     const [selected, setSelected] = useState<string>(pathname)
     const locationUrl = useRef(0)
     const router = useRouter();
+    console.log("report page : ", pathname, location)
 
     useEffect(() => {
         router.push(`${selected}`)

@@ -1,7 +1,7 @@
 generator client {
   provider               = "prisma-client-js"
   output                 = "../generated/prisma"
-  previewFeatures        = ["driverAdapters", "multiSchema"]
+  previewFeatures        = ["driverAdapters", "multiSchema", "relationJoins"]
   generatedFileExtension = "ts"
   importFileExtension    = "ts"
 }

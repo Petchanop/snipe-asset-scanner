@@ -71,11 +71,10 @@ function ChildrenSelectComponent(props: {
         setChildId(locationByName.id)
         setChildLocation(target.value)
         context.current = locationByName.id
-        replace(`${pathname}?id=${context.current}`)
+        replace(`${pathname}?location=${context.current}`)
     }
 
     const childrenLocationChange = useMemo(() => { 
-        console.log("child location change")
         return locationByParent.filter((loc) =>
         // @ts-expect-error cause it not wrong type the object has => id in parent properties
         loc.parent.id === parent.id
@@ -86,10 +85,8 @@ function ChildrenSelectComponent(props: {
         const setDefaultValue = () => {
             const defaultValue = childrenLocationChange.length ? childrenLocationChange[0]!.name : "";
             context.current = childrenLocationChange[0]?.id as unknown as number
-            console.log("location rerender")
             setChildLocation(defaultValue as string)
         }
-        console.log("set Children location")
         setChildrenLocation(childrenLocationChange)
         setDefaultValue();
 

@@ -28,7 +28,6 @@ export default function TableLayout({
     const [ locationId, setLocationId ] = useState(parseInt(location?.toString()!))
     const router = useRouter();
 
-
     function handleOnChange(event: SyntheticEvent, newValue: string) {
         setSelected(newValue)
     }
@@ -57,7 +56,7 @@ export default function TableLayout({
                     className="pl-2"
                     onChange={handleOnChange}
                     >
-                    <Tab value="/reports" label="reports">
+                    <Tab value={`/reports?location=${locationId}`} label="reports">
                     </Tab>
                     <Tab value={`/locations/${locationId}/assets`} label="new count"></Tab>
                     <Tab value="/locations/search" label="search"></Tab>

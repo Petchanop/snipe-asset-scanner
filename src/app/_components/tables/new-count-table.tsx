@@ -4,7 +4,7 @@ import Table from "@mui/material/Table";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect , useState } from "react";
 import { handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { mockLocationTableData } from "@/_constants/mockData";
 import Typography from "@mui/material/Typography";
@@ -17,16 +17,11 @@ import MenuItem from "@mui/material/MenuItem";
 import ListAsset from "@/_components/tables/list-asset";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import { blue } from "@mui/material/colors";
-import { Asset, TAssetRow, TAssetTab, TSnipeDocument } from "@/_types/types";
+import { TAssetRow, TAssetTab, TSnipeDocument } from "@/_types/types";
 import { INLOCATION, OUTLOCATION } from "@/_constants/constants";
-import { getAssetsByLocation } from "@/_apis/report.api";
-import { getUserById } from "@/_apis/snipe-it/snipe-it.api";
+import { getAssetByLocationCount, getAssetsByLocation, getUserByIdPrisma } from "@/_apis/report.api";
 import dayjs, { Dayjs } from "dayjs";
 import { useLocationUrlContext } from "@/locations/layout";
-import { Router } from "next/router";
-import { useRouter } from "next/navigation";
-import { replaceInvalidDateByNull } from "@mui/x-date-pickers/internals";
-import { log } from "console";
 
 function CheckAdditionalAssetButton() {
     return (
@@ -142,15 +137,15 @@ function SelectCountInput(props: {
                     {
                         locations.map((loc) =>
                             <MenuItem value={loc.name as unknown as string} key={loc.id}>
-                                <div dangerouslySetInnerHTML={{ __html: loc.name! }} 
-                                    data-key={loc.id} 
+                                <div dangerouslySetInnerHTML={{ __html: loc.name! }}
+                                    data-key={loc.id}
                                     data-value={loc.name}
                                     onClick={(event) => {
                                         const target = event.target as HTMLElement
                                         context.setLocationUrl(parseInt(target.dataset.key as string))
                                         setSelectedLocation(target.dataset.value as string)
                                         context.setSelected(`/locations/${target.dataset.key}/assets`)
-                                        
+
                                     }}
                                 ></div>
                             </MenuItem>
@@ -261,10 +256,23 @@ function AssetTable(props: {
     isCheckTable: boolean,
     assetTab: TAssetTab,
     setAssetTab: (value: SetStateAction<TAssetTab>) => void
+    page: number,
+    setPage: Dispatch<SetStateAction<number>>,
+    rowsPerPage: number,
+    setRowsPerPage: Dispatch<SetStateAction<number>>
+    dataLength: number,
 }) {
-    const { data, isCheckTable, assetTab, setAssetTab } = props
-    const [page, setPage] = useState<number>(0);
-    const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+    const {
+        data,
+        isCheckTable,
+        assetTab,
+        setAssetTab,
+        page,
+        setPage,
+        rowsPerPage,
+        setRowsPerPage,
+        dataLength
+    } = props
     return (
         <>
             <ButtonGroup >
@@ -299,23 +307,19 @@ function AssetTable(props: {
                 <ListAsset data={data} isCheckTable={isCheckTable} assetTab={assetTab} />
                 <TableFooter>
                     <TableRow>
-                        {
-                            data.length ?
-                                <TablePagination
-                                    showFirstButton
-                                    showLastButton
-                                    rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                                    colSpan={4}
-                                    count={data.length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    onPageChange={(event, page) => handleChangePage(event, page, setPage)}
-                                    onRowsPerPageChange={(event) =>
-                                        handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
-                                    }
-                                />
-                                : <></>
-                        }
+                        <TablePagination
+                            showFirstButton
+                            showLastButton
+                            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                            colSpan={4}
+                            count={dataLength}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={(event, page) => handleChangePage(event, page, setPage)}
+                            onRowsPerPageChange={(event) =>
+                                handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
+                            }
+                        />
                     </TableRow>
                 </TableFooter>
             </Table>
@@ -330,32 +334,47 @@ export type PNewCountTableProps =
 export default function NewCountTable(props: {
     locations: PNewCountTableProps[],
     defaultLocation: string;
+    locationId: number;
 }) {
-    const { locations, defaultLocation } = props
+    const { locations, defaultLocation, locationId } = props
     const [location, setLocation] = useState<string>(defaultLocation)
     const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
     const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
     const [data, setData] = useState<TAssetRow[]>([])
+    const [dataLength, setDataLength] = useState(0)
+    const [page, setPage] = useState<number>(0);
+    const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
-    //use effect to fetch data from location change
+    useEffect(() => {
+        const getPageLength = async () => {
+            const pageLength = await getAssetByLocationCount(locationId)
+            setDataLength(pageLength)
+        }
+        getPageLength()
+    }, [locationId])
+
+
     useEffect(() => {
         const fetchAsset = async () => {
-            const locationIdFindByName = locations.find((loc) => loc.name = location)!.id
-            const assets = await getAssetsByLocation(locationIdFindByName)
-            const assetsRow = await assets.map(async (asset) => {
+            const { data, error } = await getAssetsByLocation(locationId, rowsPerPage, page)
+            if (error) {
+                throw new Error(`Cannot retrieve asset at ${location}`)
+            }
+            const assetsRow = Promise.all(data.map(async (asset) => {
                 return ({
                     assetCode: asset.asset_tag as string,
                     assetName: asset.name as string,
-                    assignedTo: await getUserById(asset.assigned_to!),
+                    assignedTo: await getUserByIdPrisma(asset.assigned_to),
                     countCheck: false,
                     assignIncorrect: false,
                 })
-            })
-            console.log(assetsRow)
+            }))
+            const assetData = await assetsRow
+            setData(assetData as TAssetRow[])
         }
 
         fetchAsset()
-    }, [location])
+    }, [locationId, page, rowsPerPage])
     return (
         <>
             <NewCountInput
@@ -371,6 +390,11 @@ export default function NewCountTable(props: {
                 isCheckTable={isCheckTable}
                 assetTab={assetTab}
                 setAssetTab={setAssetTab}
+                page={page}
+                setPage={setPage}
+                rowsPerPage={rowsPerPage}
+                setRowsPerPage={setRowsPerPage}
+                dataLength={dataLength}
             />
         </>
     )

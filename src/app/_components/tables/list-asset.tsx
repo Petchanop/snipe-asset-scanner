@@ -24,7 +24,7 @@ export function createAssetTableCell(
                 {assetName}
             </TableCell>
             <TableCell>
-                {assignedTo}
+                {assignedTo.first_name} {assignedTo.last_name}
             </TableCell>
             {
                 assetTab ?
