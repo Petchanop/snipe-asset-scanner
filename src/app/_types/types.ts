@@ -1,4 +1,4 @@
-
+import { asset_count, assets, locations, users } from "@/prisma/generated/prisma";
 export type TSnipeDocument = {
     date: string;
     documentNumber: string;
@@ -22,5 +22,10 @@ export type TAssetRow = {
     countCheck: boolean;
     assignIncorrect: boolean;
 };
+
+export type AssetCount = asset_count;
+export type Asset = assets;
+export type Location = locations;
+export type User = users;
 
 export type TAssetTab = "INLOCATION" | "OUTLOCATION"

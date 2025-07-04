@@ -7,6 +7,7 @@ export default async function ReportTablePage() {
     const locations = await fetchLocations();
     const parentLocation = getParentLocation(locations.data!.rows)
     const childrenLocation = getChildrenLocation(locations.data!.rows)
+    
     return (
         <LocationTable  parentLocation={parentLocation} childrenLocation={childrenLocation}/>
     )

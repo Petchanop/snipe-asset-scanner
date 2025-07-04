@@ -1,4 +1,17 @@
-model AssetCount {
+generator client {
+  provider               = "prisma-client-js"
+  output                 = "../generated/prisma"
+  previewFeatures        = ["driverAdapters", "multiSchema"]
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model asset_count {
     id  Int @id @default(autoincrement()) @db.UnsignedInt
     document_number String  @unique
     document_date DateTime @default(now())
@@ -8,12 +21,12 @@ model AssetCount {
     created_by  Int?
     created_at DateTime @default(now())
 
-    AssetCountLine AssetCountLine[]
+    AssetCountLine asset_count_line[]
 }
 
-model AssetCountLine {
+model asset_count_line {
     id  Int @id @default(autoincrement()) @db.UnsignedInt
-    count_id AssetCount @relation(fields: [asset_count_id], references: [id])
+    count_id asset_count @relation(fields: [asset_count_id], references: [id])
     asset_count_id Int @db.UnsignedInt
     asset_id    Int
     asset_code String

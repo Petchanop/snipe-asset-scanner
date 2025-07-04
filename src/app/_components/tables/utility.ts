@@ -1,7 +1,7 @@
 import { ChangeEvent, MouseEvent } from "react";
 
 export function dataPerPage(data: any, page: number, rowsPerPage: number): any[] {
-    return data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    return data.length ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : []
 }
 
 export function handleChangePage(

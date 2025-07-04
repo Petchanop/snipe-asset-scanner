@@ -3,7 +3,6 @@ import { useParams } from "next/navigation";
 
 export default function ReportTablePage() {
     const params = useParams<{slug: string}>()
-    console.log(params)
     const { slug } = params;
 
     //fetch data by slug retrieve from params

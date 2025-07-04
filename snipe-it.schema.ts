@@ -140,6 +140,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * /users
+         * @description List users
+         */
+        get: operations["users"];
+        put?: never;
+        /**
+         * /users
+         * @description Create a new user
+         */
+        post: operations["users-2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/accessories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * /accessories
+         * @description Return a listing of accessories
+         */
+        get: operations["accessories"];
+        put?: never;
+        /**
+         * /accessories
+         * @description Create a new accessory
+         */
+        post: operations["accessories-1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/models/{id}": {
         parameters: {
             query?: never;
@@ -190,54 +238,6 @@ export interface paths {
          * @description Create a model
          */
         post: operations["models-1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/accessories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * /accessories
-         * @description Return a listing of accessories
-         */
-        get: operations["accessories"];
-        put?: never;
-        /**
-         * /accessories
-         * @description Create a new accessory
-         */
-        post: operations["accessories-1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * /users
-         * @description List users
-         */
-        get: operations["users"];
-        put?: never;
-        /**
-         * /users
-         * @description Create a new user
-         */
-        post: operations["users-2"];
         delete?: never;
         options?: never;
         head?: never;
@@ -549,6 +549,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/components": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * /components
+         * @description Return a listing of components
+         */
+        get: operations["components"];
+        put?: never;
+        /**
+         * /components
+         * @description Creates a component
+         */
+        post: operations["components-1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/components/{id}": {
         parameters: {
             query?: never;
@@ -579,30 +603,6 @@ export interface paths {
          * @description Updates a some details of a component
          */
         patch: operations["componentsid-2"];
-        trace?: never;
-    };
-    "/components": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * /components
-         * @description Return a listing of components
-         */
-        get: operations["components"];
-        put?: never;
-        /**
-         * /components
-         * @description Creates a component
-         */
-        post: operations["components-1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/hardware/{id}/checkout": {
@@ -990,26 +990,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users/{id}/accessories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * /users/:id/accessories
-         * @description Get a list of accessories checked out to the user
-         */
-        get: operations["usersidaccessories"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/hardware/audit/overdue": {
         parameters: {
             query?: never;
@@ -1022,6 +1002,26 @@ export interface paths {
          * @description Retrieve a list of assets that are overdue for auditing.
          */
         get: operations["hardwareauditoverdue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}/accessories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * /users/:id/accessories
+         * @description Get a list of accessories checked out to the user
+         */
+        get: operations["usersidaccessories"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1070,26 +1070,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/accessories/{id}/checkin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * /accessories/:id/checkin
-         * @description Checkin an accessory from a user
-         */
-        post: operations["accessories-checkin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/accessories/{id}/checkout": {
         parameters: {
             query?: never;
@@ -1104,6 +1084,26 @@ export interface paths {
          * @description Check an accessory out to a user
          */
         post: operations["accessories-checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/accessories/{id}/checkin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * /accessories/:id/checkin
+         * @description Checkin an accessory from a user
+         */
+        post: operations["accessories-checkin"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1283,26 +1283,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/components/{id}/checkout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * /components/:id/checkout
-         * @description Check an accessory out to an asset
-         */
-        post: operations["componentsidcheckout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/fieldsets/{id}/fields": {
         parameters: {
             query?: never;
@@ -1317,6 +1297,26 @@ export interface paths {
         get: operations["fieldsetsidfields"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/components/{id}/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * /components/:id/checkout
+         * @description Check an accessory out to an asset
+         */
+        post: operations["componentsidcheckout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3289,6 +3289,391 @@ export interface operations {
             };
         };
     };
+    users: {
+        parameters: {
+            query?: {
+                /** @description String to search on */
+                search?: string;
+                /** @description Number of records to return */
+                limit?: number;
+                /** @description Offset to use when retrieving results (useful in pagination) */
+                offset?: number;
+                /** @description Field to order by */
+                sort?: string;
+                /** @description Sort order (asc or desc) */
+                order?: string;
+                first_name?: string;
+                last_name?: string;
+                username?: string;
+                email?: string;
+                employee_num?: string;
+                state?: string;
+                zip?: string;
+                country?: string;
+                group_id?: number;
+                department_id?: number;
+                company_id?: number;
+                location_id?: number;
+                /** @description Set this to "true" if you want to return only deleted users */
+                deleted?: boolean;
+                /** @description Set this to "true" if you want both deleted and active users */
+                all?: boolean;
+                /** @description Whether the user was imported/synched with LDAP - should be 0 or 1 */
+                ldap_import?: boolean;
+                /** @description Number of checked out assets */
+                assets_count?: number;
+                /** @description Number of checked out licenses */
+                licenses_count?: number;
+                /** @description Number of checked out accessories */
+                accessories_count?: number;
+                /** @description Number of checked out consumables */
+                consumables_count?: number;
+                /** @description Whether the user is marked as a remote worker or not (should be 0 or 1) */
+                remote?: boolean;
+                /** @description Whether or not the user is marked as a VIP (1 or 0 for true or false, respectively) */
+                vip?: number;
+                start_date?: string;
+                end_date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "users-2": {
+        parameters: {
+            query?: never;
+            header?: {
+                Accept?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    first_name: string;
+                    last_name?: string;
+                    username: string;
+                    password: string;
+                    /** @description Needs to match the 'password' exactly */
+                    password_confirmation: string;
+                    email?: string;
+                    permissions?: string;
+                    activated?: boolean;
+                    phone?: string;
+                    jobtitle?: string;
+                    /** Format: int32 */
+                    manager_id?: number;
+                    employee_num?: string;
+                    notes?: string;
+                    /** Format: int32 */
+                    company_id?: number;
+                    two_factor_enrolled?: boolean;
+                    two_factor_optin?: boolean;
+                    /** Format: int32 */
+                    department_id?: number;
+                    /** Format: int32 */
+                    location_id?: number;
+                    /** @description Whether or not the user is a remote worker */
+                    remote?: boolean;
+                    /**
+                     * Format: int32
+                     * @description ID of the group or groups the user should be associated with. This can be a single ID number, or an array, like [1,2,3]
+                     * @default null
+                     */
+                    groups?: number;
+                    /** @default false */
+                    autoassign_licenses?: boolean;
+                    /** @default false */
+                    vip?: boolean;
+                    /** Format: date */
+                    start_date?: string;
+                    /** Format: date */
+                    end_date?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    accessories: {
+        parameters: {
+            query?: {
+                /** @description Specify the number of results you wish to return */
+                limit?: number;
+                /** @description Offset to use */
+                offset?: number;
+                /** @description A text string to search the assets data for */
+                search?: string;
+                /** @description Return only assets associated with a specific order number */
+                order_number?: string;
+                /** @description Specify the column name you wish to sort by */
+                sort?: string;
+                /** @description Specify the order (asc or desc) you wish to order by on your sort column */
+                order?: string;
+                /** @description Whether to include detailed information on categories, etc (true) or just the text name (false) */
+                expand?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default 0
+                         * @example 4
+                         */
+                        total: number;
+                        rows?: {
+                            /**
+                             * @default 0
+                             * @example 1
+                             */
+                            id: number;
+                            /** @example USB Keyboard */
+                            name?: string;
+                            company?: unknown;
+                            manufacturer?: {
+                                /**
+                                 * @default 0
+                                 * @example 1
+                                 */
+                                id: number;
+                                /** @example Apple */
+                                name?: string;
+                            };
+                            supplier?: {
+                                /**
+                                 * @default 0
+                                 * @example 1
+                                 */
+                                id: number;
+                                /** @example Beier, Von and Schoen */
+                                name?: string;
+                            };
+                            /** @example 2033154 */
+                            model_number?: string;
+                            category?: {
+                                /**
+                                 * @default 0
+                                 * @example 8
+                                 */
+                                id: number;
+                                /** @example Keyboards */
+                                name?: string;
+                            };
+                            location?: {
+                                /**
+                                 * @default 0
+                                 * @example 5
+                                 */
+                                id: number;
+                                /** @example South Fred */
+                                name?: string;
+                            };
+                            notes?: unknown;
+                            /**
+                             * @default 0
+                             * @example 15
+                             */
+                            qty: number;
+                            purchase_date?: unknown;
+                            purchase_cost?: unknown;
+                            order_number?: unknown;
+                            /**
+                             * @default 0
+                             * @example 2
+                             */
+                            min_qty: number;
+                            /**
+                             * @default 0
+                             * @example 15
+                             */
+                            remaining_qty: number;
+                            image?: unknown;
+                            created_at?: {
+                                /** @example 2018-10-09 19:07:31 */
+                                datetime?: string;
+                                /** @example 2018-10-09 07:07 PM */
+                                formatted?: string;
+                            };
+                            updated_at?: {
+                                /** @example 2018-10-09 19:07:31 */
+                                datetime?: string;
+                                /** @example 2018-10-09 07:07 PM */
+                                formatted?: string;
+                            };
+                            available_actions?: {
+                                /**
+                                 * @default true
+                                 * @example true
+                                 */
+                                checkout: boolean;
+                                /**
+                                 * @default true
+                                 * @example false
+                                 */
+                                checkin: boolean;
+                                /**
+                                 * @default true
+                                 * @example true
+                                 */
+                                update: boolean;
+                                /**
+                                 * @default true
+                                 * @example true
+                                 */
+                                delete: boolean;
+                            };
+                            /**
+                             * @default true
+                             * @example true
+                             */
+                            user_can_checkout: boolean;
+                        }[];
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example error */
+                        status?: string;
+                        /** @example Unauthorized. */
+                        message?: string;
+                    };
+                };
+            };
+        };
+    };
+    "accessories-1": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /**
+                     * Format: int32
+                     * @description Quantity of the accessory you have
+                     */
+                    qty: number;
+                    /** @description Order number for this accessory. */
+                    order_number?: string;
+                    /**
+                     * Format: float
+                     * @description Cost of item being purchased.
+                     */
+                    purchase_cost?: number;
+                    /** @description Date accessory was purchased */
+                    purchase_date?: string;
+                    /** @description Model number of Accessory */
+                    model_number?: string;
+                    /**
+                     * Format: int32
+                     * @description ID number of the category the accessory belongs to
+                     */
+                    category_id: number;
+                    /**
+                     * Format: int32
+                     * @description ID Number of the company the accessory is assigned to
+                     */
+                    company_id?: number;
+                    /**
+                     * Format: int32
+                     * @description ID number of the location the accessory is assigned to
+                     */
+                    location_id?: number;
+                    /**
+                     * Format: int32
+                     * @description ID number of the manufacturer for this accessory.
+                     */
+                    manufacturer_id?: number;
+                    /**
+                     * Format: int32
+                     * @description ID number of the supplier for this accessory
+                     */
+                    supplier_id?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     modelsid: {
         parameters: {
             query?: never;
@@ -3741,391 +4126,6 @@ export interface operations {
                         /** @example Method not allowed */
                         messages?: string;
                     };
-                };
-            };
-        };
-    };
-    accessories: {
-        parameters: {
-            query?: {
-                /** @description Specify the number of results you wish to return */
-                limit?: number;
-                /** @description Offset to use */
-                offset?: number;
-                /** @description A text string to search the assets data for */
-                search?: string;
-                /** @description Return only assets associated with a specific order number */
-                order_number?: string;
-                /** @description Specify the column name you wish to sort by */
-                sort?: string;
-                /** @description Specify the order (asc or desc) you wish to order by on your sort column */
-                order?: string;
-                /** @description Whether to include detailed information on categories, etc (true) or just the text name (false) */
-                expand?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @default 0
-                         * @example 4
-                         */
-                        total: number;
-                        rows?: {
-                            /**
-                             * @default 0
-                             * @example 1
-                             */
-                            id: number;
-                            /** @example USB Keyboard */
-                            name?: string;
-                            company?: unknown;
-                            manufacturer?: {
-                                /**
-                                 * @default 0
-                                 * @example 1
-                                 */
-                                id: number;
-                                /** @example Apple */
-                                name?: string;
-                            };
-                            supplier?: {
-                                /**
-                                 * @default 0
-                                 * @example 1
-                                 */
-                                id: number;
-                                /** @example Beier, Von and Schoen */
-                                name?: string;
-                            };
-                            /** @example 2033154 */
-                            model_number?: string;
-                            category?: {
-                                /**
-                                 * @default 0
-                                 * @example 8
-                                 */
-                                id: number;
-                                /** @example Keyboards */
-                                name?: string;
-                            };
-                            location?: {
-                                /**
-                                 * @default 0
-                                 * @example 5
-                                 */
-                                id: number;
-                                /** @example South Fred */
-                                name?: string;
-                            };
-                            notes?: unknown;
-                            /**
-                             * @default 0
-                             * @example 15
-                             */
-                            qty: number;
-                            purchase_date?: unknown;
-                            purchase_cost?: unknown;
-                            order_number?: unknown;
-                            /**
-                             * @default 0
-                             * @example 2
-                             */
-                            min_qty: number;
-                            /**
-                             * @default 0
-                             * @example 15
-                             */
-                            remaining_qty: number;
-                            image?: unknown;
-                            created_at?: {
-                                /** @example 2018-10-09 19:07:31 */
-                                datetime?: string;
-                                /** @example 2018-10-09 07:07 PM */
-                                formatted?: string;
-                            };
-                            updated_at?: {
-                                /** @example 2018-10-09 19:07:31 */
-                                datetime?: string;
-                                /** @example 2018-10-09 07:07 PM */
-                                formatted?: string;
-                            };
-                            available_actions?: {
-                                /**
-                                 * @default true
-                                 * @example true
-                                 */
-                                checkout: boolean;
-                                /**
-                                 * @default true
-                                 * @example false
-                                 */
-                                checkin: boolean;
-                                /**
-                                 * @default true
-                                 * @example true
-                                 */
-                                update: boolean;
-                                /**
-                                 * @default true
-                                 * @example true
-                                 */
-                                delete: boolean;
-                            };
-                            /**
-                             * @default true
-                             * @example true
-                             */
-                            user_can_checkout: boolean;
-                        }[];
-                    };
-                };
-            };
-            /** @description 401 */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example error */
-                        status?: string;
-                        /** @example Unauthorized. */
-                        message?: string;
-                    };
-                };
-            };
-        };
-    };
-    "accessories-1": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /**
-                     * Format: int32
-                     * @description Quantity of the accessory you have
-                     */
-                    qty: number;
-                    /** @description Order number for this accessory. */
-                    order_number?: string;
-                    /**
-                     * Format: float
-                     * @description Cost of item being purchased.
-                     */
-                    purchase_cost?: number;
-                    /** @description Date accessory was purchased */
-                    purchase_date?: string;
-                    /** @description Model number of Accessory */
-                    model_number?: string;
-                    /**
-                     * Format: int32
-                     * @description ID number of the category the accessory belongs to
-                     */
-                    category_id: number;
-                    /**
-                     * Format: int32
-                     * @description ID Number of the company the accessory is assigned to
-                     */
-                    company_id?: number;
-                    /**
-                     * Format: int32
-                     * @description ID number of the location the accessory is assigned to
-                     */
-                    location_id?: number;
-                    /**
-                     * Format: int32
-                     * @description ID number of the manufacturer for this accessory.
-                     */
-                    manufacturer_id?: number;
-                    /**
-                     * Format: int32
-                     * @description ID number of the supplier for this accessory
-                     */
-                    supplier_id?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    users: {
-        parameters: {
-            query?: {
-                /** @description String to search on */
-                search?: string;
-                /** @description Number of records to return */
-                limit?: number;
-                /** @description Offset to use when retrieving results (useful in pagination) */
-                offset?: number;
-                /** @description Field to order by */
-                sort?: string;
-                /** @description Sort order (asc or desc) */
-                order?: string;
-                first_name?: string;
-                last_name?: string;
-                username?: string;
-                email?: string;
-                employee_num?: string;
-                state?: string;
-                zip?: string;
-                country?: string;
-                group_id?: number;
-                department_id?: number;
-                company_id?: number;
-                location_id?: number;
-                /** @description Set this to "true" if you want to return only deleted users */
-                deleted?: boolean;
-                /** @description Set this to "true" if you want both deleted and active users */
-                all?: boolean;
-                /** @description Whether the user was imported/synched with LDAP - should be 0 or 1 */
-                ldap_import?: boolean;
-                /** @description Number of checked out assets */
-                assets_count?: number;
-                /** @description Number of checked out licenses */
-                licenses_count?: number;
-                /** @description Number of checked out accessories */
-                accessories_count?: number;
-                /** @description Number of checked out consumables */
-                consumables_count?: number;
-                /** @description Whether the user is marked as a remote worker or not (should be 0 or 1) */
-                remote?: boolean;
-                /** @description Whether or not the user is marked as a VIP (1 or 0 for true or false, respectively) */
-                vip?: number;
-                start_date?: string;
-                end_date?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "users-2": {
-        parameters: {
-            query?: never;
-            header?: {
-                Accept?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    first_name: string;
-                    last_name?: string;
-                    username: string;
-                    password: string;
-                    /** @description Needs to match the 'password' exactly */
-                    password_confirmation: string;
-                    email?: string;
-                    permissions?: string;
-                    activated?: boolean;
-                    phone?: string;
-                    jobtitle?: string;
-                    /** Format: int32 */
-                    manager_id?: number;
-                    employee_num?: string;
-                    notes?: string;
-                    /** Format: int32 */
-                    company_id?: number;
-                    two_factor_enrolled?: boolean;
-                    two_factor_optin?: boolean;
-                    /** Format: int32 */
-                    department_id?: number;
-                    /** Format: int32 */
-                    location_id?: number;
-                    /** @description Whether or not the user is a remote worker */
-                    remote?: boolean;
-                    /**
-                     * Format: int32
-                     * @description ID of the group or groups the user should be associated with. This can be a single ID number, or an array, like [1,2,3]
-                     * @default null
-                     */
-                    groups?: number;
-                    /** @default false */
-                    autoassign_licenses?: boolean;
-                    /** @default false */
-                    vip?: boolean;
-                    /** Format: date */
-                    start_date?: string;
-                    /** Format: date */
-                    end_date?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -6188,174 +6188,6 @@ export interface operations {
             };
         };
     };
-    componentsid: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "componentsid-1": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /** Format: int32 */
-                    qty: number;
-                    /** Format: int32 */
-                    category_id: number;
-                    /** Format: int32 */
-                    location_id?: number;
-                    /** Format: int32 */
-                    company_id?: number;
-                    order_number?: string;
-                    /** Format: date */
-                    purchase_date?: string;
-                    /** Format: float */
-                    purchase_cost?: number;
-                    /** Format: int32 */
-                    min_amt?: number;
-                    serial?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "componentsid-3": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "componentsid-2": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /** Format: int32 */
-                    qty: number;
-                    /** Format: int32 */
-                    category_id: number;
-                    /** Format: int32 */
-                    location_id?: number;
-                    /** Format: int32 */
-                    company_id?: number;
-                    order_number?: string;
-                    /** Format: date */
-                    purchase_date?: string;
-                    /** Format: float */
-                    purchase_cost?: number;
-                    /** Format: int32 */
-                    min_amt?: number;
-                    serial?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
     components: {
         parameters: {
             query?: {
@@ -6542,6 +6374,174 @@ export interface operations {
                     min_amt?: number;
                     serial?: string;
                     model_number?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    componentsid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "componentsid-1": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /** Format: int32 */
+                    qty: number;
+                    /** Format: int32 */
+                    category_id: number;
+                    /** Format: int32 */
+                    location_id?: number;
+                    /** Format: int32 */
+                    company_id?: number;
+                    order_number?: string;
+                    /** Format: date */
+                    purchase_date?: string;
+                    /** Format: float */
+                    purchase_cost?: number;
+                    /** Format: int32 */
+                    min_amt?: number;
+                    serial?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "componentsid-3": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "componentsid-2": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /** Format: int32 */
+                    qty: number;
+                    /** Format: int32 */
+                    category_id: number;
+                    /** Format: int32 */
+                    location_id?: number;
+                    /** Format: int32 */
+                    company_id?: number;
+                    order_number?: string;
+                    /** Format: date */
+                    purchase_date?: string;
+                    /** Format: float */
+                    purchase_cost?: number;
+                    /** Format: int32 */
+                    min_amt?: number;
+                    serial?: string;
                 };
             };
         };
@@ -9797,152 +9797,6 @@ export interface operations {
             };
         };
     };
-    usersidaccessories: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description User id */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @default 0
-                         * @example 1
-                         */
-                        total: number;
-                        rows?: {
-                            /**
-                             * @default 0
-                             * @example 1
-                             */
-                            id: number;
-                            /** @example USB Keyboard */
-                            name?: string;
-                            company?: unknown;
-                            manufacturer?: {
-                                /**
-                                 * @default 0
-                                 * @example 1
-                                 */
-                                id: number;
-                                /** @example Apple */
-                                name?: string;
-                            };
-                            supplier?: {
-                                /**
-                                 * @default 0
-                                 * @example 2
-                                 */
-                                id: number;
-                                /** @example Block and Sons */
-                                name?: string;
-                            };
-                            /** @example 41230142 */
-                            model_number?: string;
-                            category?: {
-                                /**
-                                 * @default 0
-                                 * @example 8
-                                 */
-                                id: number;
-                                /** @example Keyboards */
-                                name?: string;
-                            };
-                            location?: {
-                                /**
-                                 * @default 0
-                                 * @example 4
-                                 */
-                                id: number;
-                                /** @example East Caseyhaven */
-                                name?: string;
-                            };
-                            notes?: unknown;
-                            /**
-                             * @default 0
-                             * @example 15
-                             */
-                            qty: number;
-                            purchase_date?: unknown;
-                            purchase_cost?: unknown;
-                            order_number?: unknown;
-                            /**
-                             * @default 0
-                             * @example 2
-                             */
-                            min_qty: number;
-                            /**
-                             * @default 0
-                             * @example 14
-                             */
-                            remaining_qty: number;
-                            /** @example https://snipe-it.local:8890/uploads/accessories/usb-keyboard.jpg */
-                            image?: string;
-                            created_at?: {
-                                /** @example 2018-12-05 15:37:21 */
-                                datetime?: string;
-                                /** @example 2018-12-05 03:37 PM */
-                                formatted?: string;
-                            };
-                            updated_at?: {
-                                /** @example 2018-12-05 15:37:21 */
-                                datetime?: string;
-                                /** @example 2018-12-05 03:37 PM */
-                                formatted?: string;
-                            };
-                            available_actions?: {
-                                /**
-                                 * @default true
-                                 * @example true
-                                 */
-                                checkout: boolean;
-                                /**
-                                 * @default true
-                                 * @example false
-                                 */
-                                checkin: boolean;
-                                /**
-                                 * @default true
-                                 * @example true
-                                 */
-                                update: boolean;
-                                /**
-                                 * @default true
-                                 * @example true
-                                 */
-                                delete: boolean;
-                            };
-                            /**
-                             * @default true
-                             * @example true
-                             */
-                            user_can_checkout: boolean;
-                        }[];
-                    };
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
     hardwareauditoverdue: {
         parameters: {
             query?: never;
@@ -10153,6 +10007,152 @@ export interface operations {
             };
         };
     };
+    usersidaccessories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default 0
+                         * @example 1
+                         */
+                        total: number;
+                        rows?: {
+                            /**
+                             * @default 0
+                             * @example 1
+                             */
+                            id: number;
+                            /** @example USB Keyboard */
+                            name?: string;
+                            company?: unknown;
+                            manufacturer?: {
+                                /**
+                                 * @default 0
+                                 * @example 1
+                                 */
+                                id: number;
+                                /** @example Apple */
+                                name?: string;
+                            };
+                            supplier?: {
+                                /**
+                                 * @default 0
+                                 * @example 2
+                                 */
+                                id: number;
+                                /** @example Block and Sons */
+                                name?: string;
+                            };
+                            /** @example 41230142 */
+                            model_number?: string;
+                            category?: {
+                                /**
+                                 * @default 0
+                                 * @example 8
+                                 */
+                                id: number;
+                                /** @example Keyboards */
+                                name?: string;
+                            };
+                            location?: {
+                                /**
+                                 * @default 0
+                                 * @example 4
+                                 */
+                                id: number;
+                                /** @example East Caseyhaven */
+                                name?: string;
+                            };
+                            notes?: unknown;
+                            /**
+                             * @default 0
+                             * @example 15
+                             */
+                            qty: number;
+                            purchase_date?: unknown;
+                            purchase_cost?: unknown;
+                            order_number?: unknown;
+                            /**
+                             * @default 0
+                             * @example 2
+                             */
+                            min_qty: number;
+                            /**
+                             * @default 0
+                             * @example 14
+                             */
+                            remaining_qty: number;
+                            /** @example https://snipe-it.local:8890/uploads/accessories/usb-keyboard.jpg */
+                            image?: string;
+                            created_at?: {
+                                /** @example 2018-12-05 15:37:21 */
+                                datetime?: string;
+                                /** @example 2018-12-05 03:37 PM */
+                                formatted?: string;
+                            };
+                            updated_at?: {
+                                /** @example 2018-12-05 15:37:21 */
+                                datetime?: string;
+                                /** @example 2018-12-05 03:37 PM */
+                                formatted?: string;
+                            };
+                            available_actions?: {
+                                /**
+                                 * @default true
+                                 * @example true
+                                 */
+                                checkout: boolean;
+                                /**
+                                 * @default true
+                                 * @example false
+                                 */
+                                checkin: boolean;
+                                /**
+                                 * @default true
+                                 * @example true
+                                 */
+                                update: boolean;
+                                /**
+                                 * @default true
+                                 * @example true
+                                 */
+                                delete: boolean;
+                            };
+                            /**
+                             * @default true
+                             * @example true
+                             */
+                            user_can_checkout: boolean;
+                        }[];
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     maintenancesid: {
         parameters: {
             query?: never;
@@ -10356,38 +10356,6 @@ export interface operations {
             };
         };
     };
-    "accessories-checkin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description This is the ID of the accessory+user relationships in the accessories_users table */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
     "accessories-checkout": {
         parameters: {
             query?: {
@@ -10418,6 +10386,38 @@ export interface operations {
                 };
             };
         };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "accessories-checkin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description This is the ID of the accessory+user relationships in the accessories_users table */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description 200 */
             200: {
@@ -11138,53 +11138,6 @@ export interface operations {
             };
         };
     };
-    componentsidcheckout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the component to check out */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    /**
-                     * Format: int32
-                     * @description User ID of an asset to check a component out to
-                     */
-                    assigned_to: number;
-                    /**
-                     * Format: int32
-                     * @description Quantity of the components to check out to the asset
-                     */
-                    assigned_qty: number;
-                };
-            };
-        };
-        responses: {
-            /** @description 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
     fieldsetsidfields: {
         parameters: {
             query?: never;
@@ -11277,6 +11230,53 @@ export interface operations {
                         /** @example Method not allowed */
                         messages?: string;
                     };
+                };
+            };
+        };
+    };
+    componentsidcheckout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the component to check out */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: int32
+                     * @description User ID of an asset to check a component out to
+                     */
+                    assigned_to: number;
+                    /**
+                     * Format: int32
+                     * @description Quantity of the components to check out to the asset
+                     */
+                    assigned_qty: number;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };

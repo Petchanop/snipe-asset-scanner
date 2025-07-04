@@ -1,6 +1,6 @@
 'use client'
 import { mockLocationTableData } from "@/_constants/mockData";
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, ChangeEvent, useEffect, useMemo } from "react";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
@@ -17,6 +17,10 @@ import { MapActionColor, MapColor } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
 import { TLocation } from "@/_types/snipe-it.type";
+import { getReportFromParentLocation } from "@/_apis/report.api";
+import { AssetCount, Location } from "@/_types/types";
+import { useLocationUrlContext } from "@/reports/layout";
+import { usePathname, useRouter } from "next/navigation";
 
 function createLocationTableCell(data: locationTableData) {
     const { date, documentNumber, location, status, action } = data;
@@ -52,39 +56,61 @@ function createLocationTableCell(data: locationTableData) {
 
 function ChildrenSelectComponent(props: {
     parent: TLocation,
-    locationByParent: TLocation[]
+    locationByParent: TLocation[],
+    setChildId: (value: number) => void
 }) {
-    const { parent, locationByParent } = props
+    const { parent, locationByParent, setChildId } = props
     const [childLocation, setChildLocation] = useState("")
-    const [childrenLocation, setChildrenLocatoin] = useState<TLocation[]>([])
+    const [childrenLocation, setChildrenLocation] = useState<TLocation[]>([])
+    const pathname = usePathname()
+    const { replace } = useRouter()
+    const context = useLocationUrlContext()
+
+    const handleOnClick = (target: EventTarget & (HTMLInputElement | HTMLTextAreaElement)) => {
+        const locationByName = childrenLocation.filter((loc) => loc.name == target.value)[0] as unknown as Location
+        setChildId(locationByName.id)
+        setChildLocation(target.value)
+        context.current = locationByName.id
+        replace(`${pathname}?id=${context.current}`)
+    }
+
+    const childrenLocationChange = useMemo(() => { 
+        console.log("child location change")
+        return locationByParent.filter((loc) =>
+        // @ts-expect-error cause it not wrong type the object has => id in parent properties
+        loc.parent.id === parent.id
+    )}, [parent])
+    // locationByParent
 
     useEffect(() => {
-        const childrenLocation = locationByParent.filter((loc) =>
-            // @ts-expect-error cause it not wrong type the object has => id in parent properties
-            loc.parent.id === parent.id
-        )
         const setDefaultValue = () => {
-            const defaultValue = childrenLocation.length ? childrenLocation[0]!.name : "";
-            console.log(childrenLocation[0])
+            const defaultValue = childrenLocationChange.length ? childrenLocationChange[0]!.name : "";
+            context.current = childrenLocationChange[0]?.id as unknown as number
+            console.log("location rerender")
             setChildLocation(defaultValue as string)
         }
+        console.log("set Children location")
+        setChildrenLocation(childrenLocationChange)
         setDefaultValue();
-        setChildrenLocatoin(childrenLocation)
 
         //fetch report by child location later
-    }, [locationByParent, parent])
+    }, [childrenLocationChange])
+
     return (
         <>
             <TextField
                 select
                 label="sub location"
+                name={parent.name}
                 value={childLocation}
                 className="mt-3 p-4"
-                onChange={(event) => setChildLocation(event?.target.value)}
+                onChange={(event) => handleOnClick(event.target)}
             >
                 {
                     childrenLocation.map((loc) =>
-                        <MenuItem value={loc.name as unknown as string} key={loc.id}><div dangerouslySetInnerHTML={{__html: loc.name!}}></div></MenuItem>
+                        <MenuItem value={loc.name as unknown as string} key={loc.id}>
+                            <div dangerouslySetInnerHTML={{ __html: loc.name! }} data-key={loc.id} data-name={loc.name}></div>
+                        </MenuItem>
                     )
                 }
             </TextField>
@@ -92,17 +118,22 @@ function ChildrenSelectComponent(props: {
     )
 }
 
-function ParentSelectComponent(props: { parentLocation: TLocation[], setParent: (location: TLocation) => void }) {
+function ParentSelectComponent(props: {
+    parentLocation: TLocation[],
+    setParent: (location: TLocation) => void,
+}) {
     const { parentLocation, setParent } = props
+
     return (
         <TextField
             select
             label="location"
             defaultValue={parentLocation[0]?.name ? parentLocation[0]?.name : ""}
             className="mt-3 p-4"
-            onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-                setParent(parentLocation.find((loc) => loc.name == event.target.value)!)}
-        >
+            onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                const newParent = parentLocation.find((loc) => loc.name == event.target.value);
+                setParent(newParent!)
+            }}>
             {
                 parentLocation.map((loc) =>
                     <MenuItem value={loc.name} key={loc.id}>{loc.name}</MenuItem>
@@ -117,11 +148,24 @@ export default function LocationTable(props: { parentLocation: TLocation[], chil
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
     const [parent, setParent] = useState(parentLocation[0])
-
+    const [report, setReport] = useState([] as AssetCount[])
+    const [childId, setChildId] = useState<number | null>(null)
+    useEffect(() => {
+        const filterReportByChildId = () => {
+            setReport(report.filter((report) => report.location_id == childId))
+        }
+        const fetchReportByParent = async () => {
+            const parentId = parentLocation.find((loc) => loc.name === (parent as TLocation).name) as TLocation
+            const newReport = await getReportFromParentLocation(parentId.id!)
+            setReport(newReport)
+        }
+        fetchReportByParent();
+        filterReportByChildId();
+    }, [childId, parent])
     return (
         <>
             <ParentSelectComponent parentLocation={parentLocation} setParent={setParent} />
-            <ChildrenSelectComponent parent={parent!} locationByParent={childrenLocation} />
+            <ChildrenSelectComponent parent={parent!} locationByParent={childrenLocation} setChildId={setChildId} />
             <Table stickyHeader size="small">
                 <TableHead>
                     <TableRow>
@@ -134,7 +178,7 @@ export default function LocationTable(props: { parentLocation: TLocation[], chil
                 </TableHead>
                 <TableBody sx={{ overflow: 'hidden' }}>
                     {
-                        (dataPerPage(mockLocationTableData, page, rowsPerPage)).map((mockData) =>
+                        (dataPerPage(report, page, rowsPerPage)).map((mockData) =>
                             <TableRow key={mockData.documentNumber}>
                                 {createLocationTableCell(mockData)}
                             </TableRow>

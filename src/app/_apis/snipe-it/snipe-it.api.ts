@@ -1,7 +1,7 @@
 'use server'
 
 import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } from "@/_apis/next.api";
-import { TAsset, TLocation } from "@/_types/snipe-it.type";
+import { TAsset, TLocation, TUser } from "@/_types/snipe-it.type";
 
 const client = await createGateway();
 type AssetResponse = Exclude<TAsset, TStatusResponse>
@@ -34,4 +34,17 @@ export async function fetchLocations() : Promise<TResponse<TArrayResponse<TLocat
         return { data: { total: data.total, rows: data.rows} , error: null}
     }
     return { data: null, error: data}
+}
+
+export async function getUserById(Id : number) : Promise<TResponse<TUser>> {
+    const {data, error } = await client.GET("/users/{id}", {
+        params: {
+            path: { id: Id }
+            }
+        }
+    )
+    if (error) {
+        return { data: null, error: error}
+    }
+    return {data: data, error: null}
 }

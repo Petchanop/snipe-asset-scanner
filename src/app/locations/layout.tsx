@@ -3,21 +3,42 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Paper from "@mui/material/Paper";
+import Tab from "@mui/material/Tab";
 import TableContainer from "@mui/material/TableContainer";
-import Link from "next/link";
-import { ReactNode, useState } from "react";
+import Tabs from "@mui/material/Tabs";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { createContext, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
+
+type LocationStateContext = {
+    locationUrl: number;
+    setLocationUrl: Dispatch<SetStateAction<number>>;
+    setSelected: Dispatch<SetStateAction<string>>;
+}
+
+const LocationUrlContext = createContext<LocationStateContext | null>(null);
 
 export default function TableLayout({
-    children,
+    children
 }: {
     children: ReactNode
 }) {
-    const [selected, setSelected] = useState<string>("locations")
+    const pathname = usePathname()
+    const { location } = useParams()
+    const [selected, setSelected] = useState<string>(pathname)
+    const [ locationId, setLocationId ] = useState(parseInt(location?.toString()!))
+    const router = useRouter();
 
-    function addBgBlueIfClick(match: string) : string {
-        return selected === match ? "bg-blue-200" : ""
+
+    function handleOnChange(event: SyntheticEvent, newValue: string) {
+        setSelected(newValue)
     }
-
+    useEffect(() => {
+        router.push(`${selected}`)
+    }, [selected])
+                 
+    useEffect(() => {
+        router.replace(`${selected}`)
+    },[locationId])
     return <>
         <Card className='w-screen h-screen lg:w-4/6 lg:h-3/4 absolute lg:top-22'
             sx={{
@@ -31,64 +52,38 @@ export default function TableLayout({
                 title="Asset Count"
             />
             <CardContent className="space-y-4">
-                <div className="pl-2 space-x-4">
-                    {/* <Select 
-                        labelId="navigation-select-box"
-                        id="navigation-select-box"
-                        value={selected}
-                        onChange={(event) => setSelected(event.target.value)}
+               <Tabs
+                    value={selected}
+                    className="pl-2"
+                    onChange={handleOnChange}
                     >
-                        <MenuItem value="locations"> */}
-                    <Link
-                        href="/reports"
-                        className={`
-                            hover:bg-blue-200 w-20 
-                            ${addBgBlueIfClick("location")}
-                            outline-solid outline-offset-2 
-                            outline-blue-400
-                            rounded-md`}
-                        onClick={() => setSelected("reports")}
-                    >
-                        {/* <Link href="/locations"> */}
-                        <span className="m-4 text-blue-400">Report</span>
-                    </Link>
-                    {/* </MenuItem> */}
-                    {/* <MenuItem value="new-count"> */}
-                    <Link
-                        href="/locations/assets"
-                        className={`
-                            hover:bg-blue-200 w-20
-                            ${addBgBlueIfClick("newcount")}
-                            outline-solid outline-offset-2
-                            outline-blue-400
-                            rounded-md`}
-                        onClick={() => setSelected("newcount")}
-                    >
-                        {/* <Link href="/locations/assets"> */}
-                        <span className="m-4 text-blue-400">New count</span>
-                    </Link>
-                    {/* </MenuItem>
-                    </Select> */}
-                    <Link
-                        href="/locations/assets/search"
-                        className={`
-                            hover:bg-blue-200 w-20 
-                            ${addBgBlueIfClick("search")}
-                            outline-solid outline-offset-2
-                            outline-blue-400
-                            rounded-md`}
-                        onClick={() => setSelected("search")}
-                    >
-                        {/* <Link href="/locations/assets"> */}
-                        <span className="m-4 text-blue-400">Search</span>
-                    </Link>
-                </div>
+                    <Tab value="/reports" label="reports">
+                    </Tab>
+                    <Tab value={`/locations/${locationId}/assets`} label="new count"></Tab>
+                    <Tab value="/locations/search" label="search"></Tab>
+                </Tabs>
                 <Paper elevation={10}>
                     <TableContainer className="w-full lg:max-h-[55vh] max-h-[75vh]">
+                        {/* <LocationUrlContext value={locationUrl}> */}
+                        <LocationUrlContext 
+                            value={{
+                                locationUrl: locationId,
+                                setLocationUrl: setLocationId,
+                                setSelected: setSelected
+                            }}>
                         {children}
-                    </TableContainer>
-                </Paper>
-            </CardContent>
-        </Card >
+                    </LocationUrlContext>
+                </TableContainer>
+            </Paper>
+        </CardContent>
+    </Card >
     </>
+}
+
+export function useLocationUrlContext() {
+    const context = useContext(LocationUrlContext)
+    if (!context) {
+        throw new Error("useLocatoinUrlContext must be use within Context provider")
+    }
+    return context
 }
