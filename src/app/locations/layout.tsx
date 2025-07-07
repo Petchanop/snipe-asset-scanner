@@ -59,7 +59,7 @@ export default function TableLayout({
                     <Tab value={`/reports?location=${locationId}`} label="reports">
                     </Tab>
                     <Tab value={`/locations/${locationId}/assets`} label="new count"></Tab>
-                    <Tab value="/locations/search" label="search"></Tab>
+                    <Tab value={`/locations/search?location=${locationId}`} label="search"></Tab>
                 </Tabs>
                 <Paper elevation={10}>
                     <TableContainer className="w-full lg:max-h-[55vh] max-h-[75vh]">

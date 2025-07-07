@@ -4,7 +4,7 @@ import Table from "@mui/material/Table";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import { ChangeEvent, Dispatch, SetStateAction, useEffect , useState } from "react";
+import { ChangeEvent, createContext, Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useState } from "react";
 import { handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { mockLocationTableData } from "@/_constants/mockData";
 import Typography from "@mui/material/Typography";
@@ -15,13 +15,16 @@ import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import ListAsset from "@/_components/tables/list-asset";
-import ButtonGroup from "@mui/material/ButtonGroup";
 import { blue } from "@mui/material/colors";
 import { TAssetRow, TAssetTab, TSnipeDocument } from "@/_types/types";
 import { INLOCATION, OUTLOCATION } from "@/_constants/constants";
 import { getAssetByLocationCount, getAssetsByLocation, getUserByIdPrisma } from "@/_apis/report.api";
 import dayjs, { Dayjs } from "dayjs";
-import { useLocationUrlContext } from "@/locations/layout";
+import { useLocationUrlContext } from "@/reports/layout";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { usePathname, useRouter } from "next/navigation";
+import { getAssetCountLineByAssetCount, getAssetCountReport } from "@/_libs/report.utils";
 
 function CheckAdditionalAssetButton() {
     return (
@@ -74,21 +77,22 @@ function SelectCountInput(props: {
     selectedLocation: string,
     setSelectedLocation: (value: string) => void,
     setDocumentDate: (value: string) => void,
-    isCheckTable: boolean
+    isCheckTable: boolean,
 }) {
     const { locations,
         selectedLocation,
         setSelectedLocation,
         setDocumentDate,
-        isCheckTable
+        isCheckTable,
     } = props
-    const [dateValue, setDateValue] = useState<Dayjs | null>(dayjs())
+    // const [dateValue, setDateValue] = useState<Dayjs | null>(dayjs())
     const context = useLocationUrlContext()
+    const dateContext = useDateContext()
 
     const handleDateOnChange = (value: SetStateAction<dayjs.Dayjs | null>) => {
         if (value) {
             setDocumentDate(value.toString())
-            setDateValue(value)
+            dateContext.setDateValue(value)
         }
     }
 
@@ -108,7 +112,7 @@ function SelectCountInput(props: {
                 <Typography className="lg:w-30 w-20">Date</Typography>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker label="Select Date"
-                        value={dateValue}
+                        value={dateContext.dateValue}
                         disableFuture
                         format="DD/MM/YYYY"
                         className="lg:w-2/3 w-3/5"
@@ -142,9 +146,9 @@ function SelectCountInput(props: {
                                     data-value={loc.name}
                                     onClick={(event) => {
                                         const target = event.target as HTMLElement
-                                        context.setLocationUrl(parseInt(target.dataset.key as string))
+                                        context.setLocationId(parseInt(target.dataset.key as string))
                                         setSelectedLocation(target.dataset.value as string)
-                                        context.setSelected(`/locations/${target.dataset.key}/assets`)
+                                        context.setSelected(`/reports/count-assets?location=${target.dataset.key}`)
 
                                     }}
                                 ></div>
@@ -167,6 +171,8 @@ function SelectCountButton(props: {
         setLocation,
         setIsCheckTable
     } = props
+    const { replace } = useRouter()
+    const pathname = usePathname()
     return (
         <div className="flex flex-col pt-2 max-md:w-2/5 items-center space-y-2">
             <div className="flex flex-row">
@@ -186,7 +192,10 @@ function SelectCountButton(props: {
                     `hover:bg-blue-200 max-md:w-2/5
                     max-md:text-xs max-md:font-medium
                 `}
-                    onClick={() => setIsCheckTable((pre) => !pre)}
+                    onClick={() => {
+                        setIsCheckTable((pre) => !pre)
+                        replace(`${window.location.href}/`)
+                    }}
                 >
                     Start
                 </Button>
@@ -273,28 +282,21 @@ function AssetTable(props: {
         setRowsPerPage,
         dataLength
     } = props
+
+    function handleSelectValue(event: SyntheticEvent, newValue: string) {
+        setAssetTab(newValue as TAssetTab)
+    }
+
     return (
         <>
-            <ButtonGroup >
-                <Button sx={{
-                    borderBottom: 'none',
-                    borderBottomLeftRadius: 0,
-                }}
-                    className={assetTab === INLOCATION ? 'bg-blue-200' : ''}
-                    onClick={() => setAssetTab("INLOCATION")}
-                >
-                    Asset List in Location
-                </Button>
-                <Button sx={{
-                    borderBottom: 'none',
-                    borderBottomRightRadius: 0
-                }}
-                    className={assetTab === OUTLOCATION ? 'bg-blue-200' : ''}
-                    onClick={() => setAssetTab("OUTLOCATION")}
-                >
-                    Additional Asset List in Location
-                </Button>
-            </ButtonGroup>
+            <Tabs
+                value={assetTab}
+                className="pl-2"
+                onChange={handleSelectValue}
+            >
+                <Tab value={INLOCATION} label="in location"></Tab>
+                <Tab value={OUTLOCATION} label="additional in location"></Tab>
+            </Tabs>
             <Table stickyHeader size="small" sx={{
                 minWidth: 650,
                 border: 'solid',
@@ -331,6 +333,13 @@ export type PNewCountTableProps =
     { name: string, id: number }
 
 
+type TDateValueContext = {
+    dateValue: Dayjs;
+    setDateValue: Dispatch<SetStateAction<Dayjs | null>>
+}
+
+const DateValueContext = createContext<TDateValueContext | null>(null)
+
 export default function NewCountTable(props: {
     locations: PNewCountTableProps[],
     defaultLocation: string;
@@ -344,6 +353,7 @@ export default function NewCountTable(props: {
     const [dataLength, setDataLength] = useState(0)
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+    const [dateValue, setDateValue] = useState<Dayjs | null>(dayjs())
 
     useEffect(() => {
         const getPageLength = async () => {
@@ -355,16 +365,14 @@ export default function NewCountTable(props: {
 
 
     useEffect(() => {
-        const fetchAsset = async () => {
-            const { data, error } = await getAssetsByLocation(locationId, rowsPerPage, page)
-            if (error) {
-                throw new Error(`Cannot retrieve asset at ${location}`)
-            }
+        const fetchAssetCountLine = async () => {
+            const assetCount = await getAssetCountReport(dateValue?.toDate()!, locationId)
+            const data = await getAssetCountLineByAssetCount(assetCount!.id)
             const assetsRow = Promise.all(data.map(async (asset) => {
                 return ({
-                    assetCode: asset.asset_tag as string,
-                    assetName: asset.name as string,
-                    assignedTo: await getUserByIdPrisma(asset.assigned_to),
+                    assetCode: asset.asset_code as string,
+                    assetName: asset.asset_name as string,
+                    assignedTo: await getUserByIdPrisma(asset.assigned_to!),
                     countCheck: false,
                     assignIncorrect: false,
                 })
@@ -373,29 +381,61 @@ export default function NewCountTable(props: {
             setData(assetData as TAssetRow[])
         }
 
-        fetchAsset()
-    }, [locationId, page, rowsPerPage])
+        // fetchAsset()
+    }, [locationId, page, rowsPerPage, dateValue])
     return (
         <>
-            <NewCountInput
-                locations={locations}
-                location={location}
-                setLocation={setLocation}
-                isCheckTable={isCheckTable}
-                setIsCheckTable={setIsCheckTable}
-                assetTab={assetTab}
-            />
-            <AssetTable
-                data={data as TAssetRow[]}
-                isCheckTable={isCheckTable}
-                assetTab={assetTab}
-                setAssetTab={setAssetTab}
-                page={page}
-                setPage={setPage}
-                rowsPerPage={rowsPerPage}
-                setRowsPerPage={setRowsPerPage}
-                dataLength={dataLength}
-            />
+            <DateValueContext 
+            value={{
+                dateValue : dateValue!,
+                setDateValue : setDateValue
+            }}>
+                <NewCountInput
+                    locations={locations}
+                    location={location}
+                    setLocation={setLocation}
+                    isCheckTable={isCheckTable}
+                    setIsCheckTable={setIsCheckTable}
+                    assetTab={assetTab}
+                />
+                <AssetTable
+                    data={data as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    page={page}
+                    setPage={setPage}
+                    rowsPerPage={rowsPerPage}
+                    setRowsPerPage={setRowsPerPage}
+                    dataLength={dataLength}
+                />
+            </DateValueContext>
         </>
     )
 }
+
+function useDateContext() {
+    const context = useContext(DateValueContext)
+    if (!context) {
+        throw new Error("useLocatoinUrlContext must be use within Context provider")
+    }
+    return context
+}
+
+// function fetchAsset() {
+//       const { data, error } = await getAssetsByLocation(locationId, rowsPerPage, page)
+//             if (error) {
+//                 throw new Error(`Cannot retrieve asset at ${location}`)
+//             }
+//             const assetsRow = Promise.all(data.map(async (asset) => {
+//                 return ({
+//                     assetCode: asset.asset_tag as string,
+//                     assetName: asset.name as string,
+//                     assignedTo: await getUserByIdPrisma(asset.assigned_to),
+//                     countCheck: false,
+//                     assignIncorrect: false,
+//                 })
+//             }))
+//             const assetData = await assetsRow
+//             setData(assetData as TAssetRow[])
+// }

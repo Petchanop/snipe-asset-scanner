@@ -1,4 +1,5 @@
 'use client'
+import { checkSamePathName } from "@/_libs/location.utils";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
@@ -6,27 +7,47 @@ import Paper from "@mui/material/Paper";
 import Tab from "@mui/material/Tab";
 import TableContainer from "@mui/material/TableContainer";
 import Tabs from "@mui/material/Tabs";
-import { useParams, usePathname, useRouter } from "next/navigation";
-import { createContext, Dispatch, ReactNode, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { createContext, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useContext, useEffect, useState } from "react";
 
-const LocationUrlContext = createContext<RefObject<number> | null>(null);
+type LocationStateContext = {
+    locationUrl: number;
+    setLocationId: Dispatch<SetStateAction<number>>;
+    setSelected: Dispatch<SetStateAction<string>>;
+}
+
+const LocationUrlContext = createContext<LocationStateContext | null>(null);
 
 export default function TableLayout({
-    children,
+    children
 }: {
     children: ReactNode
 }) {
     const pathname = usePathname()
-    const paramId = useParams()
-    const [selected, setSelected] = useState<string>(pathname)
-    const locationUrl = useRef(0)
+    const params = useSearchParams()
+    const location = params.get('location')
+    const [selected, setSelected] = useState<string>(`${pathname}?location=${parseInt(location?.toString()!)}`)
+    const [ locationId, setLocationId ] = useState(parseInt(location?.toString()!))
     const router = useRouter();
-    console.log("report page : ", pathname, location)
 
+    function handleOnChange(event: SyntheticEvent, newValue: string) {
+        setSelected(newValue)
+    }
     useEffect(() => {
-        router.push(`${selected}`)
+        console.log(selected, pathname)
+        if (!checkSamePathName(selected, pathname))
+            console.log("push ", selected)
+            router.push(selected)
     }, [selected])
-
+                 
+    useEffect(() => {
+        if (locationId) {
+            if (checkSamePathName(selected, pathname)){
+                console.log("replace ", selected)
+                router.replace(selected)
+            }
+        }
+    },[locationId])
     return <>
         <Card className='w-screen h-screen lg:w-4/6 lg:h-3/4 absolute lg:top-22'
             sx={{
@@ -40,25 +61,31 @@ export default function TableLayout({
                 title="Asset Count"
             />
             <CardContent className="space-y-4">
-                <Tabs
+               <Tabs
                     value={selected}
-                    className="pl-2">
-                    <Tab value="/reports" label="reports" onClick={() =>
-                        setSelected("/reports")
-                    }>
+                    className="pl-2"
+                    onChange={handleOnChange}
+                    >
+                    <Tab value={`/reports?location=${locationId}`} label="reports">
                     </Tab>
-                    <Tab value={`/locations/${locationUrl.current}/assets`} label="new count" onClick={() => setSelected(`/locations/${locationUrl.current}/assets`)}></Tab>
-                    <Tab value="/locations/search" label="search" onClick={() => setSelected("/locations/search")}></Tab>
+                    <Tab value={`/reports/count-assets?location=${locationId}`} label="new count"></Tab>
+                    <Tab value={`/reports?location=${locationId}/1/search`} label="search"></Tab>
                 </Tabs>
                 <Paper elevation={10}>
-                   <TableContainer className="w-full lg:max-h-[55vh] max-h-[75vh]">
-                        <LocationUrlContext value={locationUrl}>
-                            {children}
-                        </LocationUrlContext>
-                    </TableContainer>
-                </Paper>
-            </CardContent>
-        </Card >
+                    <TableContainer className="w-full lg:max-h-[55vh] max-h-[75vh]">
+                        {/* <LocationUrlContext value={locationUrl}> */}
+                        <LocationUrlContext 
+                            value={{
+                                locationUrl: locationId,
+                                setLocationId: setLocationId,
+                                setSelected: setSelected
+                            }}>
+                        {children}
+                    </LocationUrlContext>
+                </TableContainer>
+            </Paper>
+        </CardContent>
+    </Card >
     </>
 }
 

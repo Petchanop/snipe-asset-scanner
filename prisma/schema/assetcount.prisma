@@ -14,7 +14,7 @@ datasource db {
 model asset_count {
     id  Int @id @default(autoincrement()) @db.UnsignedInt
     document_number String  @unique
-    document_date DateTime @default(now())
+    document_date DateTime @default(now()) 
     rtd_location_id Int?
     location_id Int?
     state   String

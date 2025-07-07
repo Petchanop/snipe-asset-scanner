@@ -22,7 +22,6 @@ export default function RootLayout({
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <main className="w-full h-svh flex justify-center">
-            <div>Header</div>
             {children}
           </main>
         </AppRouterCacheProvider>

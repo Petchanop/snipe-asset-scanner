@@ -20,7 +20,8 @@ import { TLocation } from "@/_types/snipe-it.type";
 import { getReportFromParentLocation } from "@/_apis/report.api";
 import { AssetCount, Location } from "@/_types/types";
 import { useLocationUrlContext } from "@/reports/layout";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { getParentFromChildId } from "@/_libs/location.utils";
 
 function createLocationTableCell(data: locationTableData) {
     const { date, documentNumber, location, status, action } = data;
@@ -57,21 +58,21 @@ function createLocationTableCell(data: locationTableData) {
 function ChildrenSelectComponent(props: {
     parent: TLocation,
     locationByParent: TLocation[],
+    childId: number,
     setChildId: (value: number) => void
 }) {
-    const { parent, locationByParent, setChildId } = props
+    const { parent, locationByParent, childId, setChildId } = props
     const [childLocation, setChildLocation] = useState("")
     const [childrenLocation, setChildrenLocation] = useState<TLocation[]>([])
     const pathname = usePathname()
-    const { replace } = useRouter()
     const context = useLocationUrlContext()
 
     const handleOnClick = (target: EventTarget & (HTMLInputElement | HTMLTextAreaElement)) => {
         const locationByName = childrenLocation.filter((loc) => loc.name == target.value)[0] as unknown as Location
         setChildId(locationByName.id)
         setChildLocation(target.value)
-        context.current = locationByName.id
-        replace(`${pathname}?location=${context.current}`)
+        context.setSelected(`/reports?location=${locationByName.id}`)
+        context.setLocationId(locationByName.id)
     }
 
     const childrenLocationChange = useMemo(() => { 
@@ -83,9 +84,16 @@ function ChildrenSelectComponent(props: {
 
     useEffect(() => {
         const setDefaultValue = () => {
-            const defaultValue = childrenLocationChange.length ? childrenLocationChange[0]!.name : "";
-            context.current = childrenLocationChange[0]?.id as unknown as number
-            setChildLocation(defaultValue as string)
+            let defaultValue = childrenLocationChange.find((loc) => loc.id == childId)
+            let locationId = childId as unknown as number
+            if (!defaultValue) {
+                defaultValue = childrenLocationChange[0]
+                locationId = childrenLocationChange[0]?.id! 
+            }
+            context.setSelected(`/reports?location=${locationId}`)
+            context.setLocationId(locationId)
+            setChildId(locationId)
+            setChildLocation(defaultValue?.name! as string)
         }
         setChildrenLocation(childrenLocationChange)
         setDefaultValue();
@@ -117,15 +125,17 @@ function ChildrenSelectComponent(props: {
 
 function ParentSelectComponent(props: {
     parentLocation: TLocation[],
+    parentProp: TLocation,
     setParent: (location: TLocation) => void,
 }) {
-    const { parentLocation, setParent } = props
+    const { parentLocation, parentProp, setParent } = props
 
     return (
         <TextField
             select
             label="location"
-            defaultValue={parentLocation[0]?.name ? parentLocation[0]?.name : ""}
+            // defaultValue={parentProp.name}
+            value={parentProp.name}
             className="mt-3 p-4"
             onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                 const newParent = parentLocation.find((loc) => loc.name == event.target.value);
@@ -140,29 +150,40 @@ function ParentSelectComponent(props: {
     )
 }
 
-export default function LocationTable(props: { parentLocation: TLocation[], childrenLocation: TLocation[] }) {
-    const { parentLocation, childrenLocation } = props
+export default function LocationTable(props: { 
+    parentLocation: TLocation[], 
+    childrenLocation: TLocation[],
+    parentProp: TLocation | null,
+    childProp: TLocation | null
+}) {
+    const { parentLocation, childrenLocation, parentProp, childProp } = props
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-    const [parent, setParent] = useState(parentLocation[0])
+    const [parent, setParent] = useState(parentProp)
     const [report, setReport] = useState([] as AssetCount[])
-    const [childId, setChildId] = useState<number | null>(null)
+    const [childId, setChildId] = useState<number | null>(childProp?.id!)
     useEffect(() => {
         const filterReportByChildId = () => {
-            setReport(report.filter((report) => report.location_id == childId))
+            if (childId) {
+                setReport(report.filter((report) => report.location_id == childId))
+            }
         }
-        const fetchReportByParent = async () => {
+       
+        filterReportByChildId();
+    }, [childId, parent])
+
+    useEffect(()=> {
+         const fetchReportByParent = async () => {
             const parentId = parentLocation.find((loc) => loc.name === (parent as TLocation).name) as TLocation
             const newReport = await getReportFromParentLocation(parentId.id!)
             setReport(newReport)
         }
         fetchReportByParent();
-        filterReportByChildId();
-    }, [childId, parent])
+    }, [parent])
     return (
         <>
-            <ParentSelectComponent parentLocation={parentLocation} setParent={setParent} />
-            <ChildrenSelectComponent parent={parent!} locationByParent={childrenLocation} setChildId={setChildId} />
+            <ParentSelectComponent parentLocation={parentLocation} parentProp={parent!} setParent={setParent} />
+            <ChildrenSelectComponent parent={parent!} locationByParent={childrenLocation} childId={childId!} setChildId={setChildId} />
             <Table stickyHeader size="small">
                 <TableHead>
                     <TableRow>
