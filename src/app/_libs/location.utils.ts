@@ -18,3 +18,7 @@ export function checkSamePathName(navigateTo: string, path: string) : boolean {
     const stripSearchParams = navigateTo.split('?')
     return stripSearchParams.find((splitPath) => splitPath === path) ? true : false
 }
+
+export function checkTabPathname(pathname: string) : boolean {
+    return !pathname.includes('check')
+}

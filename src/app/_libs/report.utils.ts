@@ -1,5 +1,24 @@
+'use server'
 import { AssetCount, AssetCountLine } from '@/_types/types'
 import { prisma } from './prisma';
+
+export async function changeDateToIsoString(date : Date) : Promise<string> {
+    const [month, day, year] = date.toLocaleDateString('th-Bk').split('/').map(Number);
+    return (new Date(year!, month! - 1, day)).toISOString()
+}
+
+export async function createDocumentNumber(locationId: number, date: string) : Promise<string> {
+    let divided = locationId
+    let i = 0
+    while (Math.floor(divided /= 10)) { 
+        console.log(divided)
+        i++
+    }
+    const fillZero = '0'.repeat(i)
+    const formatDate = date.split('/').join('')
+    const beforeEncryptString = `${fillZero}${locationId}${formatDate}`
+    return beforeEncryptString
+}
 
 export type FCreateAssetCountReport = {
     document_number: string;
@@ -13,7 +32,13 @@ export async function createAssetCountReport(
     payload: FCreateAssetCountReport)
     : Promise<AssetCount> {
     return await prisma.asset_count.create({
-        data: payload
+        data: {
+            document_number: payload.document_number,
+            document_date: await changeDateToIsoString(payload.document_date),
+            rtd_location_id: payload.rtd_location_id,
+            location_id: payload.location_id,
+            state: payload.state
+        }
     })
 }
 
@@ -22,7 +47,7 @@ export async function getAssetCountReportList(
     : Promise<AssetCount[]> {
     return await prisma.asset_count.findMany({
         where: {
-            created_at: date,
+            created_at: await changeDateToIsoString(date),
             location_id: locationId
         }
     })
@@ -33,7 +58,7 @@ export async function getAssetCountReport(
     : Promise<AssetCount | null> {
     return await prisma.asset_count.findFirst({
         where: {
-            document_date: date,
+            document_date: await changeDateToIsoString(date),
             location_id: locationId
         }
     })

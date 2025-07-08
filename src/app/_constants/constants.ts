@@ -4,12 +4,25 @@ import { blue, green, grey, red, yellow } from "@mui/material/colors"
 export const INLOCATION = "INLOCATION"
 export const OUTLOCATION = "OUTLOCATION"
 
+export const timeFormat =  {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }
+
 export const MapColor: Record<string, { [key: number]: string }> = {
     "NEW": blue,
     "IN PROGRESS": yellow,
     "COMPLETED": green,
     "CANCEL": red
 }
+
+export enum ReportState {
+    NEW = "NEW",
+    INPROGRESS = "IN PROGRESS",
+    COMPLETED = "COMPLETED",
+    CANCEL = "CANCEL"
+} 
 
 export const MapActionColor: Record<string, { [key: number]: string }> = {
     "OPEN": blue,

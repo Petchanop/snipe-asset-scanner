@@ -1,4 +1,5 @@
 import { asset_count, asset_count_line, assets, locations, users } from "@/prisma/generated/prisma";
+
 export type TSnipeDocument = {
     date: string;
     documentNumber: string;

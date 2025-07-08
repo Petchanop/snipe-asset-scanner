@@ -20,8 +20,7 @@ import { TLocation } from "@/_types/snipe-it.type";
 import { getReportFromParentLocation } from "@/_apis/report.api";
 import { AssetCount, Location } from "@/_types/types";
 import { useLocationUrlContext } from "@/reports/layout";
-import { usePathname, useSearchParams } from "next/navigation";
-import { getParentFromChildId } from "@/_libs/location.utils";
+import { usePathname } from "next/navigation";
 
 function createLocationTableCell(data: locationTableData) {
     const { date, documentNumber, location, status, action } = data;
@@ -64,7 +63,6 @@ function ChildrenSelectComponent(props: {
     const { parent, locationByParent, childId, setChildId } = props
     const [childLocation, setChildLocation] = useState("")
     const [childrenLocation, setChildrenLocation] = useState<TLocation[]>([])
-    const pathname = usePathname()
     const context = useLocationUrlContext()
 
     const handleOnClick = (target: EventTarget & (HTMLInputElement | HTMLTextAreaElement)) => {
