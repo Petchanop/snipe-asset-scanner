@@ -15,12 +15,12 @@ import { AssetTable } from "@/_components/tables/list-asset";
 import { TAssetRow, TAssetTab, TSnipeDocument } from "@/_types/types";
 import { getAssetByLocationCount } from "@/_apis/report.api";
 import dayjs, { Dayjs } from "dayjs";
-import { ReportContext, useLocationUrlContext, useReportContext } from "@/reports/layout";
+import { ReportContext, useLocationUrlContext, useReportContext } from "@/_components/tableLayout";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createAssetCountReport, createDocumentNumber, getAssetCountLineByAssetCount, getAssetCountReport } from "@/_libs/report.utils";
 import { getUserById } from "@/_apis/snipe-it/snipe-it.api";
-import { Router } from "next/router";
 import { ReportState } from "@/_constants/constants";
+import toast from "react-hot-toast";
 
 function CheckAdditionalAssetButton() {
   return (
@@ -60,7 +60,7 @@ function CheckAssetButton(props: {
         onClick={() => {
           push(`${pathname}/${reportContext.DocumentNumber}/check?location=${location!.toString()}`)
         }
-      }
+        }
       >Check</Button>
       <Button className={
         `hover:bg-blue-200 max-md:w-1/3 
@@ -178,7 +178,7 @@ function SelectCountButton(props: {
   async function handleClickStart() {
     setIsCheckTable((pre) => !pre)
     const documentNumber = await createDocumentNumber(
-      locationContext.locationUrl, 
+      locationContext.locationUrl,
       dateContext.dateValue.toDate().toLocaleDateString('th-BK')
     )
     if (!documentContext.DocumentNumber) {
@@ -281,8 +281,6 @@ export function NewCountInput(props: {
   )
 }
 
-
-
 export type PNewCountTableProps =
   { name: string, id: number }
 
@@ -319,21 +317,28 @@ export default function NewCountTable(props: {
 
   useEffect(() => {
     const fetchReport = async () => {
-      console.log("fetch report by date ", dateValue?.toDate()!.toLocaleDateString('th-Bk'), " at location ", locationId)
-      let report = await getAssetCountReport(dateValue?.toDate()!, locationId)
+      const report = await getAssetCountReport(dateValue?.toDate()!, locationId)
       if (!report) {
         setData([])
       } else {
         setDocumentNumber(report.document_number)
         const assetCountLineReport = await getAssetCountLineByAssetCount(report.id)
         const mapAssetData: TAssetRow[] = await Promise.all(
-          assetCountLineReport.map(async (data) => {
+          assetCountLineReport.map(async (asset) => {
+            const {data, error} = await getUserById(asset.assigned_to!)
+            if (error) {
+              toast('cannot fetch asset count line')
+            }
             return {
-              assetCode: data.asset_code,
-              assetName: data.asset_name,
-              assignedTo: await getUserById(data.assigned_to!),
-              countCheck: data.asset_check,
-              assignIncorrect: data.asset_name_not_correct
+              assetCode: asset.asset_code,
+              assetName: asset.asset_name,
+              assignedTo: {
+                id: data?.id,
+                first_name: data?.first_name,
+                last_name: data?.last_name
+              },
+              countCheck: asset.asset_check,
+              assignIncorrect: asset.is_not_asset_loc
             } as unknown as TAssetRow
           }))
         setData(mapAssetData)

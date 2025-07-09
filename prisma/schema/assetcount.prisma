@@ -29,7 +29,7 @@ model asset_count_line {
     count_id asset_count @relation(fields: [asset_count_id], references: [id])
     asset_count_id Int @db.UnsignedInt
     asset_id    Int
-    asset_code String
+    asset_code String @unique
     asset_name  String
     assigned_to   Int?
     asset_check Boolean

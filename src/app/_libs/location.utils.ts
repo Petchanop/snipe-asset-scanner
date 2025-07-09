@@ -10,6 +10,10 @@ export function getChildrenLocation(data: TLocation[]) : TLocation[] {
     return data.filter((loc) => loc.parent != null )
 }
 
+export function getOtherLocation(data: TLocation[]) : TLocation[] {
+    return data.filter((loc) => loc.parent == null && !(loc.children as unknown as string[]).length )
+}
+
 export function getParentFromChildId(childLocation: TLocation[], id: number): TLocation{
     return childLocation.find((loc) => loc.id == id)?.parent!
 }

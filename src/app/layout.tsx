@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import "./globals.css";
 import { ReactNode } from "react";
+import TableLayout from "./_components/tableLayout";
 
 export const metadata: Metadata = {
   title: "Snipe-it asset tracker",
@@ -21,8 +22,10 @@ export default function RootLayout({
       </head>
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <main className="w-full h-svh flex justify-center">
-            {children}
+          <main className="w-full h-svh flex justify-center overflow-auto">
+            <TableLayout
+             children={children}
+             />
           </main>
         </AppRouterCacheProvider>
       </body>

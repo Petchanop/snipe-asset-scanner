@@ -5,46 +5,69 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow"
 import { tableHeadersAdditional } from "@/_constants/constants";
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Table from "@mui/material/Table";
 import { blue } from "@mui/material/colors";
 import Button from "@mui/material/Button";
-import { fetchSearchAsset } from "@/_apis/snipe-it/snipe-it.api";
+import { AssetResponse, fetchSearchAsset } from "@/_apis/snipe-it/snipe-it.api";
 import { toast, ToastBar, Toaster } from 'react-hot-toast';
-import { TAssetRow } from "@/_types/types";
+import { AssetCount } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
 import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
+import { AddAssetCountLine } from "@/_apis/report.api";
 
-function createSearchAssetTableCell(data: TAssetRow, action: JSX.Element,
-  actionLabel: string) {
-  const { assetCode, assetName, assignedTo, assignIncorrect } = data;
+export type ExtendAssetResponse = AssetResponse & {
+  asset_name_not_correct: boolean;
+  is_not_asset_loc: boolean;
+  asset_check: boolean;
+}
+
+function CreateSearchAssetTableCell(props: {
+  data: ExtendAssetResponse,
+  actionLabel: string,
+  assetCountReport: AssetCount
+}) {
+  const { data, actionLabel, assetCountReport } = props
+  const [checked, setChecked] = useState(data.is_not_asset_loc)
   return (
     <>
       <TableCell>
-        {assetCode}
+        {data.asset_tag}
       </TableCell>
       <TableCell>
-        {assetName}
+        {data.name}
       </TableCell>
       <TableCell>
-        {assignedTo.first_name} {assignedTo.last_name}
+        {data.assigned_to!.first_name} {data.assigned_to!.last_name}
       </TableCell>
-      <TableCell className="place-content-center">
-        {assignIncorrect}
-        <Checkbox checked={assignIncorrect} />
+      <TableCell className="relative place-content-center justify-center items-center justify-content-center">
+        <Checkbox checked={checked} onChange={() => {
+          setChecked((pre) => !pre)
+        }} />
       </TableCell>
       <TableCell>
-        {action} {actionLabel}
-        {/* <Checkbox disabled={!isCheckTable} />[Del] */}
+        <Button onClick={() => {
+            const newData = data
+            newData.is_not_asset_loc = checked
+            AddAssetCountLine(newData, assetCountReport).then((result) => console.log(result))
+        }
+        }>
+          {actionLabel}
+        </Button>
       </TableCell>
     </>
   )
 }
 
-function SearchAssetTable(props: { data: TAssetRow[], isCheckTable: boolean, assetTab: boolean }) {
-  const { data } = props
+function SearchAssetTable(props: {
+  data: AssetResponse[],
+  isCheckTable: boolean,
+  assetTab: boolean,
+  assetCountReport: AssetCount
+}) {
+  const { data, assetCountReport } = props
   const headers = tableHeadersAdditional
   return (
     <>
@@ -60,43 +83,59 @@ function SearchAssetTable(props: { data: TAssetRow[], isCheckTable: boolean, ass
       <TableBody sx={{ overflow: 'hidden' }} className="place-content-center">
         {
           data.length ?
-            (data).map((asset: TAssetRow) =>
-              <TableRow key={asset.assetCode}>
-                {createSearchAssetTableCell(asset, <></>, "")}
-              </TableRow>
+            (data).map((asset: AssetResponse) => {
+              const extendTypeAsset: ExtendAssetResponse = {
+                ...asset,
+                asset_name_not_correct: false,
+                is_not_asset_loc: asset.location?.id != assetCountReport.location_id,
+                asset_check: false,
+              }
+              return (
+                <TableRow key={asset.asset_tag} >
+                  <CreateSearchAssetTableCell data={extendTypeAsset} actionLabel={"Add"} assetCountReport={assetCountReport} />
+                </TableRow>
+              )
+            }
             )
             : <></>
         }
-      </TableBody>
+      </TableBody >
     </>
   )
 }
 
-export default function SearchAsset() {
+export default function SearchAsset(
+  props: {
+    assetCountReport: AssetCount
+  }
+) {
+  const { assetCountReport } = props
   const [searchInput, setSearchInput] = useState<string>("")
   const [scanData, setScanData] = useState<IDetectedBarcode[]>()
   const [fetchData, setFetchData] = useState<boolean>(false)
-  const [searchResult, setSearchResult] = useState<TAssetRow[]>([])
+  const [searchResult, setSearchResult] = useState<AssetResponse[]>([])
   const [show, setShow] = useState(false)
 
   async function callFetchAssetSearch() {
+    console.log("fetch data ", searchInput, fetchData)
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
       if (error) {
         toast(`${searchInput} not found.`)
       } else {
-        const asset: TAssetRow = {
-          assetCode: data.asset_tag as string,
-          assetName: data.name as string,
-          assignedTo: {
-            id: data.assigned_to?.id as unknown as number,
-            first_name: data.assigned_to?.first_name as unknown as string,
-            last_name: data.assigned_to?.last_name as unknown as string
-          },
-          countCheck: false,
-          assignIncorrect: false,
-        }
-        setSearchResult([...searchResult, asset])
+        console.log("client ", data!.id)
+        // const asset: TAssetRow = {
+        //   assetCode: data.asset_tag as string,
+        //   assetName: data.name as string,
+        //   assignedTo: {
+        //     id: data.assigned_to?.id as unknown as number,
+        //     first_name: data.assigned_to?.first_name as unknown as string,
+        //     last_name: data.assigned_to?.last_name as unknown as string
+        //   },
+        //   countCheck: false,
+        //   assignIncorrect: false,
+        // }
+        setSearchResult([...searchResult, data])
         setSearchInput("")
       }
     }
@@ -112,26 +151,27 @@ export default function SearchAsset() {
     const fetchAssetFromScanData = async () => {
       console.log(scanData)
       scanData?.map(async (result) => {
-      const { data, error } = await fetchSearchAsset(encodeURIComponent(result.rawValue));
-      if (error) {
-        toast(`${result.rawValue} not found.`)
-      } else {
-        const asset: TAssetRow = {
-          assetCode: data.asset_tag as string,
-          assetName: data.name as string,
-          assignedTo: {
-            id: data.assigned_to?.id as unknown as number,
-            first_name: data.assigned_to?.first_name as unknown as string,
-            last_name: data.assigned_to?.last_name as unknown as string
-          },
-          countCheck: false,
-          assignIncorrect: false,
+        const { data, error } = await fetchSearchAsset(encodeURIComponent(result.rawValue));
+        if (error) {
+          toast(`${result.rawValue} not found.`)
+        } else {
+          // const asset: TAssetRow = {
+          //   assetCode: data.asset_tag as string,
+          //   assetName: data.name as string,
+          //   assignedTo: {
+          //     id: data.assigned_to?.id as unknown as number,
+          //     first_name: data.assigned_to?.first_name as unknown as string,
+          //     last_name: data.assigned_to?.last_name as unknown as string
+          //   },
+          //   countCheck: false,
+          //   assignIncorrect: false,
+          // }
+          setSearchResult([...searchResult, data])
         }
-        setSearchResult([...searchResult, asset])
-      }
       })
     }
     fetchAssetFromScanData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanData])
 
   return (
@@ -166,6 +206,7 @@ export default function SearchAsset() {
             className="w-1/2"
             onChange={(event) => setSearchInput(event.target.value)}
             disabled={show}
+            value={searchInput}
           />
           <Button onClick={() => setFetchData(true)}>Search</Button>
           <Typography className="content-center">OR</Typography>
@@ -195,7 +236,7 @@ export default function SearchAsset() {
           borderWidth: 1,
           borderColor: blue[400]
         }}>
-          <SearchAssetTable data={searchResult} isCheckTable={true} assetTab={false} />
+          <SearchAssetTable data={searchResult} isCheckTable={true} assetTab={false} assetCountReport={assetCountReport} />
         </Table>
       </div>
     </>

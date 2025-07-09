@@ -4,14 +4,16 @@ import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } f
 import { TAsset, TLocation, TUser } from "@/_types/snipe-it.type";
 
 const client = await createGateway();
-type AssetResponse = Exclude<TAsset, TStatusResponse>
+export type AssetResponse = Exclude<TAsset, TStatusResponse>
 export async function fetchSearchAsset(searchInput: string) : Promise<TResponse<AssetResponse>>{
-    let {data, error} = await client.GET("/hardware/bytag/{asset_tag}", {
+    const result = await client.GET("/hardware/bytag/{asset_tag}", {
         params: {
                 path: { asset_tag: searchInput }
             }
         }
     )
+    const { error } = result
+    let { data } = result
     if (searchInput.includes('/')) {
         const requestOption = {
             method: "GET",
@@ -22,12 +24,12 @@ export async function fetchSearchAsset(searchInput: string) : Promise<TResponse<
         }}
         const request = `${process.env.SNIPE_URL}/hardware/bytag/${searchInput}`
         data = await fetch(request, requestOption)
-        .then((response) => response.text())
+        .then((response) => response.json())
         .then((result) => {
             return result
-    }) as AssetResponse
+        }) as AssetResponse
     }
-    if (error)
+    if (error && !JSON.stringify(data))
         return {data: null , error: error}
     if (checkIfIsTStatusResponse(data)) {
         return { data: null , error: data as TStatusResponse}

@@ -56,6 +56,7 @@ export async function getAssetCountReportList(
 export async function getAssetCountReport(
     date: Date, locationId: number)
     : Promise<AssetCount | null> {
+    (changeDateToIsoString(date)).then((result) => console.log(result))
     return await prisma.asset_count.findFirst({
         where: {
             document_date: await changeDateToIsoString(date),

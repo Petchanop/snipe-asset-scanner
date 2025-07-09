@@ -12,7 +12,7 @@ export type locationTableData = {
     date: string;
     documentNumber: string;
     location: string;
-    status: string;
+    state: string;
     action: string;
 }
 

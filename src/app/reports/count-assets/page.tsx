@@ -18,7 +18,7 @@ export default async function AssetsTablePage({ searchParams } : {
     //fetch location from snipe api
     const locations = await fetchLocations();
     const childrenLocation = getChildrenLocation(locations.data!.rows) as TLocation[]
-    const locationData = await getLocationById(parseInt(resolveLocationId?.toString()!))
+    const locationData = await getLocationById(parseInt(resolveLocationId?.toString()!)) 
     let filterByParentId = null
     if (!locationData?.parent_id) {
         filterByParentId = childrenLocation
@@ -41,7 +41,7 @@ export default async function AssetsTablePage({ searchParams } : {
     return (
         <NewCountTable 
             locations={filterByParentId} 
-            defaultLocation={locationData?.name!}
+            defaultLocation={locationData?.name!} 
             locationId={parseInt(resolveLocationId!.toString())}
         />
     )
