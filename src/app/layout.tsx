@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import "./globals.css";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import TableLayout from "./_components/tableLayout";
 
 export const metadata: Metadata = {
@@ -23,9 +23,11 @@ export default function RootLayout({
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <main className="w-full h-svh flex justify-center overflow-auto">
-            <TableLayout
-             children={children}
-             />
+            <Suspense fallback={<div>Loading...</div>}>
+              <TableLayout>
+                {children}
+              </TableLayout>
+            </Suspense>
           </main>
         </AppRouterCacheProvider>
       </body>
