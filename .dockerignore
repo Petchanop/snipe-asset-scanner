@@ -1,0 +1,5 @@
+.next
+.devcontainer
+.vscode
+node_modules
+snippeit.dump.sql

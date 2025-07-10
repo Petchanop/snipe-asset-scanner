@@ -1,0 +1,26 @@
+services: 
+  snipe-asset-scanner:
+    container_name: snipe-asset-scanner
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      tags:
+        - "snipe-asset-scanner:v1.0"
+    env_file:
+      - .env
+
+    ports:
+      - "3000:3000"
+    # command: sleep infity
+    networks:
+      - snipe-it-db_snipe-it
+
+networks:
+  snipe-it-db_snipe-it:
+    external: true
+
+# GRANT ALL PRIVILEGES ON `snipeit`.* TO 'snipeit'@'%';
+# FLUSH PRIVILEGES;
+
+
