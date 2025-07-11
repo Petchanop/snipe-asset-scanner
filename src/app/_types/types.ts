@@ -23,6 +23,7 @@ export type assetUser = {
 }
 
 export type TAssetRow = {
+    id?: number;
     assetCode: string;
     assetName: string;
     assignedTo: assetUser;

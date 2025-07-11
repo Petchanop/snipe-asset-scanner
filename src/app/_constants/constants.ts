@@ -41,7 +41,7 @@ export const tableHeaders: HeadersAssetTable[] = [
         fontColor: ["black"]
     },
     {
-        label: "assigned to",
+        label: "Assigned to",
         isSelectBox: false,
         fontColor: ["black"]
     },
@@ -69,7 +69,7 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         fontColor: ["black"]
     },
     {
-        label: "assigned to",
+        label: "Assigned to",
         isSelectBox: false,
         fontColor: ["black"]
     },

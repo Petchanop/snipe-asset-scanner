@@ -1,4 +1,8 @@
-import { INLOCATION, tableHeaders, tableHeadersAdditional } from "@/_constants/constants";
+import {
+  INLOCATION,
+  tableHeaders,
+  tableHeadersAdditional
+} from "@/_constants/constants";
 import { OUTLOCATION, TAssetRow, TAssetTab } from "@/_types/types";
 import { JSX } from "@emotion/react/jsx-runtime";
 import Checkbox from "@mui/material/Checkbox";
@@ -12,19 +16,26 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow"
 import Tabs from "@mui/material/Tabs";
-import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent } from "react";
-import { handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
+import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useState } from "react";
+import {
+  handleChangePage,
+  handleChangeRowsPerPage
+} from "@/_components/tables/utility";
+import { UpdateAssetCountLine } from "@/_libs/report.utils";
 
-export function createAssetTableCell(
-  data: TAssetRow,
-  assetTab: TAssetTab,
-  action: JSX.Element,
-  actionLabel: string,
-  isCheckTable: boolean
-) {
-  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect } = data;
+export function CreateAssetTableCell(
+  props: {
+    data: TAssetRow,
+    assetTab: TAssetTab,
+    action: JSX.Element,
+    actionLabel: string,
+    isCheckTable: boolean
+  }) {
+  const { data, assetTab, actionLabel, action, isCheckTable } = props
+  const {id, assetCode, assetName, assignedTo, countCheck, assignIncorrect } = data;
+  const [count, setCount] = useState(countCheck)
+  const [incorrect, setIncorrect] = useState(assignIncorrect)
   const tabType = !assignIncorrect ? INLOCATION : OUTLOCATION
-  console.log(tabType, assignIncorrect)
   return (
     <>
       {
@@ -42,20 +53,29 @@ export function createAssetTableCell(
             {
               assetTab ?
                 <TableCell>
-                  {countCheck}
-                  <Checkbox checked={countCheck} disabled={!isCheckTable} />
+                  <Checkbox checked={count}
+                    disabled={!isCheckTable}
+                    onChange={ async () => { 
+                      setCount((pre) => !pre)
+                      await UpdateAssetCountLine(id!, {asset_check: count })
+                    }}
+                  />
                 </TableCell>
                 : <></>
             }
             <TableCell className="place-content-center">
-              {assignIncorrect}
-              <Checkbox checked={assignIncorrect} disabled={!isCheckTable} />
+              <Checkbox checked={incorrect}
+                disabled={!isCheckTable}
+                onChange={ async () => {
+                   setIncorrect((pre) => !pre)
+                   await UpdateAssetCountLine(id!, {is_not_asset_loc: incorrect })
+                }}
+              />
             </TableCell>
             {
               !assetTab ?
                 <TableCell>
                   {action} {actionLabel}
-                  {/* <Checkbox disabled={!isCheckTable} />[Del] */}
                 </TableCell>
                 : <></>
             }
@@ -71,6 +91,7 @@ export default function ListAsset(props: {
 }) {
   const { data, isCheckTable, assetTab } = props
   const headers = assetTab ? tableHeaders : tableHeadersAdditional
+  console.log(data)
   return (
     <>
       <TableHead>
@@ -87,13 +108,15 @@ export default function ListAsset(props: {
           data.length ?
             (data).map((mockData: TAssetRow) =>
               <TableRow key={mockData.assetCode}>
-                {createAssetTableCell(
-                  mockData, assetTab,
-                  <Checkbox disabled={!isCheckTable} />,
-                  "[Del]", isCheckTable)}
+                <CreateAssetTableCell
+                  data={mockData}
+                  assetTab={assetTab}
+                  action={<Checkbox disabled={!isCheckTable} />}
+                  actionLabel={"[Del]"}
+                  isCheckTable={isCheckTable}
+                />
               </TableRow>
-            )
-            :
+            ) :
             <TableRow sx={{
               height: '8rem',
               maxHeight: '8rem'

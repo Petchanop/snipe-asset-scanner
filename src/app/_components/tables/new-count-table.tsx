@@ -17,10 +17,15 @@ import { getAssetByLocationCount } from "@/_apis/report.api";
 import dayjs, { Dayjs } from "dayjs";
 import { ReportContext, useLocationUrlContext, useReportContext } from "@/_components/tableLayout";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { createAssetCountReport, createDocumentNumber, getAssetCountLineByAssetCount, getAssetCountReport } from "@/_libs/report.utils";
+import {
+  createAssetCountReport, createDocumentNumber,
+  findAssetCount,
+  getAssetCountLineByAssetCount, getAssetCountReport
+} from "@/_libs/report.utils";
 import { getUserById } from "@/_apis/snipe-it/snipe-it.api";
 import { ReportState } from "@/_constants/constants";
 import toast from "react-hot-toast";
+import { TLocation } from "@/_types/snipe-it.type";
 
 function CheckAdditionalAssetButton() {
   return (
@@ -28,14 +33,14 @@ function CheckAdditionalAssetButton() {
       <div className="flex flex-row w-full lg:pl-8 lg:space-x-8" >
         <Button className={
           `hover:bg-blue-200 max-md:w-1/3
-                        max-md:text-xs max-md:font-medium`
+          max-md:text-xs max-md:font-medium`
         }
         >Scan</Button>
       </div>
       <div className="flex flex-row w-full lg:pl-8 lg:space-x-8" >
         <Button className={
           `hover:bg-blue-200 max-md:w-1/3 
-                        max-md:text-xs max-md:font-medium`
+          max-md:text-xs max-md:font-medium`
         }>Add Asset</Button>
       </div>
     </div>
@@ -51,27 +56,41 @@ function CheckAssetButton(props: {
   const location = searchParam.get('location')
   const { push } = useRouter()
   const reportContext = useReportContext()
+
+  const handleFinishbutton = () => {
+    console.log("update report")
+    setIsCheckTable(false)
+
+  }
   return (
-    <div className="flex flex-row w-full lg:pl-8 lg:space-x-8">
-      <Button className={
-        `hover:bg-blue-200 max-md:w-1/3
-                        max-md:text-xs max-md:font-medium`
-      }
-        onClick={() => {
-          push(`${pathname}/${reportContext.DocumentNumber}/check?location=${location!.toString()}`)
+    <div className="flex flex-row w-full lg:pl-8 lg:space-x-8 justify-start content-center items-center">
+      <div className="flex flex-col">
+        <Button className={
+          `hover:bg-blue-200 max-md:w-1/3
+        max-md:text-xs max-md:font-medium`
         }
+          variant="text"
+          onClick={() => {
+            push(`${pathname}/${reportContext.DocumentNumber}/check?location=${location!.toString()}`)
+          }}
+        >Check</Button>
+      </div>
+      <div className="flex flex-col">
+        <Button className={
+          `hover:bg-blue-200 max-md:w-1/3 
+        max-md:text-xs max-md:font-medium`
         }
-      >Check</Button>
-      <Button className={
-        `hover:bg-blue-200 max-md:w-1/3 
-                        max-md:text-xs max-md:font-medium`
-      }>Finish</Button>
-      <Button className={
-        `hover:bg-blue-200 max-md:w-1/3 
-                        max-md:text-xs max-md:font-medium`
-      }
-        onClick={() => setIsCheckTable((pre) => !pre)}
-      >Cancel</Button>
+          onClick={handleFinishbutton}
+        >Finish</Button>
+      </div>
+      <div className="flex flex-col">
+        <Button className={
+          `hover:bg-blue-200 max-md:w-1/3 
+        max-md:text-xs max-md:font-medium`
+        }
+          onClick={() => setIsCheckTable((pre) => !pre)}
+        >Cancel</Button>
+      </div>
     </div>
   )
 }
@@ -82,15 +101,18 @@ function SelectCountInput(props: {
   setSelectedLocation: (value: string) => void,
   setDocumentDate: (value: string) => void,
   isCheckTable: boolean,
+  defaultLocation: TLocation
 }) {
   const { locations,
     selectedLocation,
     setSelectedLocation,
     setDocumentDate,
     isCheckTable,
+    defaultLocation
   } = props
   const context = useLocationUrlContext()
   const dateContext = useDateContext()
+  const documentContext = useReportContext()
 
   const handleDateOnChange = (value: SetStateAction<dayjs.Dayjs | null>) => {
     if (value) {
@@ -103,7 +125,7 @@ function SelectCountInput(props: {
     <div className="flex flex-col w-1/2 max-md:w-3/4 space-y-2">
       {
         isCheckTable ?
-          <Typography className="">Document Number</Typography>
+          <Typography className="mt-2 mb-4">{documentContext.DocumentNumber}</Typography>
           : <></>
       }
       <div className="flex flex-row items-center">
@@ -137,22 +159,33 @@ function SelectCountInput(props: {
           disabled={isCheckTable}
         >
           {
-            locations.map((loc) =>
-              <MenuItem value={loc.name as unknown as string} key={loc.id}>
-                <div dangerouslySetInnerHTML={{ __html: loc.name! }}
-                  data-key={loc.id}
-                  data-value={loc.name}
+            locations.length ?
+              locations.map((loc) =>
+                <MenuItem value={loc.name as unknown as string} key={loc.id}>
+                  <div dangerouslySetInnerHTML={{ __html: loc.name! }}
+                    data-key={loc.id}
+                    data-value={loc.name}
+                    onClick={(event) => {
+                      const target = event.target as HTMLElement
+                      context.setLocationId(parseInt(target.dataset.key as string))
+                      setSelectedLocation(target.dataset.value as string)
+                      context.selected.current = `/reports/count-assets?location=${target.dataset.key}`
+                    }}
+                  ></div>
+                </MenuItem>
+              ) :
+              <MenuItem value={defaultLocation.name as unknown as string} key={defaultLocation.id}>
+                <div dangerouslySetInnerHTML={{ __html: defaultLocation.name! }}
+                  data-key={defaultLocation.id}
+                  data-value={defaultLocation.name}
                   onClick={(event) => {
                     const target = event.target as HTMLElement
                     context.setLocationId(parseInt(target.dataset.key as string))
                     setSelectedLocation(target.dataset.value as string)
-                    context.setSelected(
-                      `/reports/count-assets?location=${target.dataset.key}`
-                    )
+                    context.selected.current = `/reports/count-assets?location=${target.dataset.key}`
                   }}
                 ></div>
               </MenuItem>
-            )
           }
         </Select>
       </div>
@@ -178,16 +211,18 @@ function SelectCountButton(props: {
   async function handleClickStart() {
     setIsCheckTable((pre) => !pre)
     const documentNumber = await createDocumentNumber(
-      locationContext.locationUrl,
-      dateContext.dateValue.toDate().toLocaleDateString('th-BK')
+      locationContext.locationId,
+      dateContext.dateValue.format('DD/MM/YYYY')
     )
-    if (!documentContext.DocumentNumber) {
+    const document = await findAssetCount(documentNumber)
+    console.log("documentNumber ", documentNumber, document, documentContext.DocumentNumber)
+    if (!document) {
       console.log("report create ", documentNumber)
       const reportPayload = {
         document_number: documentNumber,
         document_date: dateContext.dateValue.toDate(),
         rtd_location_id: null,
-        location_id: locationContext.locationUrl,
+        location_id: locationContext.locationId,
         state: ReportState.NEW
       }
       await createAssetCountReport(reportPayload)
@@ -196,12 +231,13 @@ function SelectCountButton(props: {
     replace(`${window.location.href}`)
     //create report if it empty
   }
+
   return (
-    <div className="flex flex-col pt-2 max-md:w-2/5 items-center space-y-2">
+    <div className="flex flex-col pt-2 max-md:w-2/5 justify-center space-y-2">
       <div className="flex flex-row">
         <Button className={
           `hover:bg-blue-200 max-md:w-2/5 
-                        max-md:text-xs max-md:font-medium`
+          max-md:text-xs max-md:font-medium`
         }
           onClick={() => {
             setLocation(selectedLocation);
@@ -213,8 +249,8 @@ function SelectCountButton(props: {
       <div className="flex flex-row">
         <Button className={
           `hover:bg-blue-200 max-md:w-2/5
-                    max-md:text-xs max-md:font-medium
-                `}
+          max-md:text-xs max-md:font-medium
+          `}
           onClick={handleClickStart}
         >
           Start
@@ -227,6 +263,7 @@ function SelectCountButton(props: {
 export function NewCountInput(props: {
   locations: PNewCountTableProps[],
   location: string,
+  defaultLocation: TLocation;
   setLocation: (value: string) => void
   isCheckTable: boolean,
   setIsCheckTable: (value: SetStateAction<boolean>) => void
@@ -239,8 +276,10 @@ export function NewCountInput(props: {
     isCheckTable,
     setIsCheckTable,
     assetTab,
+    defaultLocation
   } = props
-  const [selectedLocation, setSelectedLocation] = useState<string>(location)
+  console.log("new count input ", location)
+  const [selectedLocation, setSelectedLocation] = useState(location)
   const [documentDate, setDocumentDate] = useState<string>((new Date()).toDateString())
   const documentContext = useReportContext()
   function findDocumentNumber(): TSnipeDocument[] {
@@ -264,14 +303,14 @@ export function NewCountInput(props: {
         setSelectedLocation={setSelectedLocation}
         setDocumentDate={setDocumentDate}
         isCheckTable={isCheckTable}
+        defaultLocation={defaultLocation}
       />
       {
         isCheckTable ?
           assetTab ?
             <CheckAssetButton setIsCheckTable={setIsCheckTable} />
             : <CheckAdditionalAssetButton />
-          :
-          <SelectCountButton
+          : <SelectCountButton
             selectedLocation={selectedLocation}
             setLocation={setLocation}
             setIsCheckTable={setIsCheckTable}
@@ -293,11 +332,11 @@ const DateValueContext = createContext<TDateValueContext | null>(null)
 
 export default function NewCountTable(props: {
   locations: PNewCountTableProps[],
-  defaultLocation: string;
+  defaultLocation: TLocation;
   locationId: number;
 }) {
   const { locations, defaultLocation, locationId } = props
-  const [location, setLocation] = useState<string>(defaultLocation)
+  const [location, setLocation] = useState(defaultLocation?.name! as string)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
   const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
   const [data, setData] = useState<TAssetRow[]>([])
@@ -325,11 +364,12 @@ export default function NewCountTable(props: {
         const assetCountLineReport = await getAssetCountLineByAssetCount(report.id)
         const mapAssetData: TAssetRow[] = await Promise.all(
           assetCountLineReport.map(async (asset) => {
-            const {data, error} = await getUserById(asset.assigned_to!)
+            const { data, error } = await getUserById(asset.assigned_to!)
             if (error) {
               toast('cannot fetch asset count line')
             }
             return {
+              id: asset.id,
               assetCode: asset.asset_code,
               assetName: asset.asset_name,
               assignedTo: {
@@ -361,7 +401,8 @@ export default function NewCountTable(props: {
         >
           <NewCountInput
             locations={locations}
-            location={location}
+            location={location!}
+            defaultLocation={defaultLocation}
             setLocation={setLocation}
             isCheckTable={isCheckTable}
             setIsCheckTable={setIsCheckTable}

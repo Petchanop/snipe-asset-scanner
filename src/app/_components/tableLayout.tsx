@@ -8,12 +8,15 @@ import Tab from "@mui/material/Tab";
 import TableContainer from "@mui/material/TableContainer";
 import Tabs from "@mui/material/Tabs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { createContext, Dispatch, ReactNode, SetStateAction, SyntheticEvent, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch, ReactNode, 
+  RefObject, SetStateAction, 
+  SyntheticEvent, useContext, 
+  useEffect, useRef, useState } from "react";
 
 type LocationStateContext = {
-  locationUrl: number;
+  selected: RefObject<string>;
+  locationId: number;
   setLocationId: Dispatch<SetStateAction<number>>;
-  setSelected: Dispatch<SetStateAction<string>>;
 }
 
 type ReportStateContext = {
@@ -33,31 +36,26 @@ export default function TableLayout({
   const pathname = usePathname()
   const params = useSearchParams()
   const location = params.get('location')
-  console.log("search param ", location)
+  // console.log("search param ", location)
   let tabPathname = ""
   if (!checkTabPathname(pathname)) {
     tabPathname = `/reports/count-assets?location=${parseInt(location?.toString()!)}` 
   } else {
     tabPathname = pathname
   }
-  const [selected, setSelected] = useState<string>(`${tabPathname}?location=${parseInt(location?.toString()!)}`) 
+  const selected = useRef(`${tabPathname}?location=${parseInt(location?.toString()!)}`)
   const [locationId, setLocationId] = useState(parseInt(location?.toString()!))
   const router = useRouter();
   function handleOnChange(event: SyntheticEvent, newValue: string) {
-    setSelected(newValue)
+    selected.current = newValue
+    router.push(selected.current)
   }
-  useEffect(() => {
-    if (!checkSamePathName(selected, pathname) && checkTabPathname(pathname))
-      console.log("push ", selected)
-    router.push(selected)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected])
 
   useEffect(() => {
     if (locationId) {
-      if (checkSamePathName(selected, pathname) && checkTabPathname(pathname)) {
+      if (checkSamePathName(selected.current, pathname) && checkTabPathname(pathname)) {
         console.log("replace ", selected)
-        router.replace(selected)
+        router.replace(selected.current)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,7 +74,7 @@ export default function TableLayout({
       />
       <CardContent className="space-y-4">
         <Tabs
-          value={selected}
+          value={selected.current}
           className="pl-2"
           onChange={handleOnChange}
         >
@@ -96,9 +94,9 @@ export default function TableLayout({
           <TableContainer className="w-full lg:max-h-[55vh] max-h-[75vh]">
             <LocationUrlContext
               value={{
-                locationUrl: locationId,
+                locationId: locationId,
                 setLocationId: setLocationId,
-                setSelected: setSelected
+                selected: selected,
               }}>
               {children}
             </LocationUrlContext>

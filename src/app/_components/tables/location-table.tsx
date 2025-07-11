@@ -80,7 +80,7 @@ function ChildrenSelectComponent(props: {
     const locationByName = childrenLocation.filter((loc) => loc.name == target.value)[0] as unknown as Location
     setChildId(locationByName.id)
     setChildLocation(target.value)
-    context.setSelected(`/reports?location=${locationByName.id}`)
+    context.selected.current = `/reports?location=${locationByName.id}`
     context.setLocationId(locationByName.id)
   }
 
@@ -102,8 +102,8 @@ function ChildrenSelectComponent(props: {
       }
       if (!locationId)
         locationId = parent.id as unknown as number
-      context.setSelected(`/reports?location=${locationId}`)
       context.setLocationId(locationId)
+      context.selected.current = `/reports?location=${locationId}`
       setChildId(locationId)
       setChildLocation(defaultValue?.name! as string)
     }
@@ -190,7 +190,6 @@ export default function LocationTable(props: {
     const fetchReportByParent = async () => {
       const parentId = parentLocation.find((loc) => loc.name === (parent as TLocation).name) as TLocation
       const newReport = await getReportFromParentLocation(parentId.id!)
-      console.log(newReport)
       setReport(newReport)
     }
     fetchReportByParent();

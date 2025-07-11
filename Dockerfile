@@ -1,14 +1,8 @@
-FROM alpine:3.22.0 AS base
+FROM node:alpine:3.22.0 AS base
 
 RUN apk update && apk upgrade  && \
-    apk add curl \
-    tar \
-    iputils \
-    iputils-ping \
-    cmake \
+    apk add cmake \
     git \
-    npm \
-    nodejs \
     typescript 
 
 FROM base AS development

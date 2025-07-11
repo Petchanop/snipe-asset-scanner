@@ -4,7 +4,6 @@ import { getChildrenLocation } from "@/_libs/location.utils";
 import { TLocation } from "@/_types/snipe-it.type";
 import { getLocationById } from "@/_apis/location.api";
 import { notFound } from "next/navigation";
-// import NotFound from "@/not-found";
 
 export default async function AssetsTablePage({ searchParams } : {
     searchParams: Promise<{ location?: number }>
@@ -37,11 +36,10 @@ export default async function AssetsTablePage({ searchParams } : {
                 id: loc.id as unknown as number
             }))
     }
-
     return (
         <NewCountTable 
             locations={filterByParentId} 
-            defaultLocation={locationData?.name!} 
+            defaultLocation={locationData as unknown as TLocation} 
             locationId={parseInt(resolveLocationId!.toString())}
         />
     )
