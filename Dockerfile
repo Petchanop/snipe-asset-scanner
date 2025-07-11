@@ -21,4 +21,6 @@ RUN npm run build
 
 FROM base AS production
 COPY --from=development snipeit/.next/standalone .
+COPY --from=development snipeit/.next/static ./static
+COPY --from=development snipeit/public ./public
 ENTRYPOINT ["node", "server.js"]

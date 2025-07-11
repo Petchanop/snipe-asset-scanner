@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import "./globals.css";
-import { ReactNode, Suspense } from "react";
-import TableLayout from "./_components/tableLayout";
+import { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Snipe-it asset tracker",
@@ -23,11 +22,11 @@ export default function RootLayout({
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <main className="w-full h-svh flex justify-center overflow-auto">
-            <Suspense fallback={<div>Loading...</div>}>
-              <TableLayout>
+            {/* <Suspense fallback={<LoadingSkeleton />}>
+              <TableLayout> */}
                 {children}
-              </TableLayout>
-            </Suspense>
+              {/* </TableLayout>
+            </Suspense> */}
           </main>
         </AppRouterCacheProvider>
       </body>
