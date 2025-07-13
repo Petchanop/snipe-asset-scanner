@@ -124,17 +124,6 @@ export default function SearchAsset(
       if (error) {
         toast(`${searchInput} not found.`)
       } else {
-        // const asset: TAssetRow = {
-        //   assetCode: data.asset_tag as string,
-        //   assetName: data.name as string,
-        //   assignedTo: {
-        //     id: data.assigned_to?.id as unknown as number,
-        //     first_name: data.assigned_to?.first_name as unknown as string,
-        //     last_name: data.assigned_to?.last_name as unknown as string
-        //   },
-        //   countCheck: false,
-        //   assignIncorrect: false,
-        // }
         setSearchResult([...searchResult, data])
         setSearchInput("")
       }
@@ -154,17 +143,6 @@ export default function SearchAsset(
         if (error) {
           toast(`${result.rawValue} not found.`)
         } else {
-          // const asset: TAssetRow = {
-          //   assetCode: data.asset_tag as string,
-          //   assetName: data.name as string,
-          //   assignedTo: {
-          //     id: data.assigned_to?.id as unknown as number,
-          //     first_name: data.assigned_to?.first_name as unknown as string,
-          //     last_name: data.assigned_to?.last_name as unknown as string
-          //   },
-          //   countCheck: false,
-          //   assignIncorrect: false,
-          // }
           setSearchResult([...searchResult, data])
         }
       })
@@ -223,10 +201,6 @@ export default function SearchAsset(
 
 
         <Table stickyHeader size="small" sx={{
-          // lg: {
-          //     minHeight: 300
-          // },
-          // minHeight: 580,
           minWidth: 650,
           border: 'solid',
           borderLeft: 'none',
