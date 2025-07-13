@@ -1,4 +1,4 @@
-import NewCountTable from "@/_components/tables/new-count-table";
+import NewCountTable, { PNewCountTableProps } from "@/_components/tables/new-count-table";
 import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api";
 import { getChildrenLocation } from "@/_libs/location.utils";
 import { TLocation } from "@/_types/snipe-it.type";
@@ -25,7 +25,8 @@ export default async function AssetsTablePage({ searchParams } : {
             .filter((loc) => loc.parent!.id == Number(resolveLocationId))
             .map((loc) => ({
                 name: loc.name as unknown as string,
-                id: loc.id as unknown as number
+                id: loc.id as unknown as number,
+                rtd_location_id: Number(resolveLocationId)
             }))
     } else {
         filterByParentId = childrenLocation
@@ -33,12 +34,13 @@ export default async function AssetsTablePage({ searchParams } : {
             .filter((loc) => loc.parent!.id == Number(locationData?.parent_id))
             .map((loc) => ({
                 name: loc.name as unknown as string,
-                id: loc.id as unknown as number
+                id: loc.id as unknown as number,
+                rtd_location_id: locationData?.parent_id
             }))
     }
     return (
         <NewCountTable 
-            locations={filterByParentId} 
+            locations={filterByParentId as unknown as PNewCountTableProps[]} 
             defaultLocation={locationData as unknown as TLocation} 
             locationId={parseInt(resolveLocationId!.toString())}
         />

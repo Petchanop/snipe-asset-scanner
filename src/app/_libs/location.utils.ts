@@ -1,9 +1,23 @@
 import { TLocation } from "@/_types/snipe-it.type";
+import { createGateway } from "@/_apis/next.api";
 
 export function getParentLocation(data: TLocation[]) : TLocation[] {
     return data.filter((loc) =>
         "children" in loc ? (loc.children as TLocation[]).length > 0 : null
     )
+}
+
+export async function getLocationById(id: number) : Promise<Location | null> {
+    const client = await createGateway();
+    const { data, error } = await client.GET(`/locations/{id}`, {
+        params: {
+            path: { id: id }
+        }
+    })
+    if (error) {
+        return null;
+    }
+    return data as unknown as Location;
 }
 
 export function getChildrenLocation(data: TLocation[]) : TLocation[] {

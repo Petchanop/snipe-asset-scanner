@@ -1,6 +1,7 @@
 'use server'
+import { LoadingSkeleton } from "@/_components/loading"
 import TableLayout from "@/_components/tableLayout"
-import { ReactNode } from "react"
+import { ReactNode, Suspense } from "react"
 
 export default async function ReportLayout({
   children
@@ -8,8 +9,10 @@ export default async function ReportLayout({
   children: ReactNode
 }) {
   return (
-    <TableLayout>
-      {children}
-    </TableLayout>
+    <Suspense fallback={<LoadingSkeleton />}>
+      <TableLayout>
+        {children}
+      </TableLayout>
+    </Suspense>
   )
 }

@@ -10,9 +10,10 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+  // id  Int @id @default(autoincrement()) @db.UnsignedInt
 
 model asset_count {
-    id  Int @id @default(autoincrement()) @db.UnsignedInt
+    id  String @id @default(uuid()) @db.Char(36)
     document_number String  @unique
     document_date DateTime @default(now()) 
     rtd_location_id Int?
@@ -24,10 +25,11 @@ model asset_count {
     AssetCountLine asset_count_line[]
 }
 
+    // id  Int @id @default(autoincrement()) @db.UnsignedInt
 model asset_count_line {
-    id  Int @id @default(autoincrement()) @db.UnsignedInt
+    id  String @id @default(uuid()) @db.Char(36)
     count_id asset_count @relation(fields: [asset_count_id], references: [id])
-    asset_count_id Int @db.UnsignedInt
+    asset_count_id String @db.Char(36)
     asset_id    Int
     asset_code String @unique
     asset_name  String

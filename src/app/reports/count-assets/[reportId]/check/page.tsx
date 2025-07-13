@@ -1,7 +1,8 @@
+import { getLocationById } from "@/_apis/location.api"
 import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api"
 import SearchAsset from "@/_components/tables/search-asset"
 import { prisma } from "@/_libs/prisma"
-import { getAssetByLocationId } from "@/_libs/report.utils"
+import { getAssetByLocationId, getAssetCountLineByAssetCount } from "@/_libs/report.utils"
 import { AssetCount } from "@/_types/types"
 import Typography from "@mui/material/Typography"
 
@@ -20,13 +21,20 @@ export default async function CheckAssetPage(
             document_number : documentNumber
         }
     })
-    console.log("start count page" , locationId, location, assetCountReport)
-    const assetsInLocation = await getAssetByLocationId(parseInt(locationId))
-    console.log(assetsInLocation.data)
+    const LocationData = await getLocationById(parseInt(locationId))
+    let assetsInLocation = await getAssetByLocationId(parseInt(locationId))
+    if (assetsInLocation.data!.length == 0 && LocationData?.parent_id) {
+        assetsInLocation = await getAssetByLocationId(LocationData.parent_id)
+    }
+    const assetInReport = await getAssetCountLineByAssetCount(assetCountReport!.id!)
     return (
          <div className="p-4">
             <Typography>Check asset</Typography>
-            <SearchAsset assetCountReport={assetCountReport!} assetInlocation={assetsInLocation.data as AssetResponse[]}/>
+            <SearchAsset 
+            assetCountReport={assetCountReport!} 
+            assetInlocation={assetsInLocation.data as AssetResponse[]}
+            assetInReport={assetInReport}
+            />
         </div>
     )
 }

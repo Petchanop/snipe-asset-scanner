@@ -24,6 +24,7 @@ type LocationStateContext = {
 type ReportStateContext = {
   DocumentNumber: string;
   setDocumentNumber: Dispatch<SetStateAction<string>>;
+  setRefetchReport: Dispatch<SetStateAction<boolean>>;
 }
 
 //31 line of console.log
@@ -90,10 +91,10 @@ export default function TableLayout({
             `/reports/count-assets?location=${locationId}`}
             label="new count">
           </Tab>
-          <Tab value={
+          {/* <Tab value={
             `/reports/count-assets/search?location=${locationId}`}
             label="search">
-          </Tab>
+          </Tab> */}
         </Tabs>
         <Paper elevation={10}>
           <TableContainer className="w-full lg:max-h-[55vh] max-h-[75vh]">

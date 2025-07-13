@@ -85,7 +85,7 @@ export async function getAssetCountReport(
 }
 
 type FCreateAssetCountLine = {
-    asset_count_id: number;
+    asset_count_id: string;
     asset_id: number;
     asset_code: string;
     asset_name: string;
@@ -112,7 +112,7 @@ type FUpdateAssetCountLine = {
 }
 
 export async function UpdateAssetCountLine(
-    countId: number, payload: FUpdateAssetCountLine)
+    countId: string, payload: FUpdateAssetCountLine)
     : Promise<AssetCountLine | null> {
     const assetCountLine = await getAssetCountLine(countId)
     payload.checked_on = dayjs().toDate()
@@ -128,7 +128,7 @@ export async function UpdateAssetCountLine(
 }
 
 export async function getAssetCountLine(
-    countId: number
+    countId: string
 ): Promise<AssetCountLine | null> {
     return await prisma.asset_count_line.findUnique({
         where: {
@@ -138,7 +138,7 @@ export async function getAssetCountLine(
 }
 
 export async function getAssetCountLineByAssetCount(
-    assetCountId: number
+    assetCountId: string
 ): Promise<AssetCountLine[]> {
     return await prisma.asset_count_line.findMany({
         where: {

@@ -12,12 +12,11 @@ services:
 
     ports:
       - "3000:3000"
-    # command: sleep infity
     networks:
-      - snipe-it-db_snipe-it
+      - snipe-it_default
 
 networks:
-  snipe-it-db_snipe-it:
+  snipe-it_default:
     external: true
 
 # GRANT ALL PRIVILEGES ON `snipeit`.* TO 'snipeit'@'%';

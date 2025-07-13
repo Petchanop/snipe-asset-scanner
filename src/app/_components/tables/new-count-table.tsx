@@ -59,6 +59,7 @@ function CheckAssetButton(props: {
 
   const handleFinishbutton = () => {
     setIsCheckTable(false)
+    reportContext.setRefetchReport((pre) => !pre)
   }
   return (
     <div className="flex flex-row w-full lg:pl-8 lg:space-x-8 justify-start content-center items-center">
@@ -95,8 +96,8 @@ function CheckAssetButton(props: {
 
 function SelectCountInput(props: {
   locations: PNewCountTableProps[],
-  selectedLocation: string,
-  setSelectedLocation: (value: string) => void,
+  selectedLocation: PNewCountTableProps,
+  setSelectedLocation: (value: PNewCountTableProps) => void,
   setDocumentDate: (value: string) => void,
   isCheckTable: boolean,
   defaultLocation: TLocation
@@ -146,7 +147,7 @@ function SelectCountInput(props: {
           id="display location"
           className="lg:w-2/3 w-3/5"
           label="location"
-          value={selectedLocation}
+          value={selectedLocation.name}
           renderValue={(selected: string) => {
             if (!selected.length) {
               return <em>Location</em>
@@ -166,7 +167,8 @@ function SelectCountInput(props: {
                     onClick={(event) => {
                       const target = event.target as HTMLElement
                       context.setLocationId(parseInt(target.dataset.key as string))
-                      setSelectedLocation(target.dataset.value as string)
+                      const selectedLoc = locations.find(loc => loc.id === parseInt(target.dataset.key as string));
+                      if (selectedLoc) setSelectedLocation(selectedLoc);
                       context.selected.current = `/reports/count-assets?location=${target.dataset.key}`
                     }}
                   ></div>
@@ -179,7 +181,8 @@ function SelectCountInput(props: {
                   onClick={(event) => {
                     const target = event.target as HTMLElement
                     context.setLocationId(parseInt(target.dataset.key as string))
-                    setSelectedLocation(target.dataset.value as string)
+                    const selectedLoc = locations.find(loc => loc.id === parseInt(target.dataset.key as string));
+                    if (selectedLoc) setSelectedLocation(selectedLoc);
                     context.selected.current = `/reports/count-assets?location=${target.dataset.key}`
                   }}
                 ></div>
@@ -192,8 +195,8 @@ function SelectCountInput(props: {
 }
 
 function SelectCountButton(props: {
-  selectedLocation: string,
-  setLocation: (value: string) => void,
+  selectedLocation: PNewCountTableProps,
+  setLocation: (value: PNewCountTableProps) => void,
   setIsCheckTable: (value: SetStateAction<boolean>) => void
 }) {
   const {
@@ -219,7 +222,7 @@ function SelectCountButton(props: {
       const reportPayload = {
         document_number: documentNumber,
         document_date: dateContext.dateValue.toDate(),
-        rtd_location_id: null,
+        rtd_location_id: selectedLocation.rtd_location_id as number,
         location_id: locationContext.locationId,
         state: ReportState.NEW
       }
@@ -260,9 +263,9 @@ function SelectCountButton(props: {
 
 export function NewCountInput(props: {
   locations: PNewCountTableProps[],
-  location: string,
+  location: PNewCountTableProps,
   defaultLocation: TLocation;
-  setLocation: (value: string) => void
+  setLocation: Dispatch<SetStateAction<PNewCountTableProps>>,
   isCheckTable: boolean,
   setIsCheckTable: (value: SetStateAction<boolean>) => void
   assetTab: TAssetTab,
@@ -281,7 +284,7 @@ export function NewCountInput(props: {
   const documentContext = useReportContext()
   function findDocumentNumber(): TSnipeDocument[] {
     return mockLocationTableData
-      .filter((data) => data.location == selectedLocation
+      .filter((data) => data.location == selectedLocation.name
         && data.date == documentDate)
   }
   useEffect(() => {
@@ -318,7 +321,7 @@ export function NewCountInput(props: {
 }
 
 export type PNewCountTableProps =
-  { name: string, id: number }
+  { name: string, id: number, rtd_location_id?: number }
 
 type TDateValueContext = {
   dateValue: Dayjs;
@@ -333,8 +336,9 @@ export default function NewCountTable(props: {
   locationId: number;
 }) {
   const { locations, defaultLocation, locationId } = props
-  const [location, setLocation] = useState(defaultLocation?.name! as string)
+  const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
+  const [refechtReport, setRefetchReport] = useState<boolean>(false)
   const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
   const [data, setData] = useState<TAssetRow[]>([])
   const [dataLength, setDataLength] = useState(0)
@@ -378,12 +382,14 @@ export default function NewCountTable(props: {
               assignIncorrect: asset.is_not_asset_loc
             } as unknown as TAssetRow
           }))
+        console.log("mapAssetData ", mapAssetData)
         setData(mapAssetData)
+        setRefetchReport(false)
       }
     }
 
     fetchReport()
-  }, [locationId, dateValue])
+  }, [locationId, dateValue, refechtReport])
   return (
     <>
       <DateValueContext
@@ -393,7 +399,8 @@ export default function NewCountTable(props: {
         }}>
         <ReportContext value={{
           DocumentNumber: documentNumber,
-          setDocumentNumber: setDocumentNumber
+          setDocumentNumber: setDocumentNumber,
+          setRefetchReport: setRefetchReport
         }}
         >
           <NewCountInput

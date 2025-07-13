@@ -16,7 +16,7 @@ import { MapActionColor, MapColor, ReportState } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
 import { TLocation } from "@/_types/snipe-it.type";
-import { getReportFromParentLocation } from "@/_apis/report.api";
+import { getReportFromChildLocation, getReportFromParentLocation } from "@/_apis/report.api";
 import { AssetCount, Location } from "@/_types/types";
 import { useLocationUrlContext } from "@/_components/tableLayout";
 
@@ -190,12 +190,16 @@ export default function LocationTable(props: {
   useEffect(() => {
     const fetchReportByParent = async () => {
       const parentId = parentLocation.find((loc) => loc.name === (parent as TLocation).name) as TLocation
-      const newReport = await getReportFromParentLocation(parentId.id!)
+      let newReport = await getReportFromParentLocation(parentId.id!)
+      if (!newReport.length) {
+        newReport = await getReportFromChildLocation(childId!)
+      }
+      console.log("new report", parentId, childId, newReport)
       setReport(newReport)
     }
     fetchReportByParent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parent])
+  }, [parent, childId])
   return (
     <>
       <ParentSelectComponent parentLocation={parentLocation} parentProp={parent!} setParent={setParent} />

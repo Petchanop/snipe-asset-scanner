@@ -1,14 +1,15 @@
-'use server'
-import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api"
-import LocationTable from "@/_components/tables/location-table"
-import { getChildrenLocation, getOtherLocation, getParentFromChildId, getParentLocation } from '@/_libs/location.utils';
+import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api";
+import LocationTable from "@/_components/tables/location-table";
+import { getChildrenLocation, getOtherLocation, getParentFromChildId, getParentLocation } from "@/_libs/location.utils";
 import { TLocation } from "@/_types/snipe-it.type";
 
-export default async function ReportTablePage({ searchParams }: {
-    searchParams: Promise<{ location?: number }>
+export default async function ReportListPage({ params }: {
+    params: Promise<{ locationId: number }>
 }) {
-    const { location } = await searchParams
-    const locationId = location ? parseInt(location!.toString()) : null
+    const location = await params
+    console.log(location)
+    const locationId = location.locationId
+    
     const locations = await fetchLocations();
     let parentLocation = getParentLocation(locations.data!.rows)
     const childrenLocation = getChildrenLocation(locations.data!.rows)

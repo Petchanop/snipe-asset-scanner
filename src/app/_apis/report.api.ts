@@ -14,12 +14,12 @@ export async function getReportFromParentLocation(location: number): Promise<Ass
     const result = await prisma.asset_count.findMany({
         where: {
             OR: [
-                    {
-                        rtd_location_id: location
-                    },
-                    {
-                        location_id: location
-                    }
+                {
+                    rtd_location_id: location
+                },
+                {
+                    location_id: location
+                }
             ]
         }
     })
@@ -92,6 +92,15 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             asset_name_not_correct: false,
             is_not_asset_loc: data.is_not_asset_loc,
             checked_on: dayjs().toDate()
+        }
+    })
+}
+
+export async function DeleteAssetCountLine(assetCountId: string, assetTag: string): Promise<AssetCountLine | null> {
+    return await prisma.asset_count_line.delete({
+        where: {
+            asset_count_id: assetCountId,
+            asset_code: assetTag
         }
     })
 }

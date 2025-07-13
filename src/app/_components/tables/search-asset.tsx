@@ -5,24 +5,28 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow"
 import { tableHeadersAdditional } from "@/_constants/constants";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Table from "@mui/material/Table";
 import { blue } from "@mui/material/colors";
 import Button from "@mui/material/Button";
 import { AssetResponse, fetchSearchAsset } from "@/_apis/snipe-it/snipe-it.api";
 import { toast, ToastBar, Toaster } from 'react-hot-toast';
-import { AssetCount } from "@/_types/types";
+import { AssetCount, AssetCountLine } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
 import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
-import { AddAssetCountLine } from "@/_apis/report.api";
+import { AddAssetCountLine, DeleteAssetCountLine } from "@/_apis/report.api";
 import dayjs from "dayjs";
+import TableFooter from "@mui/material/TableFooter";
+import TablePagination from "@mui/material/TablePagination";
+import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "./utility";
 
 export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
   is_not_asset_loc: boolean;
   asset_check: boolean;
+  in_report: boolean;
 }
 
 function CreateSearchAssetTableCell(props: {
@@ -32,6 +36,7 @@ function CreateSearchAssetTableCell(props: {
 }) {
   const { data, actionLabel, assetCountReport } = props
   const [checked, setChecked] = useState(data.is_not_asset_loc)
+  const [disabled, setDisabled] = useState(data.in_report)
   return (
     <>
       <TableCell>
@@ -48,14 +53,22 @@ function CreateSearchAssetTableCell(props: {
           setChecked((pre) => !pre)
         }} />
       </TableCell>
-      <TableCell>
-        <Button onClick={() => {
-            const newData = data
-            newData.is_not_asset_loc = checked
-            AddAssetCountLine(newData, assetCountReport).then((result) => console.log(result))
-        }
-        }>
-          {actionLabel}
+      <TableCell className="p-0">
+        <Button
+          onClick={() => {
+            if (!disabled) {
+              const newData = data
+              newData.is_not_asset_loc = checked
+              AddAssetCountLine(newData, assetCountReport).then((result) => console.log(result))
+              setDisabled(true)
+            } else {
+              DeleteAssetCountLine(assetCountReport.id!, data.asset_tag!)
+              setDisabled(false)
+            }
+          }}
+          className={`${disabled ? "text-red-500 " : ""}`}
+        >
+          {!disabled ? actionLabel : "Remove"}
         </Button>
       </TableCell>
     </>
@@ -66,9 +79,12 @@ function SearchAssetTable(props: {
   data: AssetResponse[],
   isCheckTable: boolean,
   assetTab: boolean,
-  assetCountReport: AssetCount
+  assetCountReport: AssetCount,
+  assetInReport: AssetCountLine[]
 }) {
-  const { data, assetCountReport } = props
+  const { data, assetCountReport, assetInReport } = props
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const headers = tableHeadersAdditional
   return (
     <>
@@ -84,12 +100,13 @@ function SearchAssetTable(props: {
       <TableBody sx={{ overflow: 'hidden' }} className="place-content-center">
         {
           data.length ?
-            (data).map((asset: AssetResponse) => {
+            dataPerPage(data, page, rowsPerPage).map((asset: AssetResponse) => {
               const extendTypeAsset: ExtendAssetResponse = {
                 ...asset,
                 asset_name_not_correct: false,
                 is_not_asset_loc: asset.location?.id != assetCountReport.location_id,
                 asset_check: false,
+                in_report: assetInReport.find((report) => report.asset_code === asset.asset_tag) ? true : false,
               }
               return (
                 <TableRow key={`${asset.asset_tag}${dayjs().get('second')}`} >
@@ -101,6 +118,23 @@ function SearchAssetTable(props: {
             : <></>
         }
       </TableBody >
+      <TableFooter>
+        <TableRow>
+          <TablePagination
+            showFirstButton
+            showLastButton
+            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+            colSpan={4}
+            count={data.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(event, page) => handleChangePage(event, page, setPage)}
+            onRowsPerPageChange={(event) =>
+              handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
+            }
+          />
+        </TableRow>
+      </TableFooter>
     </>
   )
 }
@@ -109,9 +143,10 @@ export default function SearchAsset(
   props: {
     assetCountReport: AssetCount
     assetInlocation: AssetResponse[]
+    assetInReport: AssetCountLine[]
   }
 ) {
-  const { assetCountReport, assetInlocation } = props
+  const { assetCountReport, assetInlocation, assetInReport } = props
   const [searchInput, setSearchInput] = useState<string>("")
   const [scanData, setScanData] = useState<IDetectedBarcode[]>()
   const [fetchData, setFetchData] = useState<boolean>(false)
@@ -209,7 +244,13 @@ export default function SearchAsset(
           borderWidth: 1,
           borderColor: blue[400]
         }}>
-          <SearchAssetTable data={searchResult} isCheckTable={true} assetTab={false} assetCountReport={assetCountReport} />
+          <SearchAssetTable
+            data={searchResult}
+            isCheckTable={true}
+            assetTab={false}
+            assetCountReport={assetCountReport}
+            assetInReport={assetInReport}
+          />
         </Table>
       </div>
     </>
