@@ -1,5 +1,7 @@
+import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api"
 import SearchAsset from "@/_components/tables/search-asset"
 import { prisma } from "@/_libs/prisma"
+import { getAssetByLocationId } from "@/_libs/report.utils"
 import { AssetCount } from "@/_types/types"
 import Typography from "@mui/material/Typography"
 
@@ -19,10 +21,12 @@ export default async function CheckAssetPage(
         }
     })
     console.log("start count page" , locationId, location, assetCountReport)
+    const assetsInLocation = await getAssetByLocationId(parseInt(locationId))
+    console.log(assetsInLocation.data)
     return (
          <div className="p-4">
             <Typography>Check asset</Typography>
-            <SearchAsset assetCountReport={assetCountReport!} />
+            <SearchAsset assetCountReport={assetCountReport!} assetInlocation={assetsInLocation.data as AssetResponse[]}/>
         </div>
     )
 }

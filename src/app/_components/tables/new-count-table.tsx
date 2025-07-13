@@ -58,9 +58,7 @@ function CheckAssetButton(props: {
   const reportContext = useReportContext()
 
   const handleFinishbutton = () => {
-    console.log("update report")
     setIsCheckTable(false)
-
   }
   return (
     <div className="flex flex-row w-full lg:pl-8 lg:space-x-8 justify-start content-center items-center">
@@ -278,7 +276,6 @@ export function NewCountInput(props: {
     assetTab,
     defaultLocation
   } = props
-  console.log("new count input ", location)
   const [selectedLocation, setSelectedLocation] = useState(location)
   const [documentDate, setDocumentDate] = useState<string>((new Date()).toDateString())
   const documentContext = useReportContext()
@@ -401,7 +398,7 @@ export default function NewCountTable(props: {
         >
           <NewCountInput
             locations={locations}
-            location={location!}
+            location={location}
             defaultLocation={defaultLocation}
             setLocation={setLocation}
             isCheckTable={isCheckTable}

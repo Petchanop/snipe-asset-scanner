@@ -30,8 +30,6 @@
     "next": "15.3.3",
     "openapi-fetch": "^0.14.0",
     "openapi-typescript": "^7.8.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
@@ -46,6 +44,10 @@
     "tailwindcss": "^4",
     "tsx": "^4.20.3",
     "typescript": "^5"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "prisma": {
     "schema": "./prisma/schema/"

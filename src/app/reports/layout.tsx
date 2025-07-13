@@ -1,12 +1,15 @@
 'use server'
+import TableLayout from "@/_components/tableLayout"
 import { ReactNode } from "react"
 
-export default  async function ReportLayout({
+export default async function ReportLayout({
   children
 }: {
   children: ReactNode
 }) {
   return (
-        <>{children}</>
+    <TableLayout>
+      {children}
+    </TableLayout>
   )
 }

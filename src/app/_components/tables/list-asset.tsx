@@ -16,7 +16,7 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow"
 import Tabs from "@mui/material/Tabs";
-import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from "react";
 import {
   handleChangePage,
   handleChangeRowsPerPage
@@ -36,6 +36,14 @@ export function CreateAssetTableCell(
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const tabType = !assignIncorrect ? INLOCATION : OUTLOCATION
+
+  useEffect(() => {
+    UpdateAssetCountLine(id!, {asset_check: count })
+  }, [count,id])
+  
+  useEffect(() => {
+    UpdateAssetCountLine(id!, {is_not_asset_loc: incorrect })
+  }, [incorrect,id])
   return (
     <>
       {
@@ -57,7 +65,6 @@ export function CreateAssetTableCell(
                     disabled={!isCheckTable}
                     onChange={ async () => { 
                       setCount((pre) => !pre)
-                      await UpdateAssetCountLine(id!, {asset_check: count })
                     }}
                   />
                 </TableCell>
@@ -68,7 +75,6 @@ export function CreateAssetTableCell(
                 disabled={!isCheckTable}
                 onChange={ async () => {
                    setIncorrect((pre) => !pre)
-                   await UpdateAssetCountLine(id!, {is_not_asset_loc: incorrect })
                 }}
               />
             </TableCell>
@@ -91,7 +97,6 @@ export default function ListAsset(props: {
 }) {
   const { data, isCheckTable, assetTab } = props
   const headers = assetTab ? tableHeaders : tableHeadersAdditional
-  console.log(data)
   return (
     <>
       <TableHead>

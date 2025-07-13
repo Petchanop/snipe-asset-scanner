@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, ChangeEvent, useEffect, useMemo } from "react";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
@@ -11,7 +11,7 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
+import { handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { MapActionColor, MapColor, ReportState } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
@@ -25,6 +25,7 @@ function CreateLocationTableCell(props : {
 }) {
   const { data } = props
   const { date, documentNumber, location, state } = data;
+  const reportState = processAction(state);
 
   function processAction(state: string): string {
     switch (state) {
@@ -56,8 +57,8 @@ function CreateLocationTableCell(props : {
       </TableCell>
       <TableCell>
         <Button variant="text">
-          <Typography sx={{ color: MapActionColor[processAction(state)]![500] }}>
-            [{processAction(state)}]
+          <Typography sx={{ color: MapActionColor[reportState]![500] }}>
+            [{reportState}]
           </Typography>
         </Button>
       </TableCell>
@@ -181,11 +182,11 @@ export default function LocationTable(props: {
         setReport(report.filter((report) => report.location_id == childId))
       }
     }
-
+    
     filterReportByChildId();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [childId, parent])
-
+  
   useEffect(() => {
     const fetchReportByParent = async () => {
       const parentId = parentLocation.find((loc) => loc.name === (parent as TLocation).name) as TLocation
@@ -193,7 +194,7 @@ export default function LocationTable(props: {
       setReport(newReport)
     }
     fetchReportByParent();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parent])
   return (
     <>
@@ -211,25 +212,27 @@ export default function LocationTable(props: {
         </TableHead>
         <TableBody sx={{ overflow: 'hidden' }}>
           {
-            (dataPerPage(report, page, rowsPerPage)).map((mockData: AssetCount) => {
+            report.length ? 
+            report.map((mockData: AssetCount) => {
               let locationName = parentLocation.find((loc) => 
                 loc.id == mockData.location_id
-              ) 
-              if (!locationName) 
-                  locationName = childrenLocation.find((loc) => loc.id == mockData.location_id)
-              const mapData :locationTableData = {
-                date: mockData.document_date.toDateString(),
-                documentNumber: mockData.document_number,
-                location: (locationName as TLocation)!.name!,
-                state: mockData.state,
-                action: ""
-              }
-              return (
-                <TableRow key={mapData.documentNumber} >
+            ) 
+            if (!locationName) 
+              locationName = childrenLocation.find((loc) => loc.id == mockData.location_id)
+            const mapData :locationTableData = {
+              date: mockData.document_date.toDateString(),
+              documentNumber: mockData.document_number,
+              location: (locationName as TLocation)!.name!,
+              state: mockData.state,
+              action: ""
+            }
+            return (
+              <TableRow key={mapData.documentNumber} >
                   <CreateLocationTableCell data={mapData} />
                 </TableRow>
               )
             })
+            : <></>
           }
         </TableBody>
         <TableFooter>

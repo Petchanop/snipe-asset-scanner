@@ -1,17 +1,19 @@
 'use server'
 import { AssetCount, AssetCountLine } from '@/_types/types'
-import { prisma } from './prisma';
+import { prisma } from '@/_libs/prisma';
 import dayjs from 'dayjs';
+import { AssetResponse } from '@/_apis/snipe-it/snipe-it.api';
+import { createGateway, TResponse } from '@/_apis/next.api';
 
-export async function changeDateToIsoString(date : Date) : Promise<string> {
+export async function changeDateToIsoString(date: Date): Promise<string> {
     const [month, day, year] = date.toLocaleDateString('th-Bk').split('/').map(Number);
     return (new Date(year!, month! - 1, day)).toISOString()
 }
 
-export async function createDocumentNumber(locationId: number, date: string) : Promise<string> {
+export async function createDocumentNumber(locationId: number, date: string): Promise<string> {
     let divided = locationId
     let i = 0
-    while (Math.floor(divided)) { 
+    while (Math.floor(divided)) {
         divided /= 10
         i++
     }
@@ -38,10 +40,10 @@ export type FCreateAssetCountReport = {
 //     state: true
 // })
 
-export async function findAssetCount(document_number:string) : Promise<AssetCount | null> {
+export async function findAssetCount(document_number: string): Promise<AssetCount | null> {
     return await prisma.asset_count.findFirst({
         where: {
-           document_number: document_number
+            document_number: document_number
         }
     })
 }
@@ -113,8 +115,7 @@ export async function UpdateAssetCountLine(
     countId: number, payload: FUpdateAssetCountLine)
     : Promise<AssetCountLine | null> {
     const assetCountLine = await getAssetCountLine(countId)
-    payload.checked_on =  dayjs().toDate()
-    console.log("update count line ", assetCountLine, payload)
+    payload.checked_on = dayjs().toDate()
     if (assetCountLine) {
         return await prisma.asset_count_line.update({
             where: {
@@ -129,7 +130,6 @@ export async function UpdateAssetCountLine(
 export async function getAssetCountLine(
     countId: number
 ): Promise<AssetCountLine | null> {
-    console.log("update id ", countId)
     return await prisma.asset_count_line.findUnique({
         where: {
             id: countId
@@ -145,4 +145,19 @@ export async function getAssetCountLineByAssetCount(
             asset_count_id: assetCountId
         }
     })
+}
+
+export async function getAssetByLocationId(
+    locationId: number
+): Promise<TResponse<AssetResponse[]>> {
+    const client = await createGateway();
+    const { data, error } = await client.GET("/hardware", {
+        params: {
+            query: { location_id: locationId }
+        }
+    })
+    if (error){
+        return { data: null, error: error}
+    }
+    return { data: data.rows as AssetResponse[] , error: null}
 }

@@ -17,6 +17,7 @@ import ScannerComponent from "@/_components/scanner";
 import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
 import { AddAssetCountLine } from "@/_apis/report.api";
+import dayjs from "dayjs";
 
 export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
@@ -40,7 +41,7 @@ function CreateSearchAssetTableCell(props: {
         {data.name}
       </TableCell>
       <TableCell>
-        {data.assigned_to!.first_name} {data.assigned_to!.last_name}
+        {data.assigned_to?.first_name} {data.assigned_to?.last_name}
       </TableCell>
       <TableCell className="relative place-content-center justify-center items-center justify-content-center">
         <Checkbox checked={checked} onChange={() => {
@@ -91,7 +92,7 @@ function SearchAssetTable(props: {
                 asset_check: false,
               }
               return (
-                <TableRow key={asset.asset_tag} >
+                <TableRow key={`${asset.asset_tag}${dayjs().get('second')}`} >
                   <CreateSearchAssetTableCell data={extendTypeAsset} actionLabel={"Add"} assetCountReport={assetCountReport} />
                 </TableRow>
               )
@@ -107,23 +108,22 @@ function SearchAssetTable(props: {
 export default function SearchAsset(
   props: {
     assetCountReport: AssetCount
+    assetInlocation: AssetResponse[]
   }
 ) {
-  const { assetCountReport } = props
+  const { assetCountReport, assetInlocation } = props
   const [searchInput, setSearchInput] = useState<string>("")
   const [scanData, setScanData] = useState<IDetectedBarcode[]>()
   const [fetchData, setFetchData] = useState<boolean>(false)
-  const [searchResult, setSearchResult] = useState<AssetResponse[]>([])
+  const [searchResult, setSearchResult] = useState<AssetResponse[]>(assetInlocation)
   const [show, setShow] = useState(false)
 
   async function callFetchAssetSearch() {
-    console.log("fetch data ", searchInput, fetchData)
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
       if (error) {
         toast(`${searchInput} not found.`)
       } else {
-        console.log("client ", data!.id)
         // const asset: TAssetRow = {
         //   assetCode: data.asset_tag as string,
         //   assetName: data.name as string,
@@ -149,7 +149,6 @@ export default function SearchAsset(
 
   useEffect(() => {
     const fetchAssetFromScanData = async () => {
-      console.log(scanData)
       scanData?.map(async (result) => {
         const { data, error } = await fetchSearchAsset(encodeURIComponent(result.rawValue));
         if (error) {

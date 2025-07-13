@@ -8,10 +8,12 @@ import Tab from "@mui/material/Tab";
 import TableContainer from "@mui/material/TableContainer";
 import Tabs from "@mui/material/Tabs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { createContext, Dispatch, ReactNode, 
-  RefObject, SetStateAction, 
-  SyntheticEvent, useContext, 
-  useEffect, useRef, useState } from "react";
+import {
+  createContext, Dispatch, ReactNode,
+  RefObject, SetStateAction,
+  SyntheticEvent, useContext,
+  useEffect, useRef, useState
+} from "react";
 
 type LocationStateContext = {
   selected: RefObject<string>;
@@ -36,15 +38,16 @@ export default function TableLayout({
   const pathname = usePathname()
   const params = useSearchParams()
   const location = params.get('location')
-  // console.log("search param ", location)
   let tabPathname = ""
   if (!checkTabPathname(pathname)) {
-    tabPathname = `/reports/count-assets?location=${parseInt(location?.toString()!)}` 
+    tabPathname = `/reports/count-assets?location=${parseInt(location?.toString()!)}`
   } else {
-    tabPathname = pathname
+    tabPathname = `${pathname}${params?.toString() ? `?${params?.toString()}` : ""}`
   }
-  const selected = useRef(`${tabPathname}?location=${parseInt(location?.toString()!)}`)
+
+  console.log("loading layout", tabPathname)
   const [locationId, setLocationId] = useState(parseInt(location?.toString()!))
+  const selected = useRef(tabPathname)
   const router = useRouter();
   function handleOnChange(event: SyntheticEvent, newValue: string) {
     selected.current = newValue
@@ -55,11 +58,13 @@ export default function TableLayout({
     if (locationId) {
       if (checkSamePathName(selected.current, pathname) && checkTabPathname(pathname)) {
         console.log("replace ", selected)
-        router.replace(selected.current)
+        if (selected.current)
+          router.replace(selected.current)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationId])
+
   return <>
     <Card className='w-screen h-screen lg:w-4/6 lg:h-3/4 absolute lg:top-22'
       sx={{
