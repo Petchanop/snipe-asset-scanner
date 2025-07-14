@@ -382,7 +382,6 @@ export default function NewCountTable(props: {
               assignIncorrect: asset.is_not_asset_loc
             } as unknown as TAssetRow
           }))
-        console.log("mapAssetData ", mapAssetData)
         setData(mapAssetData)
         setRefetchReport(false)
       }

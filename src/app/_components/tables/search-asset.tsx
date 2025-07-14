@@ -159,7 +159,7 @@ export default function SearchAsset(
       if (error) {
         toast(`${searchInput} not found.`)
       } else {
-        setSearchResult([...searchResult, data])
+        setSearchResult([data, ...searchResult])
         setSearchInput("")
       }
     }
@@ -178,7 +178,7 @@ export default function SearchAsset(
         if (error) {
           toast(`${result.rawValue} not found.`)
         } else {
-          setSearchResult([...searchResult, data])
+          setSearchResult([data, ...searchResult])
         }
       })
     }
