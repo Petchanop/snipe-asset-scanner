@@ -204,7 +204,7 @@ export default function SearchAsset(
           position: 'relative'
         }}
         toastOptions={{
-          duration: 1000,
+          duration: 1500,
         }}
       >
         {(t) => (
