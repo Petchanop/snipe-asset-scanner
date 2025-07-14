@@ -189,8 +189,8 @@ export default function SearchAsset(
           } else {
             toast(`${result.rawValue} is already on the list.`)
           }
-          setScanData([])
         }
+        setScanData([])
       })
     }
     fetchAssetFromScanData()
