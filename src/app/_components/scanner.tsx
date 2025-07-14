@@ -14,7 +14,13 @@ export default function ScannerComponent(
 
   return (
     <>
-      <Scanner onScan={(result) => setScanData(result)} sound />
+      <Scanner 
+      allowMultiple={true}
+      onScan={(result) => setScanData(result)} sound
+      components={{
+        zoom:true
+      }}  
+      />
       {
         scanData ?
           scanData.map((data) =>

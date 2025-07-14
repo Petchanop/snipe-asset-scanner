@@ -181,13 +181,14 @@ export default function SearchAsset(
       scanData?.map(async (result) => {
         const { data, error } = await fetchSearchAsset(encodeURIComponent(result.rawValue));
         if (error) {
-          toast(`${result.rawValue} not found.`)
+          toast.error(`${result.rawValue} not found.`)
         } else {
+          toast.success(`${result.rawValue} was found.`)
           const IsInLocation = searchResult.find((result) => result.asset_tag == data.asset_tag)
           if (!IsInLocation) {
             setSearchResult([data, ...searchResult])
           } else {
-            toast(`${result.rawValue} is already on the list.`)
+            toast.error(`${result.rawValue} is already on the list.`)
           }
         }
         setScanData([])
@@ -204,7 +205,20 @@ export default function SearchAsset(
           position: 'relative'
         }}
         toastOptions={{
-          duration: 1500,
+          error: {
+            duration: 1500,
+            style: {
+              background: '#ea7259',
+              color: '#fff'
+            }
+          },
+          success: {
+            duration: 1500,
+            style: {
+              background: '#45b42fff',
+              color: '#fff',
+            }
+          }
         }}
       >
         {(t) => (
