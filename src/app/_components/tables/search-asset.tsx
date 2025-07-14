@@ -159,7 +159,12 @@ export default function SearchAsset(
       if (error) {
         toast(`${searchInput} not found.`)
       } else {
-        setSearchResult([data, ...searchResult])
+        const IsInLocation = searchResult.find((result) => result.asset_tag == data.asset_tag)
+        if (!IsInLocation) {
+          setSearchResult([data, ...searchResult])
+        } else {
+          toast(`${searchInput} is already on the list.`)
+        }
         setSearchInput("")
       }
     }
@@ -178,7 +183,13 @@ export default function SearchAsset(
         if (error) {
           toast(`${result.rawValue} not found.`)
         } else {
-          setSearchResult([data, ...searchResult])
+          const IsInLocation = searchResult.find((result) => result.asset_tag == data.asset_tag)
+          if (!IsInLocation) {
+            setSearchResult([data, ...searchResult])
+          } else {
+            toast(`${result.rawValue} is already on the list.`)
+          }
+          setScanData([])
         }
       })
     }
@@ -202,8 +213,8 @@ export default function SearchAsset(
             style={{
               ...t.style,
               animation: t.visible
-                ? 'custom-enter 1s ease-in-out'
-                : 'custom-exit 1s ease-in',
+                ? 'custom-enter 2s ease-in-out'
+                : 'custom-exit 2s ease-in',
             }}
           />
         )}
