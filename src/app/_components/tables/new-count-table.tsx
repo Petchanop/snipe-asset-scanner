@@ -8,9 +8,9 @@ import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import Select from "@mui/material/Select";
+// import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
+// import MenuItem from "@mui/material/MenuItem";
 import { AssetTable } from "@/_components/tables/list-asset";
 import { TAssetRow, TAssetTab, TSnipeDocument } from "@/_types/types";
 import { getAssetByLocationCount } from "@/_apis/report.api";
@@ -26,10 +26,11 @@ import { getUserById } from "@/_apis/snipe-it/snipe-it.api";
 import { ReportState } from "@/_constants/constants";
 import toast from "react-hot-toast";
 import { TLocation } from "@/_types/snipe-it.type";
+import { ChildrenSelectComponent, ParentSelectComponent } from "./location-table";
 
 function CheckAdditionalAssetButton() {
   return (
-    <div className="flex flex-col w-1/2 pt-10">
+    <>
       <div className="flex flex-row w-full lg:pl-8 lg:space-x-8" >
         <Button className={
           `hover:bg-blue-200 max-md:w-1/3
@@ -43,7 +44,8 @@ function CheckAdditionalAssetButton() {
           max-md:text-xs max-md:font-medium`
         }>Add Asset</Button>
       </div>
-    </div>
+    </>
+    // </div>
   )
 }
 
@@ -102,14 +104,10 @@ function SelectCountInput(props: {
   isCheckTable: boolean,
   defaultLocation: TLocation
 }) {
-  const { locations,
-    selectedLocation,
-    setSelectedLocation,
+  const {
     setDocumentDate,
     isCheckTable,
-    defaultLocation
   } = props
-  const context = useLocationUrlContext()
   const dateContext = useDateContext()
   const documentContext = useReportContext()
 
@@ -121,14 +119,14 @@ function SelectCountInput(props: {
   }
 
   return (
-    <div className="flex flex-col w-1/2 max-md:w-3/4 space-y-2">
+    <>
       {
         isCheckTable ?
           <Typography className="mt-2 mb-4">{documentContext.DocumentNumber}</Typography>
           : <></>
       }
       <div className="flex flex-row items-center">
-        <Typography className="lg:w-30 w-20">Date</Typography>
+        <Typography className="w-29 max-lg:w-25">Date</Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker label="Select Date"
             value={dateContext.dateValue}
@@ -141,56 +139,7 @@ function SelectCountInput(props: {
           />
         </LocalizationProvider>
       </div>
-      <div className="flex flex-row">
-        <Typography className="lg:w-30 w-20">Location</Typography>
-        <Select
-          id="display location"
-          className="lg:w-2/3 w-3/5"
-          label="location"
-          value={selectedLocation.name}
-          renderValue={(selected: string) => {
-            if (!selected.length) {
-              return <em>Location</em>
-            }
-            return selected
-          }}
-          size="small"
-          disabled={isCheckTable}
-        >
-          {
-            locations.length ?
-              locations.map((loc) =>
-                <MenuItem value={loc.name as unknown as string} key={loc.id}>
-                  <div dangerouslySetInnerHTML={{ __html: loc.name! }}
-                    data-key={loc.id}
-                    data-value={loc.name}
-                    onClick={(event) => {
-                      const target = event.target as HTMLElement
-                      context.setLocationId(parseInt(target.dataset.key as string))
-                      const selectedLoc = locations.find(loc => loc.id === parseInt(target.dataset.key as string));
-                      if (selectedLoc) setSelectedLocation(selectedLoc);
-                      context.selected.current = `/reports/count-assets?location=${target.dataset.key}`
-                    }}
-                  ></div>
-                </MenuItem>
-              ) :
-              <MenuItem value={defaultLocation.name as unknown as string} key={defaultLocation.id}>
-                <div dangerouslySetInnerHTML={{ __html: defaultLocation.name! }}
-                  data-key={defaultLocation.id}
-                  data-value={defaultLocation.name}
-                  onClick={(event) => {
-                    const target = event.target as HTMLElement
-                    context.setLocationId(parseInt(target.dataset.key as string))
-                    const selectedLoc = locations.find(loc => loc.id === parseInt(target.dataset.key as string));
-                    if (selectedLoc) setSelectedLocation(selectedLoc);
-                    context.selected.current = `/reports/count-assets?location=${target.dataset.key}`
-                  }}
-                ></div>
-              </MenuItem>
-          }
-        </Select>
-      </div>
-    </div>
+    </>
   )
 }
 
@@ -262,6 +211,8 @@ function SelectCountButton(props: {
 }
 
 export function NewCountInput(props: {
+  parentLocation: TLocation[],
+  childrenLocation: TLocation[],
   locations: PNewCountTableProps[],
   location: PNewCountTableProps,
   defaultLocation: TLocation;
@@ -271,6 +222,8 @@ export function NewCountInput(props: {
   assetTab: TAssetTab,
 }) {
   const {
+    parentLocation,
+    childrenLocation,
     locations,
     location,
     setLocation,
@@ -279,6 +232,8 @@ export function NewCountInput(props: {
     assetTab,
     defaultLocation
   } = props
+  const [parent, setParent] = useState(parentLocation[0])
+  const [childId, setChildId] = useState<number | null>(defaultLocation!.id as unknown as number)
   const [selectedLocation, setSelectedLocation] = useState(location)
   const [documentDate, setDocumentDate] = useState<string>((new Date()).toDateString())
   const documentContext = useReportContext()
@@ -297,25 +252,43 @@ export function NewCountInput(props: {
   }, [selectedLocation, documentDate])
   return (
     <div className="flex flex-row w-full py-2 pl-2 lg:pl-10 content-center">
-      <SelectCountInput
-        locations={locations}
-        selectedLocation={selectedLocation}
-        setSelectedLocation={setSelectedLocation}
-        setDocumentDate={setDocumentDate}
-        isCheckTable={isCheckTable}
-        defaultLocation={defaultLocation}
-      />
-      {
-        isCheckTable ?
-          assetTab ?
-            <CheckAssetButton setIsCheckTable={setIsCheckTable} />
-            : <CheckAdditionalAssetButton />
-          : <SelectCountButton
+      <div className="flex flex-col basis-lg space-y-2">
+        <div className="flex flex-row">
+          <SelectCountInput
+            locations={locations}
             selectedLocation={selectedLocation}
-            setLocation={setLocation}
-            setIsCheckTable={setIsCheckTable}
+            setSelectedLocation={setSelectedLocation}
+            setDocumentDate={setDocumentDate}
+            isCheckTable={isCheckTable}
+            defaultLocation={defaultLocation}
           />
-      }
+        </div>
+        <div className="flex flex-row items-center">
+          <Typography className="w-25 max-lg:w-21">Location</Typography>
+          <ParentSelectComponent
+            parentLocation={parentLocation}
+            parentProp={parent!}
+            setParent={setParent} />
+          <ChildrenSelectComponent
+            parent={parent!}
+            locationByParent={childrenLocation}
+            childId={childId!}
+            setChildId={setChildId} />
+        </div>
+      </div>
+      <div className="flex flex-col basis-md pt-10">
+        {
+          isCheckTable ?
+            assetTab ?
+              <CheckAssetButton setIsCheckTable={setIsCheckTable} />
+              : <CheckAdditionalAssetButton />
+            : <SelectCountButton
+              selectedLocation={selectedLocation}
+              setLocation={setLocation}
+              setIsCheckTable={setIsCheckTable}
+            />
+        }
+      </div>
     </div>
   )
 }
@@ -331,11 +304,13 @@ type TDateValueContext = {
 const DateValueContext = createContext<TDateValueContext | null>(null)
 
 export default function NewCountTable(props: {
+  parentLocation: TLocation[],
+  childrenLocation: TLocation[],
   locations: PNewCountTableProps[],
   defaultLocation: TLocation;
   locationId: number;
 }) {
-  const { locations, defaultLocation, locationId } = props
+  const { parentLocation, childrenLocation, locations, defaultLocation, locationId } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
   const [refechtReport, setRefetchReport] = useState<boolean>(false)
@@ -403,6 +378,8 @@ export default function NewCountTable(props: {
         }}
         >
           <NewCountInput
+            parentLocation={parentLocation}
+            childrenLocation={childrenLocation}
             locations={locations}
             location={location}
             defaultLocation={defaultLocation}

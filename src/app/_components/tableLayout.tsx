@@ -46,7 +46,6 @@ export default function TableLayout({
     tabPathname = `${pathname}${params?.toString() ? `?${params?.toString()}` : ""}`
   }
 
-  console.log("loading layout", tabPathname)
   const [locationId, setLocationId] = useState(parseInt(location?.toString()!))
   const selected = useRef(tabPathname)
   const router = useRouter();

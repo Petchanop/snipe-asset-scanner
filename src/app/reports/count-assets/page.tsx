@@ -1,6 +1,6 @@
 import NewCountTable, { PNewCountTableProps } from "@/_components/tables/new-count-table";
 import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api";
-import { getChildrenLocation } from "@/_libs/location.utils";
+import { getChildrenLocation, getOtherLocation, getParentLocation } from "@/_libs/location.utils";
 import { TLocation } from "@/_types/snipe-it.type";
 import { getLocationById } from "@/_apis/location.api";
 import { notFound } from "next/navigation";
@@ -16,7 +16,9 @@ export default async function AssetsTablePage({ searchParams } : {
     //use mock data before implement api call
     //fetch location from snipe api
     const locations = await fetchLocations();
+    const parentLocation = getParentLocation(locations.data!.rows)
     const childrenLocation = getChildrenLocation(locations.data!.rows) as TLocation[]
+    const otherLocation = getOtherLocation(locations.data!.rows)
     const locationData = await getLocationById(parseInt(resolveLocationId?.toString()!)) 
     let filterByParentId = null
     if (!locationData?.parent_id) {
@@ -40,9 +42,12 @@ export default async function AssetsTablePage({ searchParams } : {
     }
     return (
         <NewCountTable 
+            parentLocation={parentLocation}
+            childrenLocation={childrenLocation}
             locations={filterByParentId as unknown as PNewCountTableProps[]} 
             defaultLocation={locationData as unknown as TLocation} 
             locationId={parseInt(resolveLocationId!.toString())}
+
         />
     )
 }

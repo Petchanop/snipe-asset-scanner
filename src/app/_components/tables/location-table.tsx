@@ -19,6 +19,7 @@ import { TLocation } from "@/_types/snipe-it.type";
 import { getReportFromChildLocation, getReportFromParentLocation } from "@/_apis/report.api";
 import { AssetCount, Location } from "@/_types/types";
 import { useLocationUrlContext } from "@/_components/tableLayout";
+import { usePathname } from "next/navigation";
 
 function CreateLocationTableCell(props : {
   data: locationTableData
@@ -70,12 +71,13 @@ function CreateLocationTableCell(props : {
   )
 }
 
-function ChildrenSelectComponent(props: {
+export function ChildrenSelectComponent(props: {
   parent: TLocation,
   locationByParent: TLocation[],
   childId: number,
   setChildId: (value: number) => void
 }) {
+  const pathname = usePathname();
   const { parent, locationByParent, childId, setChildId } = props
   const [childLocation, setChildLocation] = useState("")
   const [childrenLocation, setChildrenLocation] = useState<TLocation[]>([])
@@ -85,7 +87,7 @@ function ChildrenSelectComponent(props: {
     const locationByName = childrenLocation.filter((loc) => loc.name == target.value)[0] as unknown as Location
     setChildId(locationByName.id)
     setChildLocation(target.value)
-    context.selected.current = `/reports?location=${locationByName.id}`
+    context.selected.current = `${pathname}?location=${locationByName.id}`
     context.setLocationId(locationByName.id)
   }
 
@@ -108,7 +110,7 @@ function ChildrenSelectComponent(props: {
       if (!locationId)
         locationId = parent.id as unknown as number
       context.setLocationId(locationId)
-      context.selected.current = `/reports?location=${locationId}`
+      context.selected.current = `${pathname}?location=${locationId}`
       setChildId(locationId)
       setChildLocation(defaultValue?.name! as string)
     }
@@ -143,7 +145,7 @@ function ChildrenSelectComponent(props: {
   )
 }
 
-function ParentSelectComponent(props: {
+export function ParentSelectComponent(props: {
   parentLocation: TLocation[],
   parentProp: TLocation,
   setParent: (location: TLocation) => void,
