@@ -162,9 +162,11 @@ export function ParentSelectComponent(props: {
         setParent(newParent!)
       }}>
       {
+        parentLocation ?
         parentLocation.map((loc) =>
           <MenuItem value={loc.name} key={loc.id}>{loc.name}</MenuItem>
         )
+        : <></>
       }
     </TextField>
   )
