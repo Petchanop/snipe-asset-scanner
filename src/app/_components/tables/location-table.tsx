@@ -29,9 +29,13 @@ function CreateLocationTableCell(props : {
 
   function processAction(state: string): string {
     switch (state) {
-      case ReportState.NEW || ReportState.INPROGRESS:
+      case ReportState.NEW:
         return "OPEN"
-      case ReportState.CANCEL || ReportState.COMPLETED:
+      case ReportState.INPROGRESS:
+        return "OPEN"
+      case ReportState.COMPLETED:
+        return "VIEW"
+      case ReportState.CANCEL:
         return "VIEW"
     }
     return ""

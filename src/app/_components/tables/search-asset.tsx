@@ -157,13 +157,14 @@ export default function SearchAsset(
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
       if (error) {
-        toast(`${searchInput} not found.`)
+        toast.error(`${searchInput} not found.`)
       } else {
         const IsInLocation = searchResult.find((result) => result.asset_tag == data.asset_tag)
         if (!IsInLocation) {
+          toast.success(`${searchInput} was found.`)
           setSearchResult([data, ...searchResult])
         } else {
-          toast(`${searchInput} is already on the list.`)
+          toast.error(`${searchInput} is already on the list.`)
         }
         setSearchInput("")
       }

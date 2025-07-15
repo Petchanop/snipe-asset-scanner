@@ -84,12 +84,15 @@ export default function TableLayout({
           className="pl-2"
           onChange={handleOnChange}
         >
-          <Tab value={`/reports?location=${locationId}`}
-            label="reports">
+          <Tab value={
+            `/reports/count-assets?location=${locationId}`
+          }
+            label="new count">
           </Tab>
           <Tab value={
-            `/reports/count-assets?location=${locationId}`}
-            label="new count">
+            `/reports?location=${locationId}`
+          }
+            label="reports">
           </Tab>
           {/* <Tab value={
             `/reports/count-assets/search?location=${locationId}`}
