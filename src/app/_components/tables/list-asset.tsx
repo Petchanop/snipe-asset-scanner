@@ -145,12 +145,14 @@ export function AssetTable(props: {
   data: TAssetRow[],
   isCheckTable: boolean,
   assetTab: TAssetTab,
-  setAssetTab: (value: SetStateAction<TAssetTab>) => void
+  setAssetTab: (value: SetStateAction<TAssetTab>) => void,
+  tabValue?: TAssetTab
 }) {
   const {
     data,
     isCheckTable,
     assetTab,
+    tabValue
   } = props
   const [tablePage, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
@@ -165,7 +167,9 @@ export function AssetTable(props: {
         borderBottom: 'none',
         borderWidth: 1,
         borderColor: blue[400]
-      }}>
+      }}
+      className={tabValue == assetTab ? "" : "hidden"}
+      >
         <ListAsset data={data}
           isCheckTable={isCheckTable}
           assetTab={assetTab}
@@ -184,8 +188,8 @@ export function AssetTable(props: {
               count={data.length}
               rowsPerPage={rowsPerPage}
               page={tablePage}
-              onPageChange={(event) => {
-                handleChangePage(event, tablePage, setPage)
+              onPageChange={(event, page) => {
+                handleChangePage(event, page, setPage, data.length, rowsPerPage)
               }}
               onRowsPerPageChange={(event) => {
                 handleChangeRowsPerPage(

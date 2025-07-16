@@ -20,7 +20,6 @@ import {
   findAssetCount,
   getAssetByLocationId,
   getAssetCountLineByAssetCount, getAssetCountReport,
-  UpdateAssetCountLine
 } from "@/_libs/report.utils";
 import { AssetResponse, getUserById } from "@/_apis/snipe-it/snipe-it.api";
 import { ReportState } from "@/_constants/constants";
@@ -369,7 +368,7 @@ export default function NewCountTable(props: {
           if (error || data) {
             toast.error(`${report.document_number} asset data not found.`)
           }
-          data!.map(async (asset: AssetResponse) => {
+          assetCountLineReport = await Promise.all(data!.map(async (asset: AssetResponse) => {
             const extendTypeAsset: ExtendAssetResponse = {
               ...asset,
               asset_name_not_correct: false,
@@ -377,9 +376,8 @@ export default function NewCountTable(props: {
               asset_check: false,
               in_report: false,
             }
-            await AddAssetCountLine(extendTypeAsset, report)
-          })
-          assetCountLineReport = await getAssetCountLineByAssetCount(report.id)
+            return await AddAssetCountLine(extendTypeAsset, report)
+          }))
         }
         const mapAssetData = await Promise.all(
           assetCountLineReport.map(async (asset) => {
@@ -420,7 +418,7 @@ export default function NewCountTable(props: {
     }
 
     updateAssetCountLine()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [update])
 
   function handleSelectValue(event: SyntheticEvent, newValue: string) {
@@ -461,21 +459,21 @@ export default function NewCountTable(props: {
             <Tab value={INLOCATION} label="assets in location"></Tab>
             <Tab value={OUTLOCATION} label="additional assets in location"></Tab>
           </Tabs>
-          {
-            assetTab == INLOCATION ?
-              <AssetTable
-                data={data.filter((loc) => loc.assignIncorrect == false) as TAssetRow[]}
-                isCheckTable={isCheckTable}
-                assetTab={assetTab}
-                setAssetTab={setAssetTab}
-              />
-              : <AssetTable
-                data={data.filter((loc) => loc.assignIncorrect == true) as TAssetRow[]}
-                isCheckTable={isCheckTable}
-                assetTab={assetTab}
-                setAssetTab={setAssetTab}
-              />
-          }
+          <AssetTable
+            data={data.filter((loc) => loc.assignIncorrect == false) as TAssetRow[]}
+            isCheckTable={isCheckTable}
+            assetTab={assetTab}
+            setAssetTab={setAssetTab}
+            tabValue={INLOCATION}
+          />
+          <AssetTable
+            data={data.filter((loc) => loc.assignIncorrect == true) as TAssetRow[]}
+            isCheckTable={isCheckTable}
+            assetTab={assetTab}
+            setAssetTab={setAssetTab}
+            tabValue={OUTLOCATION}
+          />
+
         </ReportContext>
       </DateValueContext>
     </>
