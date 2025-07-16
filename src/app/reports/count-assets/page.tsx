@@ -1,6 +1,6 @@
 import NewCountTable, { PNewCountTableProps } from "@/_components/tables/new-count-table";
 import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api";
-import { getChildrenLocation, getOtherLocation, getParentLocation } from "@/_libs/location.utils";
+import { getChildrenLocation, getParentLocation } from "@/_libs/location.utils";
 import { TLocation } from "@/_types/snipe-it.type";
 import { getLocationById } from "@/_apis/location.api";
 import { notFound } from "next/navigation";
@@ -18,8 +18,12 @@ export default async function AssetsTablePage({ searchParams } : {
     const locations = await fetchLocations();
     const parentLocation = getParentLocation(locations.data!.rows)
     const childrenLocation = getChildrenLocation(locations.data!.rows) as TLocation[]
-    const otherLocation = getOtherLocation(locations.data!.rows)
-    const locationData = await getLocationById(parseInt(resolveLocationId?.toString()!)) 
+    // const otherLocation = getOtherLocation(locations.data!.rows)
+    const locationData = await getLocationById(parseInt(resolveLocationId?.toString()!))
+    const parent = parentLocation.find((loc) => (
+        loc.children as unknown as {id:number, name: string} [])
+        .find((child: { id: number, name: string}) => child.id == resolveLocationId)
+    ) as TLocation
     let filterByParentId = null
     if (!locationData?.parent_id) {
         filterByParentId = childrenLocation
@@ -47,7 +51,7 @@ export default async function AssetsTablePage({ searchParams } : {
             locations={filterByParentId as unknown as PNewCountTableProps[]} 
             defaultLocation={locationData as unknown as TLocation} 
             locationId={parseInt(resolveLocationId!.toString())}
-
+            parentProp={parent}
         />
     )
 }

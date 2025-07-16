@@ -1,17 +1,13 @@
-import { getLocationById } from "@/_apis/location.api"
-import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api"
 import SearchAsset from "@/_components/tables/search-asset"
 import { prisma } from "@/_libs/prisma"
-import { getAssetByLocationId, getAssetCountLineByAssetCount } from "@/_libs/report.utils"
+import { getAssetCountLineByAssetCount } from "@/_libs/report.utils"
 import { AssetCount } from "@/_types/types"
 import Typography from "@mui/material/Typography"
 
 export default async function CheckAssetPage(
-    { searchParams, params }: { searchParams: Promise<{location: string}>, params :  Promise<{ reportId: string}> }, 
+    { params }: { params :  Promise<{ reportId: string}> }, 
 ) {
-    const { location } = await searchParams
     const { reportId } = await params
-    const locationId = await location
     const  documentNumber = await reportId
     //fetch data here
     //use mock data before implement api cal
@@ -21,18 +17,12 @@ export default async function CheckAssetPage(
             document_number : documentNumber
         }
     })
-    const LocationData = await getLocationById(parseInt(locationId))
-    let assetsInLocation = await getAssetByLocationId(parseInt(locationId))
-    if (assetsInLocation.data!.length == 0 && LocationData?.parent_id) {
-        assetsInLocation = await getAssetByLocationId(LocationData.parent_id)
-    }
     const assetInReport = await getAssetCountLineByAssetCount(assetCountReport!.id!)
     return (
          <div className="p-4">
             <Typography>Check asset</Typography>
             <SearchAsset 
             assetCountReport={assetCountReport!} 
-            assetInlocation={assetsInLocation.data as AssetResponse[]}
             assetInReport={assetInReport}
             />
         </div>

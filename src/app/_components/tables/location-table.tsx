@@ -75,10 +75,11 @@ export function ChildrenSelectComponent(props: {
   parent: TLocation,
   locationByParent: TLocation[],
   childId: number,
+  isCheckTable?: boolean,
   setChildId: (value: number) => void
 }) {
   const pathname = usePathname();
-  const { parent, locationByParent, childId, setChildId } = props
+  const { parent, locationByParent, childId, setChildId, isCheckTable} = props
   const [childLocation, setChildLocation] = useState("")
   const [childrenLocation, setChildrenLocation] = useState<TLocation[]>([])
   const context = useLocationUrlContext()
@@ -130,6 +131,7 @@ export function ChildrenSelectComponent(props: {
             value={childLocation}
             className="mt-3 p-4"
             onChange={(event) => handleOnClick(event.target)}
+            disabled={isCheckTable}
           >
             {
               childrenLocation.map((loc) =>
@@ -148,15 +150,17 @@ export function ChildrenSelectComponent(props: {
 export function ParentSelectComponent(props: {
   parentLocation: TLocation[],
   parentProp: TLocation,
+  isCheckTable?: boolean,
   setParent: (location: TLocation) => void,
 }) {
-  const { parentLocation, parentProp, setParent } = props
+  const { parentLocation, parentProp, setParent,isCheckTable} = props
   return (
     <TextField
       select
       label="location"
       value={parentProp.name}
       className="mt-3 p-4"
+      disabled={isCheckTable}
       onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const newParent = parentLocation.find((loc) => loc.name == event.target.value);
         setParent(newParent!)

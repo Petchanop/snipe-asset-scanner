@@ -23,8 +23,10 @@ type LocationStateContext = {
 
 type ReportStateContext = {
   DocumentNumber: string;
+  update: boolean;
   setDocumentNumber: Dispatch<SetStateAction<string>>;
   setRefetchReport: Dispatch<SetStateAction<boolean>>;
+  setUpdate: Dispatch<SetStateAction<boolean>>
 }
 
 //31 line of console.log

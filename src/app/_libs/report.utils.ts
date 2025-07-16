@@ -81,7 +81,7 @@ export async function getAssetCountReport(
             document_date: await changeDateToIsoString(date),
             location_id: locationId
         }
-    })
+    }) 
 }
 
 type FCreateAssetCountLine = {
@@ -142,7 +142,7 @@ export async function getAssetCountLineByAssetCount(
 ): Promise<AssetCountLine[]> {
     return await prisma.asset_count_line.findMany({
         where: {
-            asset_count_id: assetCountId
+            asset_count_id: assetCountId,
         }
     })
 }

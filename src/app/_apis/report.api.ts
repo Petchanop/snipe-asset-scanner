@@ -83,7 +83,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             is_not_asset_loc: data.is_not_asset_loc,
         },
         create: {
-            asset_check: true,
+            asset_check: false,
             asset_id: data.id,
             asset_name: data.name!,
             asset_code: data.asset_tag!,

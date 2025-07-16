@@ -9,3 +9,18 @@ export interface HeadersAssetTable {
     isSelectBox: boolean,
     fontColor: string[]
 }
+
+export interface AssignedTo {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+export interface AssetFormData {
+  id: string;
+  assetCode: string;
+  assetName: string;
+  assignedTo: AssignedTo;
+  countCheck: boolean;
+  assignIncorrect: boolean;
+}
