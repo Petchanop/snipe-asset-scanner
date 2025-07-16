@@ -20,6 +20,7 @@ import {
   handleChangePage,
   handleChangeRowsPerPage
 } from "@/_components/tables/utility";
+import { UpdateAssetCountLine } from "@/_libs/report.utils";
 
 export function CreateAssetTableCell(
   props: {
@@ -29,21 +30,25 @@ export function CreateAssetTableCell(
     actionLabel: string,
     isCheckTable: boolean
   }) {
-  const { data, assetTab, actionLabel, action, isCheckTable} = props
+  const { data, assetTab, actionLabel, action, isCheckTable } = props
   const { assetCode, assetName, assignedTo, countCheck, assignIncorrect } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const tabType = !assignIncorrect ? INLOCATION : OUTLOCATION
 
   useEffect(() => {
-    const updateData = () => {
+    const updateData = async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       data.countCheck = count,
       data.assignIncorrect = incorrect
+      await UpdateAssetCountLine(data.id as string, { 
+        asset_check: data.countCheck,
+        is_not_asset_loc: data.assignIncorrect
+      })
     }
 
     updateData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count, incorrect])
 
   return (
@@ -147,7 +152,7 @@ export function AssetTable(props: {
     isCheckTable,
     assetTab,
   } = props
-  const [page, setPage] = useState<number>(0);
+  const [tablePage, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
   return (
@@ -164,7 +169,7 @@ export function AssetTable(props: {
         <ListAsset data={data}
           isCheckTable={isCheckTable}
           assetTab={assetTab}
-          page={page}
+          page={tablePage}
           rowsPerPage={rowsPerPage}
         />
         <TableFooter>
@@ -178,9 +183,9 @@ export function AssetTable(props: {
               colSpan={4}
               count={data.length}
               rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={(event, page) => {
-                handleChangePage(event, page, setPage)
+              page={tablePage}
+              onPageChange={(event) => {
+                handleChangePage(event, tablePage, setPage)
               }}
               onRowsPerPageChange={(event) => {
                 handleChangeRowsPerPage(

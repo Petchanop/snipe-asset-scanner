@@ -9,7 +9,10 @@ export function handleChangePage(
     newPage: number,
     setPage: (number: number) => void
 ) {
-    setPage(newPage);
+    const direction = event?.currentTarget.getAttribute('aria-label')?.includes("next")
+    let change = 0
+    direction ? change = 1 : change = -1
+    setPage(newPage + change);
 };
 
 export function handleChangeRowsPerPage(

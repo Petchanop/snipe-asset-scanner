@@ -203,7 +203,7 @@ export default function LocationTable(props: {
     const fetchReportByParent = async () => {
       const parentId = parentLocation.find((loc) => loc.name === (parent as TLocation).name) as TLocation
       let newReport = await getReportFromParentLocation(parentId.id!)
-      if (!newReport.length) {
+      if (newReport.length == 0) {
         newReport = await getReportFromChildLocation(childId!)
       }
       console.log("new report", parentId, childId, newReport)

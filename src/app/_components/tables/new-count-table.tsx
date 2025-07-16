@@ -344,7 +344,6 @@ export default function NewCountTable(props: {
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
   const [data, setData] = useState<TAssetRow[]>([])
-  const [dataNotInLocation, setDataNotInLoctaion] = useState<TAssetRow[]>([])
   const [dateValue, setDateValue] = useState<Dayjs | null>(dayjs())
   const [documentNumber, setDocumentNumber] = useState<string>("")
   const [update, setUpdate] = useState(false)
@@ -403,8 +402,7 @@ export default function NewCountTable(props: {
           }))
 
         console.log(mapAssetData)
-        setData(mapAssetData.filter((loc) => loc.assignIncorrect == false))
-        setDataNotInLoctaion(mapAssetData.filter((loc) => loc.assignIncorrect == true))
+        setData(mapAssetData)
         setRefetchReport(false)
       }
     }
@@ -417,12 +415,6 @@ export default function NewCountTable(props: {
   useEffect(() => {
     const updateAssetCountLine = async () => {
       if (update) {
-        for (const updateData of data) {
-          await UpdateAssetCountLine(updateData.id as string, {
-            asset_check: updateData.countCheck,
-            is_not_asset_loc: updateData.assignIncorrect
-          })
-        }
         setRefetchReport(true)
       }
     }
@@ -472,13 +464,13 @@ export default function NewCountTable(props: {
           {
             assetTab == INLOCATION ?
               <AssetTable
-                data={data as TAssetRow[]}
+                data={data.filter((loc) => loc.assignIncorrect == false) as TAssetRow[]}
                 isCheckTable={isCheckTable}
                 assetTab={assetTab}
                 setAssetTab={setAssetTab}
               />
               : <AssetTable
-                data={dataNotInLocation as TAssetRow[]}
+                data={data.filter((loc) => loc.assignIncorrect == true) as TAssetRow[]}
                 isCheckTable={isCheckTable}
                 assetTab={assetTab}
                 setAssetTab={setAssetTab}
