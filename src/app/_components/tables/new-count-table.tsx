@@ -29,6 +29,7 @@ import { ChildrenSelectComponent, ParentSelectComponent } from "./location-table
 import { ExtendAssetResponse } from "./search-asset";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import { LoadingTableSkeleton } from "../loading";
 
 function CheckAdditionalAssetButton() {
   return (
@@ -346,6 +347,7 @@ export default function NewCountTable(props: {
   const [dateValue, setDateValue] = useState<Dayjs | null>(dayjs())
   const [documentNumber, setDocumentNumber] = useState<string>("")
   const [update, setUpdate] = useState(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
     setData([])
@@ -355,6 +357,7 @@ export default function NewCountTable(props: {
   useEffect(() => {
     const fetchReport = async () => {
       setData([])
+      setLoading(true)
       const report = await getAssetCountReport(dateValue?.toDate()!, locationId)
       console.log("start fetch report ", report?.document_number)
       if (!report) {
@@ -402,6 +405,7 @@ export default function NewCountTable(props: {
         console.log(mapAssetData)
         setData(mapAssetData)
         setRefetchReport(false)
+        setLoading(false)
       }
     }
     if (refetchReport)
@@ -459,20 +463,27 @@ export default function NewCountTable(props: {
             <Tab value={INLOCATION} label="assets in location"></Tab>
             <Tab value={OUTLOCATION} label="additional assets in location"></Tab>
           </Tabs>
-          <AssetTable
-            data={data.filter((loc) => loc.assignIncorrect == false) as TAssetRow[]}
-            isCheckTable={isCheckTable}
-            assetTab={assetTab}
-            setAssetTab={setAssetTab}
-            tabValue={INLOCATION}
-          />
-          <AssetTable
-            data={data.filter((loc) => loc.assignIncorrect == true) as TAssetRow[]}
-            isCheckTable={isCheckTable}
-            assetTab={assetTab}
-            setAssetTab={setAssetTab}
-            tabValue={OUTLOCATION}
-          />
+          {
+            loading ?
+              <LoadingTableSkeleton />
+              :
+              <>
+                <AssetTable
+                  data={data.filter((loc) => loc.assignIncorrect == false) as TAssetRow[]}
+                  isCheckTable={isCheckTable}
+                  assetTab={assetTab}
+                  setAssetTab={setAssetTab}
+                  tabValue={INLOCATION}
+                />
+                <AssetTable
+                  data={data.filter((loc) => loc.assignIncorrect == true) as TAssetRow[]}
+                  isCheckTable={isCheckTable}
+                  assetTab={assetTab}
+                  setAssetTab={setAssetTab}
+                  tabValue={OUTLOCATION}
+                />
+              </>
+          }
 
         </ReportContext>
       </DateValueContext>
