@@ -95,6 +95,7 @@ type FCreateAssetCountLine = {
     checked_on: Date;
     is_not_asset_loc: boolean;
     asset_name_not_correct: boolean;
+    status: string;
 }
 
 export async function createAssetCountLine(payload: FCreateAssetCountLine)
@@ -109,6 +110,7 @@ type FUpdateAssetCountLine = {
     checked_on?: Date;
     is_not_asset_loc?: boolean;
     asset_name_not_correct?: boolean;
+    asset_count_line_status_id?: number;
 }
 
 export async function UpdateAssetCountLine(

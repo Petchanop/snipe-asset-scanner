@@ -361,6 +361,7 @@ export default function NewCountTable(props: {
         setDocumentNumber(report.document_number)
         let assetCountLineReport = await getAssetCountLineByAssetCount(report.id)
         if (assetCountLineReport.length == 0) {
+          console.log("create asset count line for ", report)
           const { data, error } = await getAssetByLocationId(locationId)
           if (error || data) {
             toast.error(`${report.document_number} asset data not found.`)
@@ -372,6 +373,7 @@ export default function NewCountTable(props: {
               is_not_asset_loc: asset.location?.id != report.location_id,
               asset_check: false,
               in_report: false,
+              status: asset.status_label?.status_meta as string
             }
             return await AddAssetCountLine(extendTypeAsset, report)
           }))
@@ -389,7 +391,8 @@ export default function NewCountTable(props: {
                 last_name: data ? data!.last_name : null
               },
               countCheck: asset.asset_check ? asset.asset_check : false,
-              assignIncorrect: asset.is_not_asset_loc ? asset.is_not_asset_loc : false
+              assignIncorrect: asset.is_not_asset_loc ? asset.is_not_asset_loc : false,
+              status: asset.asset_count_line_status_id
             } as unknown as TAssetRow
           }))
 
@@ -405,7 +408,7 @@ export default function NewCountTable(props: {
 
 
   useEffect(() => {
-    const updateAssetCountLine = async () => {
+    const updateAssetCountLine = () => {
       if (update) {
         setRefetchReport(true)
       }

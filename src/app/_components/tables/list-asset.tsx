@@ -1,5 +1,6 @@
 import {
   INLOCATION,
+  assetStatusOptions,
   tableHeaders,
   tableHeadersAdditional
 } from "@/_constants/constants";
@@ -21,6 +22,9 @@ import {
   handleChangeRowsPerPage
 } from "@/_components/tables/utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
+import Select from "@mui/material/Select";
+import { MenuItem } from "@mui/material";
+
 
 export function CreateAssetTableCell(
   props: {
@@ -31,9 +35,10 @@ export function CreateAssetTableCell(
     isCheckTable: boolean
   }) {
   const { data, assetTab, actionLabel, action, isCheckTable } = props
-  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect } = data;
+  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, status } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
+  const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.value)
   const tabType = !assignIncorrect ? INLOCATION : OUTLOCATION
 
   useEffect(() => {
@@ -41,15 +46,17 @@ export function CreateAssetTableCell(
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       data.countCheck = count,
       data.assignIncorrect = incorrect
-      await UpdateAssetCountLine(data.id as string, { 
+      const id = assetStatusOptions.find((status) => status.value == assetStatus)?.id as number
+      await UpdateAssetCountLine(data.id as string, {
         asset_check: data.countCheck,
-        is_not_asset_loc: data.assignIncorrect
+        is_not_asset_loc: data.assignIncorrect,
+        asset_count_line_status_id: id
       })
     }
 
     updateData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count, incorrect])
+  }, [count, incorrect, assetStatus])
 
   return (
     <>
@@ -87,6 +94,20 @@ export function CreateAssetTableCell(
                 </TableCell>
                 : <></>
             }
+            <TableCell>
+              <Select value={assetStatus}
+                onChange={(event) => setAssetStatus(event.target.value)}
+                disabled={!isCheckTable}
+              >
+                {
+                  assetStatusOptions.map((choice) =>
+                      <MenuItem value={choice.value} key={choice.label}>
+                        {choice.label}
+                      </MenuItem>
+                  )
+                }
+              </Select>
+            </TableCell>
           </>
           : <></>
       }
@@ -168,7 +189,7 @@ export function AssetTable(props: {
         borderWidth: 1,
         borderColor: blue[400]
       }}
-      className={tabValue == assetTab ? "" : "hidden"}
+        className={tabValue == assetTab ? "" : "hidden"}
       >
         <ListAsset data={data}
           isCheckTable={isCheckTable}

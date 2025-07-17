@@ -4,6 +4,7 @@ import { prisma } from "@/_libs/prisma"
 import { TResponse } from "@/_apis/next.api";
 import dayjs from "dayjs";
 import { ExtendAssetResponse } from "@/_components/tables/search-asset";
+import { assetStatusOptions } from "@/_constants/constants";
 
 export async function getReportFromChildLocation(location: number): Promise<AssetCount[]> {
     const result = await prisma.asset_count.findMany({ where: { location_id: location } })
@@ -62,6 +63,11 @@ export async function getUserByIdPrisma(userId: number): Promise<Partial<User> |
     })
 }
 
+export async function findStatusId(data: ExtendAssetResponse) : Promise<number> {
+    console.log(data.status_label?.status_meta)
+    return assetStatusOptions.find((status) => status.value.includes(data.status))?.id  as number
+}
+
 export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountReport: AssetCount): Promise<AssetCountLine> {
     const findLatest = await prisma.asset_count_line.findFirst({
         where: {
@@ -90,7 +96,8 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             assigned_to: data.assigned_to?.id,
             asset_name_not_correct: false,
             is_not_asset_loc: data.is_not_asset_loc,
-            checked_on: dayjs().toDate()
+            checked_on: dayjs().toDate(),
+            asset_count_line_status_id: await findStatusId(data)
         }
     })
 }

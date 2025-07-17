@@ -29,6 +29,7 @@ export type TAssetRow = {
     assignedTo: assetUser;
     countCheck: boolean;
     assignIncorrect: boolean;
+    status: number;
 };
 
 export type AssetCount = asset_count;

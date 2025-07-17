@@ -16,19 +16,20 @@ import { AssetCount, AssetCountLine, TAssetRow } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
 import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
-import { AddAssetCountLine } from "@/_apis/report.api";
 import dayjs from "dayjs";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "./utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { useRouter } from "next/navigation";
+import { CreatAssetCountLine } from "@/_libs/search-asset-component";
 
 export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
   is_not_asset_loc: boolean;
   asset_check: boolean;
   in_report: boolean;
+  status: string;
 }
 
 function CreateSearchAssetTableCell(props: {
@@ -275,30 +276,13 @@ export default function SearchAsset(
         const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
         if (!IsInLocation) {
           toast.success(`${searchInput} was found.`)
-          const extendTypeAsset: ExtendAssetResponse = {
-            ...data,
-            asset_name_not_correct: false,
-            is_not_asset_loc: data.location?.id != assetCountReport.location_id,
-            asset_check: false,
-            in_report: assetInReport.find((report) => report.asset_code === data.asset_tag) ? true : false,
-          }
-          const assetCountLine = await AddAssetCountLine(extendTypeAsset, assetCountReport)
-          const asset = {
-            id: assetCountLine.id,
-            assetCode: assetCountLine.asset_code,
-            assetName: assetCountLine.asset_name,
-            assignedTo: {
-              id: data?.id,
-              first_name: data.assigned_to!.first_name,
-              last_name: data.assigned_to!.last_name
-            },
-            countCheck: assetCountLine.asset_check ? assetCountLine.asset_check : false,
-            assignIncorrect: assetCountLine.is_not_asset_loc ? assetCountLine.is_not_asset_loc : false
-          } as unknown as TAssetRow
+          const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport)
+          await UpdateAssetCountLine(asset.id as string, { asset_check: true})
           setSearchResult([asset, ...searchResult])
         } else {
-          toast.error(`${searchInput} is already on the list.`)
+          await UpdateAssetCountLine(IsInLocation.asset_count_id, { asset_check: true})
         }
+        toast.success(`${searchInput} has been checked.`)
         setSearchInput("")
       }
     }
@@ -318,32 +302,15 @@ export default function SearchAsset(
           toast.error(`${result.rawValue} not found.`)
         } else {
           toast.success(`${result.rawValue} was found.`)
-          const IsInLocation = searchResult.find((result) => result.assetCode == data.asset_tag)
+          const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
           if (!IsInLocation) {
-            const extendTypeAsset: ExtendAssetResponse = {
-              ...data,
-              asset_name_not_correct: false,
-              is_not_asset_loc: data.location?.id != assetCountReport.location_id,
-              asset_check: false,
-              in_report: assetInReport.find((report) => report.asset_code === data.asset_tag) ? true : false,
-            }
-            const assetCountLine = await AddAssetCountLine(extendTypeAsset, assetCountReport)
-            const asset = {
-              id: assetCountLine.id,
-              assetCode: assetCountLine.asset_code,
-              assetName: assetCountLine.asset_name,
-              assignedTo: {
-                id: data?.id,
-                first_name: data.assigned_to!.first_name,
-                last_name: data.assigned_to!.last_name
-              },
-              countCheck: assetCountLine.asset_check ? assetCountLine.asset_check : false,
-              assignIncorrect: assetCountLine.is_not_asset_loc ? assetCountLine.is_not_asset_loc : false
-            } as unknown as TAssetRow
+            const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport)
+            await UpdateAssetCountLine(asset.id as string, { asset_check: true})
             setSearchResult([asset, ...searchResult])
           } else {
-            toast.error(`${result.rawValue} is already on the list.`)
+            await UpdateAssetCountLine(IsInLocation.asset_count_id, { asset_check: true})
           }
+          toast.success(`${result.rawValue} has been checked.`)
         }
         setScanData([])
       })
@@ -356,18 +323,19 @@ export default function SearchAsset(
     <>
       <Toaster
         containerStyle={{
-          position: 'relative'
+          position: 'relative',
+          top: '20rem',
         }}
         toastOptions={{
           error: {
-            duration: 1500,
+            duration: 2500,
             style: {
               background: '#ea7259',
               color: '#fff'
             }
           },
           success: {
-            duration: 1500,
+            duration: 2500,
             style: {
               background: '#45b42fff',
               color: '#fff',
