@@ -205,7 +205,7 @@ export function AssetTable(props: {
               rowsPerPageOptions={
                 [5, 10, 25, { label: 'All', value: -1 }]
               }
-              colSpan={4}
+              colSpan={5}
               count={data.length}
               rowsPerPage={rowsPerPage}
               page={tablePage}

@@ -116,6 +116,7 @@ type FUpdateAssetCountLine = {
 export async function UpdateAssetCountLine(
     countId: string, payload: FUpdateAssetCountLine)
     : Promise<AssetCountLine | null> {
+        console.log(countId)
     const assetCountLine = await getAssetCountLine(countId)
     payload.checked_on = dayjs().toDate()
     if (assetCountLine) {

@@ -396,7 +396,7 @@ export default function NewCountTable(props: {
             } as unknown as TAssetRow
           }))
 
-        setData(mapAssetData)
+        setData(mapAssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck)))
         setRefetchReport(false)
         setLoading(false)
       }

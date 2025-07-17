@@ -264,7 +264,7 @@ export default function SearchAsset(
   const [scanData, setScanData] = useState<IDetectedBarcode[]>()
   const [fetchData, setFetchData] = useState<boolean>(false)
   const [searchResult, setSearchResult] = useState<TAssetRow[]>([])
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(true)
   const { back } = useRouter()
 
   async function callFetchAssetSearch() {
@@ -274,13 +274,13 @@ export default function SearchAsset(
         toast.error(`${searchInput} not found.`)
       } else {
         const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
+        toast.success(`${searchInput} was found.`)
         if (!IsInLocation) {
-          toast.success(`${searchInput} was found.`)
           const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport)
           await UpdateAssetCountLine(asset.id as string, { asset_check: true})
           setSearchResult([asset, ...searchResult])
         } else {
-          await UpdateAssetCountLine(IsInLocation.asset_count_id, { asset_check: true})
+          await UpdateAssetCountLine(IsInLocation.id, { asset_check: true})
         }
         toast.success(`${searchInput} has been checked.`)
         setSearchInput("")
@@ -308,7 +308,7 @@ export default function SearchAsset(
             await UpdateAssetCountLine(asset.id as string, { asset_check: true})
             setSearchResult([asset, ...searchResult])
           } else {
-            await UpdateAssetCountLine(IsInLocation.asset_count_id, { asset_check: true})
+            await UpdateAssetCountLine(IsInLocation.id, { asset_check: true})
           }
           toast.success(`${result.rawValue} has been checked.`)
         }
@@ -324,7 +324,7 @@ export default function SearchAsset(
       <Toaster
         containerStyle={{
           position: 'relative',
-          top: '20rem',
+          top: '20%',
         }}
         toastOptions={{
           error: {

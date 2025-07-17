@@ -12,9 +12,9 @@ export function handleChangePage(
     rowsPerPage: number
 ) {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    if (newPage * rowsPerPage > dataLength) {
+   if (newPage * rowsPerPage > dataLength) {
         setPage(Math.ceil(dataLength / rowsPerPage) - 1)
-    } else {
+    } else { 
         setPage(newPage)
     }
 };
