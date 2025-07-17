@@ -261,7 +261,7 @@ export default function LocationTable(props: {
               count={report.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              onPageChange={(event, page) => handleChangePage(event, page, setPage)}
+              onPageChange={(event, page) => handleChangePage(event, page, setPage, report.length, rowsPerPage)}
               onRowsPerPageChange={(event) =>
                 handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
               }

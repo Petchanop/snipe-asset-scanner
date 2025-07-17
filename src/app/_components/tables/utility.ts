@@ -11,7 +11,6 @@ export function handleChangePage(
     dataLength: number,
     rowsPerPage: number
 ) {
-    const direction = event?.currentTarget.getAttribute('aria-label')?.includes("next")
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     if (newPage * rowsPerPage > dataLength) {
         console.log("set page ", Math.ceil(dataLength / rowsPerPage) - 1, newPage, dataLength)
