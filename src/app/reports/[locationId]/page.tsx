@@ -7,7 +7,6 @@ export default async function ReportListPage({ params }: {
     params: Promise<{ locationId: number }>
 }) {
     const location = await params
-    console.log(location)
     const locationId = location.locationId
     
     const locations = await fetchLocations();

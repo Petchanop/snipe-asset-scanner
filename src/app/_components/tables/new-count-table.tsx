@@ -162,9 +162,7 @@ function SelectCountButton(props: {
       dateContext.dateValue.format('DD/MM/YYYY')
     )
     const document = await findAssetCount(documentNumber)
-    console.log("documentNumber ", documentNumber, document, documentContext.DocumentNumber)
     if (!document) {
-      console.log("report create ", documentNumber)
       const reportPayload = {
         document_number: documentNumber,
         document_date: dateContext.dateValue.toDate(),
@@ -185,9 +183,7 @@ function SelectCountButton(props: {
       dateContext.dateValue.format('DD/MM/YYYY')
     )
     const document = await findAssetCount(documentNumber)
-    console.log("documentNumber ", documentNumber, document, documentContext.DocumentNumber)
     if (!document) {
-      console.log("report create ", documentNumber)
       const reportPayload = {
         document_number: documentNumber,
         document_date: dateContext.dateValue.toDate(),
@@ -352,7 +348,6 @@ export default function NewCountTable(props: {
 
   useEffect(() => {
     setData([])
-    console.log("set data empty", locationId)
   }, [locationId])
 
   useEffect(() => {
@@ -360,13 +355,11 @@ export default function NewCountTable(props: {
       setData([])
       setLoading(true)
       const report = await getAssetCountReport(dateValue?.toDate()!, locationId)
-      console.log("start fetch report ", report?.document_number)
       if (!report) {
         setData([])
       } else {
         setDocumentNumber(report.document_number)
         let assetCountLineReport = await getAssetCountLineByAssetCount(report.id)
-        console.log(assetCountLineReport.length == 0)
         if (assetCountLineReport.length == 0) {
           const { data, error } = await getAssetByLocationId(locationId)
           if (error || data) {
@@ -392,15 +385,14 @@ export default function NewCountTable(props: {
               assetName: asset.asset_name,
               assignedTo: {
                 id: asset.assigned_to,
-                first_name: data!.first_name,
-                last_name: data!.last_name
+                first_name: data ? data!.first_name : null,
+                last_name: data ? data!.last_name : null
               },
               countCheck: asset.asset_check ? asset.asset_check : false,
               assignIncorrect: asset.is_not_asset_loc ? asset.is_not_asset_loc : false
             } as unknown as TAssetRow
           }))
 
-        console.log(mapAssetData)
         setData(mapAssetData)
         setRefetchReport(false)
         setLoading(false)

@@ -59,7 +59,6 @@ export default function TableLayout({
   useEffect(() => {
     if (locationId) {
       if (checkSamePathName(selected.current, pathname) && checkTabPathname(pathname)) {
-        console.log("replace ", selected)
         if (selected.current)
           router.replace(selected.current)
       }

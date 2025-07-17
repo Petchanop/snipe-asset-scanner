@@ -63,7 +63,6 @@ export async function getUserByIdPrisma(userId: number): Promise<Partial<User> |
 }
 
 export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountReport: AssetCount): Promise<AssetCountLine> {
-    console.log("find asset Count", assetCountReport.id)
     const findLatest = await prisma.asset_count_line.findFirst({
         where: {
             asset_count_id: assetCountReport.id!,

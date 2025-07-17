@@ -206,7 +206,6 @@ export default function LocationTable(props: {
       if (newReport.length == 0) {
         newReport = await getReportFromChildLocation(childId!)
       }
-      console.log("new report", parentId, childId, newReport)
       setReport(newReport)
     }
     fetchReportByParent();

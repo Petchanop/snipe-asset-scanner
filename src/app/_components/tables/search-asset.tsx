@@ -22,6 +22,8 @@ import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "./utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
+import { Router } from "next/router";
+import { useRouter } from "next/navigation";
 
 export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
@@ -263,6 +265,7 @@ export default function SearchAsset(
   const [fetchData, setFetchData] = useState<boolean>(false)
   const [searchResult, setSearchResult] = useState<TAssetRow[]>([])
   const [show, setShow] = useState(false)
+  const { back } = useRouter()
 
   async function callFetchAssetSearch() {
     if (searchInput && fetchData) {
@@ -400,6 +403,7 @@ export default function SearchAsset(
           <Button onClick={() => setFetchData(true)}>Search</Button>
           <Typography className="content-center">OR</Typography>
           <Button onClick={() => setShow((pre) => !pre)}>Scan</Button>
+          <Button onClick={() => back()}>Back</Button>
 
         </div>
         {

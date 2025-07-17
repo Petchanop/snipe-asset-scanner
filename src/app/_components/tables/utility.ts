@@ -13,7 +13,6 @@ export function handleChangePage(
 ) {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     if (newPage * rowsPerPage > dataLength) {
-        console.log("set page ", Math.ceil(dataLength / rowsPerPage) - 1, newPage, dataLength)
         setPage(Math.ceil(dataLength / rowsPerPage) - 1)
     } else {
         setPage(newPage)
