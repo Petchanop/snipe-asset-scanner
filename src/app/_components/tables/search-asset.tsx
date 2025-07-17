@@ -22,7 +22,6 @@ import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "./utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
-import { Router } from "next/router";
 import { useRouter } from "next/navigation";
 
 export type ExtendAssetResponse = AssetResponse & {
