@@ -10,7 +10,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Button from "@mui/material/Button";
 import { AssetTable } from "@/_components/tables/list-asset";
-import { INLOCATION, OUTLOCATION, TAssetRow, TAssetTab, TSnipeDocument } from "@/_types/types";
+import { INLOCATION, OUTLOCATION, TAssetRow, TAssetTab, TSnipeDocument, User } from "@/_types/types";
 import { AddAssetCountLine } from "@/_apis/report.api";
 import dayjs, { Dayjs } from "dayjs";
 import { ReportContext, useLocationUrlContext, useReportContext } from "@/_components/tableLayout";
@@ -21,7 +21,7 @@ import {
   getAssetByLocationId,
   getAssetCountLineByAssetCount, getAssetCountReport,
 } from "@/_libs/report.utils";
-import { AssetResponse, getUserById } from "@/_apis/snipe-it/snipe-it.api";
+import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api";
 import { ReportState } from "@/_constants/constants";
 import toast from "react-hot-toast";
 import { TLocation } from "@/_types/snipe-it.type";
@@ -336,9 +336,10 @@ export default function NewCountTable(props: {
   locations: PNewCountTableProps[],
   defaultLocation: TLocation;
   locationId: number;
-  parentProp: TLocation
+  parentProp: TLocation;
+  users: User[];
 }) {
-  const { parentLocation, childrenLocation, locations, defaultLocation, locationId, parentProp } = props
+  const { parentLocation, childrenLocation, locations, defaultLocation, locationId, parentProp, users } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
@@ -384,18 +385,15 @@ export default function NewCountTable(props: {
         }
         const mapAssetData = await Promise.all(
           assetCountLineReport.map(async (asset) => {
-            const { data, error } = await getUserById(asset.assigned_to!)
-            if (error) {
-              toast('cannot fetch asset count line')
-            }
+            const data = users.find((user) => user.id as number == asset.assigned_to)
             return {
               id: asset.id,
               assetCode: asset.asset_code,
               assetName: asset.asset_name,
               assignedTo: {
-                id: data?.id,
-                first_name: data?.first_name,
-                last_name: data?.last_name
+                id: asset.assigned_to,
+                first_name: data!.first_name,
+                last_name: data!.last_name
               },
               countCheck: asset.asset_check ? asset.asset_check : false,
               assignIncorrect: asset.is_not_asset_loc ? asset.is_not_asset_loc : false

@@ -4,6 +4,7 @@ import { getChildrenLocation, getParentLocation } from "@/_libs/location.utils";
 import { TLocation } from "@/_types/snipe-it.type";
 import { getLocationById } from "@/_apis/location.api";
 import { notFound } from "next/navigation";
+import { GetAllUserPrisma } from "@/_apis/report.api";
 
 export default async function AssetsTablePage({ searchParams } : {
     searchParams: Promise<{ location?: number }>
@@ -20,6 +21,7 @@ export default async function AssetsTablePage({ searchParams } : {
     const childrenLocation = getChildrenLocation(locations.data!.rows) as TLocation[]
     // const otherLocation = getOtherLocation(locations.data!.rows)
     const locationData = await getLocationById(parseInt(resolveLocationId?.toString()!))
+    const users = await GetAllUserPrisma() 
     const parent = parentLocation.find((loc) => (
         loc.children as unknown as {id:number, name: string} [])
         .find((child: { id: number, name: string}) => child.id == resolveLocationId)
@@ -52,6 +54,7 @@ export default async function AssetsTablePage({ searchParams } : {
             defaultLocation={locationData as unknown as TLocation} 
             locationId={parseInt(resolveLocationId!.toString())}
             parentProp={parent}
+            users={users}
         />
     )
 }

@@ -104,3 +104,7 @@ export async function DeleteAssetCountLine(assetCountId: string, assetTag: strin
         }
     })
 }
+
+export async function GetAllUserPrisma(): Promise<User[]> {
+    return await prisma.users.findMany()
+}
