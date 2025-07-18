@@ -23,6 +23,7 @@ model asset_count {
     created_at DateTime @default(now())
 
     AssetCountLine asset_count_line[]
+    AssetCountLocation asset_count_location[]
 }
 
 model asset_count_line {
@@ -51,4 +52,14 @@ model asset_status {
   label String @db.Char(36)
   description String
   AssetCountLine asset_count_line[]
+}
+
+model asset_count_location {
+  id  String @id @default(uuid()) @db.Char(36)
+  count_id asset_count @relation(fields: [asset_count_id], references: [id])
+  asset_count_id String @db.Char(36)
+  rtd_location_id Int?
+  location_id Int
+
+  @@index([asset_count_id], map: "asset_count_location_asset_count_id_index")
 }

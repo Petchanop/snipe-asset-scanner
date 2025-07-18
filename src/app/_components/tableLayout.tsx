@@ -49,6 +49,7 @@ export default function TableLayout({
   }
 
   const [locationId, setLocationId] = useState(parseInt(location?.toString()!))
+  const [ nextstep, setNextStep ] =  useState("")
   const selected = useRef(tabPathname)
   const router = useRouter();
   function handleOnChange(event: SyntheticEvent, newValue: string) {
@@ -85,19 +86,16 @@ export default function TableLayout({
           onChange={handleOnChange}
         >
           <Tab value={
-            `/reports/count-assets?location=${locationId}`
-          }
-            label="new count">
-          </Tab>
-          <Tab value={
             `/reports?location=${locationId}`
           }
             label="reports">
           </Tab>
-          {/* <Tab value={
-            `/reports/count-assets/search?location=${locationId}`}
-            label="search">
-          </Tab> */}
+            <Tab value={
+            `/reports/count-assets?location=${locationId}`
+          }
+            disabled
+            label="new count">
+          </Tab>
         </Tabs>
         <Paper elevation={10}>
           <TableContainer className="w-full lg:max-h-[55vh] max-h-[75vh]">

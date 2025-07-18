@@ -31,13 +31,13 @@ function CreateLocationTableCell(props : {
   function processAction(state: string): string {
     switch (state) {
       case ReportState.NEW:
-        return "OPEN"
+        return "เริ่ม"
       case ReportState.INPROGRESS:
-        return "OPEN"
+        return "แก้ไข"
       case ReportState.COMPLETED:
-        return "VIEW"
+        return "เรียกดู"
       case ReportState.CANCEL:
-        return "VIEW"
+        return "เรียกดู"
     }
     return ""
   }

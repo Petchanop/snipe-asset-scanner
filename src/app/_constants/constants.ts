@@ -25,8 +25,9 @@ export enum ReportState {
 }
 
 export const MapActionColor: Record<string, { [key: number]: string }> = {
-    "OPEN": blue,
-    "VIEW": grey,
+    "เริ่ม" : blue,
+    "แก้ไข": red,
+    "เรียกดู": grey,
 }
 
 export const tableHeaders: HeadersAssetTable[] = [

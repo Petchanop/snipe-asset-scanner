@@ -302,7 +302,7 @@ type TDateValueContext = {
   setDateValue: Dispatch<SetStateAction<Dayjs | null>>
 }
 
-const DateValueContext = createContext<TDateValueContext | null>(null)
+export const DateValueContext = createContext<TDateValueContext | null>(null)
 
 export default function NewCountTable(props: {
   parentLocation: TLocation[],
@@ -462,7 +462,7 @@ export default function NewCountTable(props: {
   )
 }
 
-function useDateContext() {
+export function useDateContext() {
   const context = useContext(DateValueContext)
   if (!context) {
     throw new Error("useLocatoinUrlContext must be use within Context provider")
