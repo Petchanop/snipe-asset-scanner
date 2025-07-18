@@ -31,27 +31,6 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { LoadingTableSkeleton } from "../loading";
 
-function CheckAdditionalAssetButton() {
-  return (
-    <>
-      <div className="flex flex-row w-full lg:pl-8 lg:space-x-8" >
-        <Button className={
-          `hover:bg-blue-200 max-md:w-1/3
-          max-md:text-xs max-md:font-medium`
-        }
-        >Scan</Button>
-      </div>
-      <div className="flex flex-row w-full lg:pl-8 lg:space-x-8" >
-        <Button className={
-          `hover:bg-blue-200 max-md:w-1/3 
-          max-md:text-xs max-md:font-medium`
-        }>Add Asset</Button>
-      </div>
-    </>
-    // </div>
-  )
-}
-
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void
 }) {
@@ -186,7 +165,7 @@ function SelectCountButton(props: {
     if (!document) {
       const reportPayload = {
         document_number: documentNumber,
-        document_date: dateContext.dateValue.toDate(),
+        document_date: new Date(dateContext.dateValue.format('DD/MM/YYYY')),
         rtd_location_id: selectedLocation.rtd_location_id as number,
         location_id: locationContext.locationId,
         state: ReportState.NEW
@@ -304,7 +283,7 @@ export function NewCountInput(props: {
           isCheckTable ?
             assetTab ?
               <CheckAssetButton setIsCheckTable={setIsCheckTable} />
-              : <CheckAdditionalAssetButton />
+              : <></>
             : <SelectCountButton
               selectedLocation={selectedLocation}
               setLocation={setLocation}
