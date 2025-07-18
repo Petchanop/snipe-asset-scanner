@@ -165,7 +165,7 @@ function SelectCountButton(props: {
     if (!document) {
       const reportPayload = {
         document_number: documentNumber,
-        document_date: new Date(dateContext.dateValue.format('DD/MM/YYYY')),
+        document_date: dateContext.dateValue.toDate(),
         rtd_location_id: selectedLocation.rtd_location_id as number,
         location_id: locationContext.locationId,
         state: ReportState.NEW
@@ -174,7 +174,6 @@ function SelectCountButton(props: {
     }
     documentContext.setDocumentNumber(documentNumber)
     documentContext.setRefetchReport(true)
-    // replace(`${window.location.href}`)
   }
 
   return (

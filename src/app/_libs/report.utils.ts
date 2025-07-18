@@ -6,8 +6,8 @@ import { AssetResponse } from '@/_apis/snipe-it/snipe-it.api';
 import { createGateway, TResponse } from '@/_apis/next.api';
 
 export async function changeDateToIsoString(date: Date): Promise<string> {
-    const [month, day, year] = date.toLocaleDateString('th-Bk').split('/').map(Number);
-    return (new Date(year!, month! - 1, day)).toISOString()
+    date.setUTCHours(0,0,0,0)
+    return date.toISOString()
 }
 
 export async function createDocumentNumber(locationId: number, date: string): Promise<string> {
