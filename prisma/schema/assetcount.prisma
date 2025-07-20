@@ -35,11 +35,14 @@ model asset_count_line {
   checked_on                 DateTime     @db.Timestamp(0)
   is_not_asset_loc           Boolean
   asset_name_not_correct     Boolean
+  asset_count_line_location_id String     @db.Char(36)
+  location_id       asset_count_location @relation(fields: [asset_count_line_location_id], references: [id])
   asset_count_line_status_id Int          @default(0)
   status_id                  asset_status @relation(fields: [asset_count_line_status_id], references: [id])
 
   @@index([asset_count_id], map: "asset_count_line_asset_count_id_index")
   @@index([asset_count_line_status_id], map: "asset_count_line_status_id_index")
+  @@index([asset_count_line_location_id], map: "asset_count_line_asset_count_location_index")
 }
 
 model asset_status {
@@ -56,6 +59,7 @@ model asset_count_location {
   rtd_location_id Int?
   location_id     Int
   count_id        asset_count @relation(fields: [asset_count_id], references: [id])
+  AssetCountLine  asset_count_line[]
 
   @@index([asset_count_id], map: "asset_count_location_asset_count_id_index")
 }

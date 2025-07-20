@@ -12,7 +12,7 @@ import { blue } from "@mui/material/colors";
 import Button from "@mui/material/Button";
 import { AssetResponse, fetchSearchAsset } from "@/_apis/snipe-it/snipe-it.api";
 import { toast, ToastBar, Toaster } from 'react-hot-toast';
-import { AssetCount, AssetCountLine, TAssetRow } from "@/_types/types";
+import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
 import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
@@ -27,6 +27,7 @@ export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
   is_not_asset_loc: boolean;
   asset_check: boolean;
+  location_id: string;
   in_report: boolean;
   status: string; 
 }
@@ -256,9 +257,10 @@ export default function SearchAsset(
   props: {
     assetCountReport: AssetCount
     assetInReport: AssetCountLine[]
+    locationId: AssetCountLocation
   }
 ) {
-  const { assetCountReport, assetInReport } = props
+  const { assetCountReport, assetInReport, locationId } = props
   const [searchInput, setSearchInput] = useState<string>("")
   const [scanData, setScanData] = useState<IDetectedBarcode[]>()
   const [fetchData, setFetchData] = useState<boolean>(false)
@@ -275,7 +277,7 @@ export default function SearchAsset(
         const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
         toast.success(`${searchInput} was found.`)
         if (!IsInLocation) {
-          const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport)
+          const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId)
           await UpdateAssetCountLine(asset.id as string, { asset_check: true})
           setSearchResult([asset, ...searchResult])
         } else {
@@ -303,7 +305,7 @@ export default function SearchAsset(
           toast.success(`${result.rawValue} was found.`)
           const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
           if (!IsInLocation) {
-            const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport)
+            const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId)
             await UpdateAssetCountLine(asset.id as string, { asset_check: true})
             setSearchResult([asset, ...searchResult])
           } else {

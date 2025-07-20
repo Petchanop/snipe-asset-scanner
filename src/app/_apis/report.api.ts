@@ -89,6 +89,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             checked_on: dayjs().toDate(),
             is_not_asset_loc: data.is_not_asset_loc,
             asset_name_not_correct: false,
+            asset_count_line_location_id: data.location_id,
             asset_count_line_status_id: await findStatusId(data)
         })
     }
@@ -114,6 +115,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             asset_name_not_correct: false,
             is_not_asset_loc: data.is_not_asset_loc,
             checked_on: dayjs().toDate(),
+            asset_count_line_location_id: data.location_id,
             asset_count_line_status_id: await findStatusId(data)
         }
     })
@@ -137,6 +139,14 @@ export async function CreateAssetCountLocation(locationId: number, assetCountId:
         data: {
             location_id: locationId,
             asset_count_id: assetCountId,
+        }
+    })
+}
+
+export async function GetAssetCountLocationByAssetCountReport(assetCountId: string): Promise<AssetCountLocation[]>{
+    return await prisma.asset_count_location.findMany({
+        where : {
+            asset_count_id: assetCountId
         }
     })
 }

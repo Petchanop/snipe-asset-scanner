@@ -96,6 +96,7 @@ type FCreateAssetCountLine = {
     checked_on: Date;
     is_not_asset_loc: boolean;
     asset_name_not_correct: boolean;
+    asset_count_line_location_id: string;
     asset_count_line_status_id: number;
 }
 
@@ -141,11 +142,12 @@ export async function getAssetCountLine(
 }
 
 export async function getAssetCountLineByAssetCount(
-    assetCountId: string
+    assetCountId: string, location_id: string
 ): Promise<AssetCountLine[]> {
     const result = await prisma.asset_count_line.findMany({
         where: {
             asset_count_id: assetCountId,
+            asset_count_line_location_id: location_id
         }
     })
     return result
@@ -164,4 +166,14 @@ export async function getAssetByLocationId(
         return { data: null, error: error}
     }
     return { data: data.rows as AssetResponse[] , error: null}
+}
+
+export async function CheckAllDataCount(assetCountId: string) : Promise<boolean>{
+    const assetInReport = await prisma.asset_count_line.findMany({
+        where : {
+            asset_count_id: assetCountId
+        }
+    })
+    console.log("check all count ", assetInReport.every((asset) => asset.asset_check == true))
+    return assetInReport.every((asset) => asset.asset_check == true)
 }

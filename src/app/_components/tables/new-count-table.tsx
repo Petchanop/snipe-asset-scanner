@@ -10,11 +10,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Button from "@mui/material/Button";
 import { AssetTable } from "@/_components/tables/list-asset";
 import { AssetCount, INLOCATION, OUTLOCATION, TAssetRow, TAssetTab, User } from "@/_types/types";
-import { AddAssetCountLine } from "@/_apis/report.api";
+import { AddAssetCountLine, GetAssetCountLocationByAssetCountReport } from "@/_apis/report.api";
 import dayjs, { Dayjs } from "dayjs";
 import { ReportContext, useReportContext } from "@/_components/tableLayout";
 import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation";
 import {
+  CheckAllDataCount,
   getAssetByLocationId,
   getAssetCountLineByAssetCount,
   updateAssetCountReport,
@@ -295,7 +296,10 @@ export default function NewCountTable(props: {
         setData([])
       } else {
         setDocumentNumber(report.document_number)
-        let assetCountLineReport = await getAssetCountLineByAssetCount(report.id)
+        const locationIds = await GetAssetCountLocationByAssetCountReport(report.id)
+        const assetLocationId = locationIds.find((loc) => loc.location_id == locationId)
+        console.log("fetch asset from location id ", locationId, locationIds, assetLocationId)
+        let assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
         console.log(assetCountLineReport)
         if (assetCountLineReport.length == 0) {
           const { data, error } = await getAssetByLocationId(locationId)
@@ -309,6 +313,7 @@ export default function NewCountTable(props: {
               is_not_asset_loc: asset.location?.id != locationId,
               asset_check: false,
               in_report: false,
+              location_id: assetLocationId?.id as string,
               status: asset.status_label?.status_meta as string
             }
             return await AddAssetCountLine(extendTypeAsset, report)
@@ -332,10 +337,14 @@ export default function NewCountTable(props: {
             } as unknown as TAssetRow
           }))
 
-        if (mapAssetData.every((asset) => asset.countCheck == true)) {
+        if (await CheckAllDataCount(report.id) == true) {
           await updateAssetCountReport(report.document_number, {
             ...report,
             state: ReportState.COMPLETED})
+        } else {
+           await updateAssetCountReport(report.document_number, {
+            ...report,
+            state: ReportState.INPROGRESS})
         }
 
         setData(mapAssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck)))
