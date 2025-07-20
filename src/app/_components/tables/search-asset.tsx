@@ -16,7 +16,6 @@ import { AssetCount, AssetCountLine, TAssetRow } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
 import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
-import dayjs from "dayjs";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "./utility";
@@ -29,7 +28,7 @@ export type ExtendAssetResponse = AssetResponse & {
   is_not_asset_loc: boolean;
   asset_check: boolean;
   in_report: boolean;
-  status: string;
+  status: string; 
 }
 
 function CreateSearchAssetTableCell(props: {
@@ -105,7 +104,7 @@ function SearchAssetTable(props: {
           data.length ?
             dataPerPage(data, page, rowsPerPage).map((asset: TAssetRow) => {
               return (
-                <TableRow key={`${asset.assetCode}${dayjs().get('second')}`} >
+                <TableRow key={`${asset.assetCode}${asset.assetName}`} >
                   <CreateSearchAssetTableCell data={asset} />
                 </TableRow>
               )

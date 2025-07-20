@@ -1,30 +1,32 @@
 "use server"
-import { AssetCount, AssetCountLine, User } from "@/_types/types";
+import { AssetCount, AssetCountLine, AssetCountLocation, User } from "@/_types/types";
 import { prisma } from "@/_libs/prisma"
 import { TResponse } from "@/_apis/next.api";
 import dayjs from "dayjs";
 import { ExtendAssetResponse } from "@/_components/tables/search-asset";
 import { assetStatusOptions } from "@/_constants/constants";
+import { createAssetCountLine } from "@/_libs/report.utils";
 
 export async function getReportFromChildLocation(location: number): Promise<AssetCount[]> {
-    const result = await prisma.asset_count.findMany({ where: { location_id: location } })
-    return result
+    const result = await prisma.asset_count_location.findMany({
+    where: {
+        location_id: location, // Replace with actual ID
+    }, 
+    include: {
+        count_id: true, // This pulls the related asset_count
+    }})
+    return result.map(item => item.count_id);
 }
 
 export async function getReportFromParentLocation(location: number): Promise<AssetCount[]> {
-    const result = await prisma.asset_count.findMany({
-        where: {
-            OR: [
-                {
-                    rtd_location_id: location
-                },
-                {
-                    location_id: location
-                }
-            ]
-        }
-    })
-    return result
+    const result = await prisma.asset_count_location.findMany({
+    where: {
+        location_id: location, // Replace with actual ID
+    }, 
+    include: {
+        count_id: true, // This pulls the related asset_count
+    }})
+    return result.map(item => item.count_id);
 }
 
 export async function getAssetsByLocation(
@@ -63,9 +65,8 @@ export async function getUserByIdPrisma(userId: number): Promise<Partial<User> |
     })
 }
 
-export async function findStatusId(data: ExtendAssetResponse) : Promise<number> {
-    console.log(data.status_label?.status_meta)
-    return assetStatusOptions.find((status) => status.value.includes(data.status))?.id  as number
+export async function findStatusId(data: ExtendAssetResponse): Promise<number> {
+    return assetStatusOptions.find((status) => status.value == data.status)!.id || 0;
 }
 
 export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountReport: AssetCount): Promise<AssetCountLine> {
@@ -76,10 +77,26 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
         },
         orderBy: {}
     })
+    if (!findLatest) {
+        return await createAssetCountLine({
+            asset_count_id: assetCountReport.id!,
+            asset_id: data.id,
+            asset_code: data.asset_tag!,
+            asset_name: data.name!,
+            assigned_to: data.assigned_to?.id || null,
+            asset_check: false,
+            checked_by: null,
+            checked_on: dayjs().toDate(),
+            is_not_asset_loc: data.is_not_asset_loc,
+            asset_name_not_correct: false,
+            asset_count_line_status_id: await findStatusId(data)
+        })
+    }
     return await prisma.asset_count_line.upsert({
         where: {
             id: findLatest?.id,
-            asset_code: data.asset_tag!
+            asset_code: data.asset_tag!,
+            asset_count_id: assetCountReport.id
         },
         update: {
             asset_count_id: assetCountReport.id,
@@ -102,15 +119,24 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
     })
 }
 
-export async function DeleteAssetCountLine(assetCountId: string, assetTag: string): Promise<AssetCountLine | null> {
+export async function DeleteAssetCountLine(assetCountId: string, id: string): Promise<AssetCountLine | null> {
     return await prisma.asset_count_line.delete({
         where: {
+            id: id,
             asset_count_id: assetCountId,
-            asset_code: assetTag
         }
     })
 }
 
 export async function GetAllUserPrisma(): Promise<User[]> {
     return await prisma.users.findMany()
+}
+
+export async function CreateAssetCountLocation(locationId: number, assetCountId: string): Promise<AssetCountLocation> {
+    return await prisma.asset_count_location.create({
+        data: {
+            location_id: locationId,
+            asset_count_id: assetCountId,
+        }
+    })
 }

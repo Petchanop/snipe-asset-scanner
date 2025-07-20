@@ -3,10 +3,24 @@
 import { TLocation } from "@/_types/snipe-it.type"
 import { Button } from "@mui/material"
 import LocationTable from "@/_components/tables/location-table"
-import { useState } from "react"
+import { useState, createContext, Dispatch, SetStateAction, useContext, useEffect } from "react"
 import CreatePlanComponent from "@/_components/planComponent"
-import { DateValueContext } from "@/_components/tables/new-count-table"
 import dayjs, { Dayjs } from "dayjs"
+
+type TDateValueContext = {
+  dateValue: Dayjs;
+  setDateValue: Dispatch<SetStateAction<Dayjs | null>>
+}
+
+const DateValueContext = createContext<TDateValueContext | null>(null)
+
+export function useDateContext() {
+  const context = useContext(DateValueContext)
+  if (!context) {
+    throw new Error("useDateValueContext must be use within Context provider")
+  }
+  return context
+}
 
 export default function ReportComponent(props: {
     locations: TLocation[],
@@ -17,8 +31,14 @@ export default function ReportComponent(props: {
 }) {
     const { locations, parentLocation, childrenLocation, parentProp, childProp } = props
     const [show, setShow] = useState(true)
-    const [dateValue, setDateValue] = useState<Dayjs | null>(dayjs())
+    const [dateValue, setDateValue] = useState<Dayjs | null>(null)
 
+    useEffect(() => {
+        if (!dateValue) {
+            //eslint-disable-next-line react-hooks/exhaustive-deps
+            setDateValue(dayjs())
+        }
+    },[dateValue])
     return (
         <>
             <div className="flex flex-col space-x-4">

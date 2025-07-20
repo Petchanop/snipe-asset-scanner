@@ -3,26 +3,23 @@
 import {
   createContext, Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useState
 } from "react";
-import { mockLocationTableData } from "@/_constants/mockData";
 import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Button from "@mui/material/Button";
 import { AssetTable } from "@/_components/tables/list-asset";
-import { INLOCATION, OUTLOCATION, TAssetRow, TAssetTab, TSnipeDocument, User } from "@/_types/types";
+import { AssetCount, INLOCATION, OUTLOCATION, TAssetRow, TAssetTab, User } from "@/_types/types";
 import { AddAssetCountLine } from "@/_apis/report.api";
 import dayjs, { Dayjs } from "dayjs";
-import { ReportContext, useLocationUrlContext, useReportContext } from "@/_components/tableLayout";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ReportContext, useReportContext } from "@/_components/tableLayout";
+import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation";
 import {
-  createAssetCountReport, createDocumentNumber,
-  findAssetCount,
   getAssetByLocationId,
-  getAssetCountLineByAssetCount, getAssetCountReport,
+  getAssetCountLineByAssetCount,
+  updateAssetCountReport,
 } from "@/_libs/report.utils";
 import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api";
-import { ReportState } from "@/_constants/constants";
 import toast from "react-hot-toast";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ChildrenSelectComponent, ParentSelectComponent } from "./location-table";
@@ -30,6 +27,7 @@ import { ExtendAssetResponse } from "./search-asset";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { LoadingTableSkeleton } from "../loading";
+import { ReportState } from "@/_constants/constants";
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void
@@ -54,7 +52,7 @@ function CheckAssetButton(props: {
         }
           variant="text"
           onClick={() => {
-            push(`${pathname}/${reportContext.DocumentNumber}/check?location=${location!.toString()}`)
+            push(`${pathname}/check?location=${location!.toString()}`)
           }}
         >Search</Button>
       </div>
@@ -82,19 +80,16 @@ function SelectCountInput(props: {
   locations: PNewCountTableProps[],
   selectedLocation: PNewCountTableProps,
   setSelectedLocation: (value: PNewCountTableProps) => void,
-  setDocumentDate: (value: string) => void,
   isCheckTable: boolean,
   defaultLocation: TLocation
 }) {
   const {
-    setDocumentDate,
     isCheckTable,
   } = props
   const dateContext = useDateContext()
 
   const handleDateOnChange = (value: SetStateAction<dayjs.Dayjs | null>) => {
     if (value) {
-      setDocumentDate(value.toString())
       dateContext.setDateValue(value)
     }
   }
@@ -106,7 +101,6 @@ function SelectCountInput(props: {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker label="Select Date"
             value={dateContext.dateValue}
-            disableFuture
             format="DD/MM/YYYY"
             className="lg:w-2/3 w-3/5"
             slotProps={{ textField: { size: 'small' } }}
@@ -130,48 +124,20 @@ function SelectCountButton(props: {
     setIsCheckTable
   } = props
   const { replace } = useRouter()
+  const params = useParams<{ reportId: string }>()
+  const documentNumber = params.reportId ? parseInt(params.reportId) : 0
   const documentContext = useReportContext()
-  const dateContext = useDateContext()
-  const locationContext = useLocationUrlContext()
 
   async function handleClickStart() {
     setIsCheckTable((pre) => !pre)
-    const documentNumber = await createDocumentNumber(
-      locationContext.locationId,
-      dateContext.dateValue.format('DD/MM/YYYY')
-    )
-    const document = await findAssetCount(documentNumber)
-    if (!document) {
-      const reportPayload = {
-        document_number: documentNumber,
-        document_date: dateContext.dateValue.toDate(),
-        rtd_location_id: selectedLocation.rtd_location_id as number,
-        location_id: locationContext.locationId,
-        state: ReportState.NEW
-      }
-      await createAssetCountReport(reportPayload)
-    }
+
+
     documentContext.setDocumentNumber(documentNumber)
     replace(`${window.location.href}`)
   }
 
   async function handleGetData() {
     setLocation(selectedLocation);
-    const documentNumber = await createDocumentNumber(
-      locationContext.locationId,
-      dateContext.dateValue.format('DD/MM/YYYY')
-    )
-    const document = await findAssetCount(documentNumber)
-    if (!document) {
-      const reportPayload = {
-        document_number: documentNumber,
-        document_date: dateContext.dateValue.toDate(),
-        rtd_location_id: selectedLocation.rtd_location_id as number,
-        location_id: locationContext.locationId,
-        state: ReportState.NEW
-      }
-      await createAssetCountReport(reportPayload)
-    }
     documentContext.setDocumentNumber(documentNumber)
     documentContext.setRefetchReport(true)
   }
@@ -229,21 +195,8 @@ export function NewCountInput(props: {
   const [parent, setParent] = useState(parentProp)
   const [childId, setChildId] = useState<number | null>(defaultLocation!.id as unknown as number)
   const [selectedLocation, setSelectedLocation] = useState(location)
-  const [documentDate, setDocumentDate] = useState<string>((new Date()).toDateString())
   const documentContext = useReportContext()
-  function findDocumentNumber(): TSnipeDocument[] {
-    return mockLocationTableData
-      .filter((data) => data.location == selectedLocation.name
-        && data.date == documentDate)
-  }
-  useEffect(() => {
-    if (selectedLocation && documentDate) {
-      const docNumber = findDocumentNumber();
-      if (docNumber.length)
-        documentContext.setDocumentNumber((docNumber[0] as TSnipeDocument).documentNumber)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedLocation, documentDate])
+
   return (
     <div className="flex flex-row w-full py-2 pl-2 lg:pl-10 content-center">
       <div className="flex flex-col basis-lg space-y-2">
@@ -257,7 +210,6 @@ export function NewCountInput(props: {
             locations={locations}
             selectedLocation={selectedLocation}
             setSelectedLocation={setSelectedLocation}
-            setDocumentDate={setDocumentDate}
             isCheckTable={isCheckTable}
             defaultLocation={defaultLocation}
           />
@@ -312,18 +264,25 @@ export default function NewCountTable(props: {
   locationId: number;
   parentProp: TLocation;
   users: User[];
+  report: AssetCount | null;
 }) {
-  const { parentLocation, childrenLocation, locations, defaultLocation, locationId, parentProp, users } = props
+  const { parentLocation, childrenLocation, locations, defaultLocation, locationId, parentProp, users, report } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
   const [data, setData] = useState<TAssetRow[]>([])
-  const [dateValue, setDateValue] = useState<Dayjs | null>(dayjs())
-  const [documentNumber, setDocumentNumber] = useState<string>("")
+  const [dateValue, setDateValue] = useState<Dayjs | null>(null)
+  const [documentNumber, setDocumentNumber] = useState<number>()
   const [update, setUpdate] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
 
+  useEffect(() => {
+    if (!dateValue) {
+      //eslint-disable-next-line react-hooks/exhaustive-deps
+      setDateValue(dayjs(report?.document_date))
+    }
+  }, [dateValue, report])
   useEffect(() => {
     setData([])
   }, [locationId])
@@ -332,14 +291,13 @@ export default function NewCountTable(props: {
     const fetchReport = async () => {
       setData([])
       setLoading(true)
-      const report = await getAssetCountReport(dateValue?.toDate()!, locationId)
       if (!report) {
         setData([])
       } else {
         setDocumentNumber(report.document_number)
         let assetCountLineReport = await getAssetCountLineByAssetCount(report.id)
+        console.log(assetCountLineReport)
         if (assetCountLineReport.length == 0) {
-          console.log("create asset count line for ", report)
           const { data, error } = await getAssetByLocationId(locationId)
           if (error || data) {
             toast.error(`${report.document_number} asset data not found.`)
@@ -348,7 +306,7 @@ export default function NewCountTable(props: {
             const extendTypeAsset: ExtendAssetResponse = {
               ...asset,
               asset_name_not_correct: false,
-              is_not_asset_loc: asset.location?.id != report.location_id,
+              is_not_asset_loc: asset.location?.id != locationId,
               asset_check: false,
               in_report: false,
               status: asset.status_label?.status_meta as string
@@ -373,6 +331,12 @@ export default function NewCountTable(props: {
               status: asset.asset_count_line_status_id
             } as unknown as TAssetRow
           }))
+
+        if (mapAssetData.every((asset) => asset.countCheck == true)) {
+          await updateAssetCountReport(report.document_number, {
+            ...report,
+            state: ReportState.COMPLETED})
+        }
 
         setData(mapAssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck)))
         setRefetchReport(false)

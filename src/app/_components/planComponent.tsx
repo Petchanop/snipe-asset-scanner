@@ -1,15 +1,14 @@
 'use client'
 
 import Button from "@mui/material/Button"
-import { DateLocationForm } from "./createPlanFormComponent"
 import { TLocation } from "@/_types/snipe-it.type"
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Typography from "@mui/material/Typography";
-import { useDateContext } from "@/_components/tables/new-count-table";
+import { useDateContext } from "@/_components/reportComponent";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -22,6 +21,32 @@ import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add"
+import { createAssetCountReport } from "@/_libs/report.utils";
+import { ReportState } from "@/_constants/constants";
+import { CreateAssetCountLocation } from "@/_apis/report.api";
+import { useRouter } from "next/navigation";
+
+type TReportForm = {
+    document_number?: number,
+    document_date: Date | null,
+    state: ReportState,
+    asset_count_location: number[]
+}
+
+type TCreateReportContext = {
+    report: TReportForm,
+    setReport: Dispatch<SetStateAction<TReportForm>>
+}
+
+const CreateReportContext = createContext<TCreateReportContext | null>(null);
+
+export function useCreateReportContext() {
+    const context = useContext(CreateReportContext)
+    if (!context) {
+        throw new Error("useCreateReportContext must be use within Context provider")
+    }
+    return context
+}
 
 const steps = ["เลือกวันที่", "เพิ่มสถานที่", "ยืนยัน"];
 
@@ -60,7 +85,7 @@ export function ObjectList(props: {
             </List>
 
             {items.length === 0 && (
-                <Typography color="text.secondary" align="center" sx={{ mt: 2 , mb: 4}}>
+                <Typography color="text.secondary" align="center" sx={{ mt: 2, mb: 4 }}>
                     ไม่มีรายการในขณะนี้
                 </Typography>
             )}
@@ -71,33 +96,45 @@ export function ObjectList(props: {
 
 function StepComponent(props: {
     step: number,
+    reportForm: any,
     parentLocation: TLocation[],
     childrenLocation: TLocation[],
     parentProp: TLocation | null,
     childProp: TLocation | null
 }) {
-    const { step, parentLocation, childrenLocation, parentProp, childProp } = props
+    const { step, parentLocation, childrenLocation, parentProp } = props
+    const CreateReportContext = useCreateReportContext()
     const [parent, setParent] = useState(parentProp)
     const [childId, setChildId] = useState<number | null>()
-    const [ selected, setSelected ] = useState(false)
-    const [documentLocation, setDocumentLocation] = useState<TLocation[]>([])
+    const [selected, setSelected] = useState(false)
+    const [documentLocation, setDocumentLocation] = useState<TLocation[]>( CreateReportContext.report.asset_count_location.map((id: number) => {
+                return childrenLocation.find((loc) => loc.id === id) || parentLocation.find((loc) => loc.id === id) as TLocation
+            }))
     const dateContext = useDateContext()
-    const handleDateOnChange = (value: SetStateAction<dayjs.Dayjs | null>) => {
+    const handleDateOnChange = (value: dayjs.Dayjs | null) => {
         if (value) {
             dateContext.setDateValue(value)
+            CreateReportContext.setReport((prev: TReportForm) => ({
+                ...prev,
+                document_date: value.toDate()
+            }))
         }
     }
 
     useEffect(() => {
-        console.log(documentLocation.find((loc) => loc.id == childId) == null)
-        if (selected && childId && documentLocation.find((loc) => loc.id == childId) == null) {
+        if (selected && childId && documentLocation.find((loc: TLocation) => loc.id == childId) == null) {
             let location = childrenLocation.find((loc) => loc.id == childId) as TLocation
             if (!location) {
                 location = parentLocation.find((loc) => loc.id == childId) as TLocation
             }
             setDocumentLocation([...documentLocation, location])
+            CreateReportContext.setReport((prev: TReportForm) => ({
+                ...prev,
+                asset_count_location: [...prev.asset_count_location, location.id!]
+            }))
         }
         setSelected(false)
+        //eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selected, childId])
     switch (step) {
         case 0:
@@ -118,11 +155,12 @@ function StepComponent(props: {
             return (
                 <>
                     <div className="flex flex-col">
-                        <div className="flex flex-row">
+                        <div className="flex lg:flex-row max-md:flex-col">
                             <ParentSelectComponent
                                 parentLocation={parentLocation}
                                 parentProp={parent!}
                                 setParent={setParent} />
+                            <div className="flex flex-row items-center space-x-2">
                             <ChildrenSelectComponent
                                 parent={parent!}
                                 locationByParent={childrenLocation}
@@ -134,9 +172,10 @@ function StepComponent(props: {
                             >
                                 <AddIcon />
                             </IconButton>
+                            </div>
                         </div>
                         <div className="flex flex-row">
-                            <ObjectList 
+                            <ObjectList
                                 items={documentLocation}
                                 setItems={setDocumentLocation}
                             />
@@ -161,11 +200,35 @@ export default function CreatePlanComponent(props: {
     parentProp: TLocation | null,
     childProp: TLocation | null
 }) {
-    const { location, parentLocation, childrenLocation, parentProp, childProp } = props
+    const { parentLocation, childrenLocation, parentProp, childProp } = props
+    const [reportForm, setReportForm] = useState<TReportForm>({
+        document_date: null,
+        state: ReportState.NEW,
+        asset_count_location: []
+    })
     const [activeStep, setActiveStep] = useState(0);
+    const { push } = useRouter()
 
-    const handleNext = () => {
-        if (activeStep < steps.length) setActiveStep((prev) => prev + 1);
+    const handleNext = async () => {
+        console.log("Report Form", reportForm, activeStep === steps.length - 1, activeStep, steps.length)
+        if (activeStep < steps.length) {
+            setActiveStep((prev) => prev + 1)
+            if (activeStep === steps.length - 1) {
+            console.log("Create Report Form", reportForm)
+            if (reportForm !== null && typeof reportForm !== 'undefined') {
+                const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
+                for (const location of (reportForm as unknown as TReportForm).asset_count_location) {
+                    await CreateAssetCountLocation(location, assetCountReport.id)
+                }
+                setReportForm((prev) => ({
+                    ...prev,
+                    document_number: assetCountReport.document_number,
+                    document_date: assetCountReport.document_date,
+                    state: assetCountReport.state as ReportState,
+                    asset_count_location: (reportForm as unknown as TReportForm).asset_count_location
+                }))
+            }
+        }}
     };
 
     const handleBack = () => {
@@ -175,6 +238,13 @@ export default function CreatePlanComponent(props: {
     const handleReset = () => {
         setActiveStep(0);
     };
+
+    useEffect(() => {
+        setReportForm((prev) => ({
+            ...prev,
+            document_date: dayjs().toDate(),
+        }))
+    }, [])
     return (
         <div className="flex flex-col w-full py-2 pl-2 lg:pl-10 place-items-center space-y-2">
             <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", mt: 4 }}>
@@ -192,8 +262,10 @@ export default function CreatePlanComponent(props: {
                             <Typography sx={{ mb: 2 }}>🎉 เสร็จสิ้นขั้นตอนทั้งหมด</Typography>
                             <Button onClick={handleReset} variant="outlined">แก้ไขรายงาน</Button>
                             <Button variant="outlined">สร้างรายงานใหม่</Button>
-                            <Button
-                                variant="outlined">เริ่มทำการตรวจนับ</Button>
+                            <Button variant="outlined"
+                            onClick={() => 
+                                push(`/reports/count-assets/${reportForm.document_number}?location=${reportForm.asset_count_location[0]}`)}
+                            >เริ่มทำการตรวจนับ</Button>
                             <div>รายชื่อรายการที่ได้ทำการสร้าง</div>
                         </>
                     ) : (
@@ -202,15 +274,20 @@ export default function CreatePlanComponent(props: {
                                 👉 ขั้นตอนที่ {activeStep + 1}: {steps[activeStep]}
                             </Typography>
                             <div className="flex flex-row items-center">
-                                <Stepper activeStep={activeStep}>
-                                    <StepComponent
-                                        step={activeStep}
-                                        parentLocation={parentLocation}
-                                        childrenLocation={childrenLocation}
-                                        parentProp={parentProp!}
-                                        childProp={childProp!}
-                                    />
-                                </Stepper>
+                                <CreateReportContext value={
+                                    { report: reportForm!, setReport: setReportForm }
+                                }>
+                                    <Stepper activeStep={activeStep}>
+                                        <StepComponent
+                                            step={activeStep}
+                                            reportForm={reportForm}
+                                            parentLocation={parentLocation}
+                                            childrenLocation={childrenLocation}
+                                            parentProp={parentProp!}
+                                            childProp={childProp!}
+                                        />
+                                    </Stepper>
+                                </CreateReportContext>
                             </div>
 
                             <Box sx={{ display: "flex", justifyContent: "space-between" }}>

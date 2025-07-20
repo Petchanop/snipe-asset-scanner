@@ -7,7 +7,7 @@ import Paper from "@mui/material/Paper";
 import Tab from "@mui/material/Tab";
 import TableContainer from "@mui/material/TableContainer";
 import Tabs from "@mui/material/Tabs";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   createContext, Dispatch, ReactNode,
   RefObject, SetStateAction,
@@ -22,9 +22,9 @@ type LocationStateContext = {
 }
 
 type ReportStateContext = {
-  DocumentNumber: string;
+  DocumentNumber: number | undefined;
   update: boolean;
-  setDocumentNumber: Dispatch<SetStateAction<string>>;
+  setDocumentNumber: Dispatch<SetStateAction<number | undefined>>;
   setRefetchReport: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>
 }
@@ -41,15 +41,16 @@ export default function TableLayout({
   const pathname = usePathname()
   const params = useSearchParams()
   const location = params.get('location')
+  const reportId = useParams()
+  const reportNumber = reportId.reportId ? reportId.reportId : undefined
   let tabPathname = ""
-  if (!checkTabPathname(pathname)) {
-    tabPathname = `/reports/count-assets?location=${parseInt(location?.toString()!)}`
+  // if (!checkTabPathname(pathname)) {
+  if (reportNumber !== undefined) {
+    tabPathname = `/reports/count-assets/${reportNumber}?location=${parseInt(location?.toString()!)}`
   } else {
     tabPathname = `${pathname}${params?.toString() ? `?${params?.toString()}` : ""}`
   }
-
   const [locationId, setLocationId] = useState(parseInt(location?.toString()!))
-  const [ nextstep, setNextStep ] =  useState("")
   const selected = useRef(tabPathname)
   const router = useRouter();
   function handleOnChange(event: SyntheticEvent, newValue: string) {
@@ -81,7 +82,7 @@ export default function TableLayout({
       />
       <CardContent className="space-y-4">
         <Tabs
-          value={selected.current}
+          value={tabPathname}
           className="pl-2"
           onChange={handleOnChange}
         >
@@ -91,7 +92,7 @@ export default function TableLayout({
             label="reports">
           </Tab>
             <Tab value={
-            `/reports/count-assets?location=${locationId}`
+             `/reports/count-assets/${reportNumber}?location=${locationId}`
           }
             disabled
             label="new count">

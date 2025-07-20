@@ -14,7 +14,7 @@ export default async function CheckAssetPage(
     //fetch location from snipe api
     const assetCountReport : AssetCount | null = await prisma.asset_count.findUnique( {
         where: {
-            document_number : documentNumber
+            document_number : parseInt(documentNumber)
         }
     })
     const assetInReport = await getAssetCountLineByAssetCount(assetCountReport!.id!)

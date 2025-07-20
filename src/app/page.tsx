@@ -9,5 +9,5 @@ export default async function Home() {
   // const locationDefaultId = childrenLocation[0]
   // console.log("redirect to default location", `/reports?loeation=${locationDefaultId?.id}`)
   // console.log("home page loading")
-  redirect(`/reports/count-assets?location=166`);
+  redirect(`/reports?location=166`);
 }

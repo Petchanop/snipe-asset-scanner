@@ -1,5 +1,5 @@
 import { HeadersAssetTable } from "@/_types/interfaces"
-import { blue, green, grey, red, yellow } from "@mui/material/colors"
+import { blue, green, grey, red, deepOrange } from "@mui/material/colors"
 
 export const INLOCATION = "INLOCATION"
 export const OUTLOCATION = "OUTLOCATION"
@@ -12,7 +12,7 @@ export const timeFormat = {
 
 export const MapColor: Record<string, { [key: number]: string }> = {
     "NEW": blue,
-    "IN PROGRESS": yellow,
+    "IN PROGRESS": deepOrange,
     "COMPLETED": green,
     "CANCEL": red
 }

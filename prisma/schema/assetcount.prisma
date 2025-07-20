@@ -10,56 +10,52 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-  // id  Int @id @default(autoincrement()) @db.UnsignedInt
 
 model asset_count {
-    id  String @id @default(uuid()) @db.Char(36)
-    document_number String  @unique
-    document_date DateTime @default(now()) 
-    rtd_location_id Int?
-    location_id Int?
-    state   String
-    created_by  Int?
-    created_at DateTime @default(now())
-
-    AssetCountLine asset_count_line[]
-    AssetCountLocation asset_count_location[]
+  id                 String                 @id @default(uuid()) @db.Char(36)
+  document_number    Int                    @unique @default(autoincrement())
+  document_date      DateTime               @default(now())
+  rtd_location_id    Int?
+  location_id        Int?
+  state              String
+  created_by         Int?
+  created_at         DateTime               @default(now())
+  AssetCountLocation asset_count_location[]
 }
 
 model asset_count_line {
-    id  String @id @default(uuid()) @db.Char(36)
-    count_id asset_count @relation(fields: [asset_count_id], references: [id])
-    asset_count_id String @db.Char(36)
-    asset_id    Int
-    asset_code String @unique
-    asset_name  String
-    assigned_to   Int?
-    asset_check Boolean
-    checked_by Int?
-    checked_on  DateTime @db.Timestamp(0)
-    is_not_asset_loc Boolean
-    asset_name_not_correct Boolean
-    status_id  asset_status @relation(fields: [asset_count_line_status_id], references: [id])
-    asset_count_line_status_id Int @default(0)
+  id                         String       @id @default(uuid()) @db.Char(36)
+  asset_count_id             String       @db.Char(36)
+  asset_id                   Int
+  asset_code                 String       
+  asset_name                 String
+  assigned_to                Int?
+  asset_check                Boolean
+  checked_by                 Int?
+  checked_on                 DateTime     @db.Timestamp(0)
+  is_not_asset_loc           Boolean
+  asset_name_not_correct     Boolean
+  asset_count_line_status_id Int          @default(0)
+  status_id                  asset_status @relation(fields: [asset_count_line_status_id], references: [id])
 
-    @@index([asset_count_id], map: "asset_count_line_asset_count_id_index")
-    @@index([asset_count_line_status_id], map: "asset_count_line_status_id_index")
+  @@index([asset_count_id], map: "asset_count_line_asset_count_id_index")
+  @@index([asset_count_line_status_id], map: "asset_count_line_status_id_index")
 }
 
 model asset_status {
-  id  Int @id @default(autoincrement())
-  name String @db.Char(36)
-  label String @db.Char(36)
-  description String
+  id             Int                @id @default(autoincrement())
+  name           String             @db.Char(36)
+  label          String             @db.Char(36)
+  description    String
   AssetCountLine asset_count_line[]
 }
 
 model asset_count_location {
-  id  String @id @default(uuid()) @db.Char(36)
-  count_id asset_count @relation(fields: [asset_count_id], references: [id])
-  asset_count_id String @db.Char(36)
+  id              String      @id @default(uuid()) @db.Char(36)
+  asset_count_id  String      @db.Char(36)
   rtd_location_id Int?
-  location_id Int
+  location_id     Int
+  count_id        asset_count @relation(fields: [asset_count_id], references: [id])
 
   @@index([asset_count_id], map: "asset_count_location_asset_count_id_index")
 }

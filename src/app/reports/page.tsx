@@ -1,7 +1,6 @@
 'use server'
 import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api"
 import ReportComponent from "@/_components/reportComponent";
-import LocationTable from "@/_components/tables/location-table"
 import { getChildrenLocation, getOtherLocation, getParentFromChildId, getParentLocation } from '@/_libs/location.utils';
 import { TLocation } from "@/_types/snipe-it.type";
 

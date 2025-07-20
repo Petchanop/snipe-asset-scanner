@@ -1,5 +1,5 @@
 'use client';
-import { useState, ChangeEvent, useEffect, useMemo } from "react";
+import { useState, ChangeEvent, useEffect, useMemo, useRef } from "react";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
@@ -19,13 +19,14 @@ import { TLocation } from "@/_types/snipe-it.type";
 import { getReportFromChildLocation, getReportFromParentLocation } from "@/_apis/report.api";
 import { AssetCount, Location } from "@/_types/types";
 import { useLocationUrlContext } from "@/_components/tableLayout";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-function CreateLocationTableCell(props : {
+function CreateLocationTableCell(props: {
   data: locationTableData
 }) {
   const { data } = props
-  const { date, documentNumber, location, state } = data;
+  const { date, documentNumber, location, state } = data; 
+  const { push } = useRouter()
   const reportState = processAction(state);
 
   function processAction(state: string): string {
@@ -41,6 +42,7 @@ function CreateLocationTableCell(props : {
     }
     return ""
   }
+  const context = useLocationUrlContext()
   return (
     <>
       <TableCell>
@@ -61,7 +63,10 @@ function CreateLocationTableCell(props : {
         </Typography>
       </TableCell>
       <TableCell>
-        <Button variant="text">
+        <Button variant="text" onClick={() => {
+          context.selected.current = `/reports/count-assets/${documentNumber}?location=${context.locationId}`
+          push(`/reports/count-assets/${documentNumber}?location=${context.locationId}`)
+        }}>
           <Typography sx={{ color: MapActionColor[reportState]![500] }}>
             [{reportState}]
           </Typography>
@@ -79,15 +84,17 @@ export function ChildrenSelectComponent(props: {
   setChildId: (value: number) => void
 }) {
   const pathname = usePathname();
-  const { parent, locationByParent, childId, setChildId, isCheckTable} = props
-  const [childLocation, setChildLocation] = useState("")
+  const { parent, locationByParent, childId, setChildId, isCheckTable } = props
+  // const [childLocation, setChildLocation] = useState("")
+  const childLocation = useRef("")
   const [childrenLocation, setChildrenLocation] = useState<TLocation[]>([])
   const context = useLocationUrlContext()
 
   const handleOnClick = (target: EventTarget & (HTMLInputElement | HTMLTextAreaElement)) => {
     const locationByName = childrenLocation.filter((loc) => loc.name == target.value)[0] as unknown as Location
     setChildId(locationByName.id)
-    setChildLocation(target.value)
+    // setChildLocation(target.value)
+    childLocation.current = target.value
     context.selected.current = `${pathname}?location=${locationByName.id}`
     context.setLocationId(locationByName.id)
   }
@@ -113,7 +120,8 @@ export function ChildrenSelectComponent(props: {
       context.setLocationId(locationId)
       context.selected.current = `${pathname}?location=${locationId}`
       setChildId(locationId)
-      setChildLocation(defaultValue?.name! as string)
+      // setChildLocation(defaultValue?.name! as string)
+      childLocation.current = defaultValue?.name! as string
     }
     setChildrenLocation(childrenLocationChange)
     setDefaultValue();
@@ -123,12 +131,12 @@ export function ChildrenSelectComponent(props: {
   return (
     <>
       {
-        childLocation ?
+        childrenLocation.length ?
           <TextField
             select
             label="sub location"
             name={parent.name}
-            value={childLocation}
+            value={childLocation.current}
             className="mt-3 p-4"
             onChange={(event) => handleOnClick(event.target)}
             disabled={isCheckTable}
@@ -153,7 +161,7 @@ export function ParentSelectComponent(props: {
   isCheckTable?: boolean,
   setParent: (location: TLocation) => void,
 }) {
-  const { parentLocation, parentProp, setParent,isCheckTable} = props
+  const { parentLocation, parentProp, setParent, isCheckTable } = props
   return (
     <TextField
       select
@@ -167,10 +175,10 @@ export function ParentSelectComponent(props: {
       }}>
       {
         parentLocation ?
-        parentLocation.map((loc) =>
-          <MenuItem value={loc.name} key={loc.id}>{loc.name}</MenuItem>
-        )
-        : <></>
+          parentLocation.map((loc) =>
+            <MenuItem value={loc.name} key={loc.id}>{loc.name}</MenuItem>
+          )
+          : <></>
       }
     </TextField>
   )
@@ -194,19 +202,22 @@ export default function LocationTable(props: {
         setReport(report.filter((report) => report.location_id == childId))
       }
     }
-    
+
     filterReportByChildId();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [childId, parent])
-  
+
   useEffect(() => {
     const fetchReportByParent = async () => {
       const parentId = parentLocation.find((loc) => loc.name === (parent as TLocation).name) as TLocation
       let newReport = await getReportFromParentLocation(parentId.id!)
       if (newReport.length == 0) {
-        newReport = await getReportFromChildLocation(childId!)
+        if (typeof childId !== 'undefined')
+          newReport = await getReportFromChildLocation(childId!)
       }
-      setReport(newReport)
+      console.log("report", newReport, childId)
+      setReport(newReport.sort((a, b) => a.document_number - b.document_number));
+      
     }
     fetchReportByParent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -227,27 +238,36 @@ export default function LocationTable(props: {
         </TableHead>
         <TableBody sx={{ overflow: 'hidden' }}>
           {
-            report.length ? 
-            report.map((mockData: AssetCount) => {
-              let locationName = parentLocation.find((loc) => 
-                loc.id == mockData.location_id
-            ) 
-            if (!locationName) 
-              locationName = childrenLocation.find((loc) => loc.id == mockData.location_id)
-            const mapData :locationTableData = {
-              date: mockData.document_date.toDateString(),
-              documentNumber: mockData.document_number,
-              location: (locationName as TLocation)!.name!,
-              state: mockData.state,
-              action: ""
-            }
-            return (
-              <TableRow key={mapData.documentNumber} >
-                  <CreateLocationTableCell data={mapData} />
-                </TableRow>
-              )
-            })
-            : <></>
+            report.length ?
+              report.map((mockData: AssetCount) => {
+                let locationName = parentLocation.find((loc) =>
+                  loc.id == mockData.location_id
+                )
+                if (!locationName)
+                  locationName = childrenLocation.find((loc) => loc.id == childId || loc.id == parent?.id)
+                const mapData: locationTableData = {
+                  date: mockData.document_date.toDateString(),
+                  documentNumber: mockData.document_number,
+                  location: (locationName as TLocation)?.name!,
+                  state: mockData.state,
+                  action: ""
+                }
+                return (
+                  <TableRow key={mapData.documentNumber} >
+                    <CreateLocationTableCell data={mapData} />
+                  </TableRow>
+                )
+              })
+              : <TableRow sx={{
+                height: '8rem',
+                maxHeight: '8rem'
+              }}>
+                <TableCell colSpan={2} />
+                <TableCell colSpan={2} rowSpan={4}>
+                  No asset report
+                </TableCell>
+                <TableCell colSpan={2} />
+              </TableRow>
           }
         </TableBody>
         <TableFooter>
