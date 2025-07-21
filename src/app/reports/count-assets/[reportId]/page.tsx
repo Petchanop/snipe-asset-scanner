@@ -3,26 +3,33 @@ import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api";
 import { getChildrenLocation, getParentLocation } from "@/_libs/location.utils";
 import { TLocation } from "@/_types/snipe-it.type";
 import { getLocationById } from "@/_apis/location.api";
-import { GetAllUserPrisma } from "@/_apis/report.api";
-import { findAssetCount, updateAssetCountReport } from "@/_libs/report.utils";
+import { GetAllUserPrisma, GetAssetCountLocationByAssetCountReport } from "@/_apis/report.api";
+import { findAssetCount, getAssetCountReport, updateAssetCountReport } from "@/_libs/report.utils";
 import { ReportState } from "@/_constants/constants";
+import { notFound } from "next/navigation";
 
-export default async function AssetsTablePage({ searchParams, params } : {
-    searchParams: Promise<{ location?: number }>, params: Promise<{ reportId: string }> } 
+export default async function AssetsTablePage({ params } : {
+    params: Promise<{ reportId: string }> } 
 ) {
-    const { location } = await searchParams
     const { reportId } = await params
-    const resolveLocationId = await location
     // if (!resolveLocationId)
     //     notFound()
     //fetch data here
     //use mock data before implement api call
     //fetch location from snipe api
+    const assetCountReport = await getAssetCountReport(parseInt(reportId))
+    if (!assetCountReport)
+        notFound()
+    const locationId = await GetAssetCountLocationByAssetCountReport(assetCountReport.id)
     const locations = await fetchLocations();
     const parentLocation = getParentLocation(locations.data!.rows)
     const childrenLocation = getChildrenLocation(locations.data!.rows) as TLocation[]
     // const otherLocation = getOtherLocation(locations.data!.rows)
-    const locationData = await getLocationById(parseInt(resolveLocationId?.toString()!))
+    const locationData : Location[] = []
+    for (const loc of locationId){
+        const location = await getLocationById(loc.location_id)
+        locationData.push(location as Location)
+    }
     const users = await GetAllUserPrisma()
     let report = await findAssetCount(reportId ? parseInt(reportId) : 0)
     if (report?.state === ReportState.NEW) {
@@ -32,7 +39,7 @@ export default async function AssetsTablePage({ searchParams, params } : {
     }
     const parent = parentLocation.find((loc) => (
         loc.children as unknown as {id:number, name: string} [])
-        .find((child: { id: number, name: string}) => child.id == resolveLocationId)
+        .find((child: { id: number, name: string}) => locationId.find((loc) => child.id == loc.location_id))
     ) as TLocation
     let filterByParentId = null
     if (!locationData?.parent_id) {

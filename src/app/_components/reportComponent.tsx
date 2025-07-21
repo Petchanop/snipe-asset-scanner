@@ -6,6 +6,7 @@ import LocationTable from "@/_components/tables/location-table"
 import { useState, createContext, Dispatch, SetStateAction, useContext, useEffect } from "react"
 import CreatePlanComponent from "@/_components/planComponent"
 import dayjs, { Dayjs } from "dayjs"
+import { AssetCount } from "@/_types/types"
 
 type TDateValueContext = {
   dateValue: Dayjs;
@@ -23,56 +24,64 @@ export function useDateContext() {
 }
 
 export default function ReportComponent(props: {
-    locations: TLocation[],
-    parentLocation: TLocation[],
-    childrenLocation: TLocation[],
-    parentProp: TLocation | null,
-    childProp: TLocation | null
+  locations: TLocation[],
+  parentLocation: TLocation[],
+  childrenLocation: TLocation[],
+  parentProp: TLocation | null,
+  childProp: TLocation | null,
+  reports: AssetCount[]
 }) {
-    const { locations, parentLocation, childrenLocation, parentProp, childProp } = props
-    const [show, setShow] = useState(true)
-    const [dateValue, setDateValue] = useState<Dayjs | null>(null)
+  const { locations, parentLocation, childrenLocation, parentProp, childProp, reports } = props
+  const [show, setShow] = useState(true)
+  const [dateValue, setDateValue] = useState<Dayjs | null>(null)
 
-    useEffect(() => {
-        if (!dateValue) {
-            //eslint-disable-next-line react-hooks/exhaustive-deps
-            setDateValue(dayjs())
-        }
-    },[dateValue])
-    return (
-        <>
-            <div className="flex flex-col space-x-4">
-                <div className="flex flex-row">
-                    <Button onClick={() => setShow(true)} variant="outlined" className={`${show ? "bg-blue-200" : ""}`}>{"ประวัติรายงานตรวจนับ"}</Button>
-                    <Button onClick={() => setShow(false)} variant="outlined" className={`${!show ? "bg-blue-200" : ""}`}>{"สร้าง รายงานตรวจนับ"}</Button>
-                </div>
-                <div className="flex flex-row">
-                    {
-                        show ?
-                            <div className="flex flex-col w-full">
-                                <LocationTable
-                                    parentLocation={parentLocation}
-                                    childrenLocation={childrenLocation}
-                                    parentProp={parentProp!}
-                                    childProp={childProp!}
-                                />
-                            </div>
-                            : <DateValueContext
-                                value={{
-                                    dateValue: dateValue!,
-                                    setDateValue: setDateValue
-                                }}>
-                                <CreatePlanComponent
-                                    location={locations}
-                                    parentLocation={parentLocation}
-                                    childrenLocation={childrenLocation}
-                                    parentProp={parentProp!}
-                                    childProp={childProp!}
-                                />
-                            </DateValueContext>
-                    }
-                </div>
-            </div>
-        </>
-    )
+  useEffect(() => {
+    if (!dateValue) {
+      //eslint-disable-next-line react-hooks/exhaustive-deps
+      setDateValue(dayjs())
+    }
+  }, [dateValue])
+  return (
+    <>
+      <div className="flex flex-col space-x-4">
+        <div className="flex flex-row">
+          <Button onClick={() => setShow(true)}
+            variant="outlined" className={`${show ? "bg-blue-200" : ""}`}>
+            {"ประวัติรายงานตรวจนับ"}
+          </Button>
+          <Button onClick={() => setShow(false)}
+            variant="outlined" className={`${!show ? "bg-blue-200" : ""}`}>
+            {"สร้าง รายงานตรวจนับ"}
+          </Button>
+        </div>
+        <div className="flex flex-row">
+          {
+            show ?
+              <div className="flex flex-col w-full">
+                <LocationTable
+                  parentLocation={parentLocation}
+                  childrenLocation={childrenLocation}
+                  parentProp={parentProp!}
+                  childProp={childProp!}
+                  reports={reports}
+                />
+              </div>
+              : <DateValueContext
+                value={{
+                  dateValue: dateValue!,
+                  setDateValue: setDateValue
+                }}>
+                <CreatePlanComponent
+                  location={locations}
+                  parentLocation={parentLocation}
+                  childrenLocation={childrenLocation}
+                  parentProp={parentProp!}
+                  childProp={childProp!}
+                />
+              </DateValueContext>
+          }
+        </div>
+      </div>
+    </>
+  )
 }

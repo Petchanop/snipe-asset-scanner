@@ -78,29 +78,29 @@ export const mockLocation = [
 ]
 
 export const tableHeaders: HeadersLocationTable[] = [
+  {
+    label: "Document No.",
+    isSelectBox: false,
+    fontColor: ["black"]
+  },
+  {
+    label: "ชื่อแผน",
+    isSelectBox: false,
+    fontColor: ["black"]
+  },
     {
-        label: "Date",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Document No.",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Location",
-        isSelectBox: false,
-        fontColor: ["black"]
-    },
-    {
-        label: "Status",
-        isSelectBox: true,
-        fontColor: ["blue", "yellow", "green", "red"]
-    },
-    {
-        label: "Actions",
-        isSelectBox: true,
-        fontColor: ["black"]
-    }
+    label: "วันที่ตรวจนับ",
+    isSelectBox: false,
+    fontColor: ["black"]
+  },
+  {
+    label: "Status",
+    isSelectBox: true,
+    fontColor: ["blue", "yellow", "green", "red"]
+  },
+  {
+    label: "Actions",
+    isSelectBox: true,
+    fontColor: ["black"]
+  }
 ]

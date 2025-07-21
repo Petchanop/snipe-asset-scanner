@@ -43,15 +43,8 @@ export default function TableLayout({
   const location = params.get('location')
   const reportId = useParams()
   const reportNumber = reportId.reportId ? reportId.reportId : undefined
-  let tabPathname = ""
-  // if (!checkTabPathname(pathname)) {
-  if (reportNumber !== undefined) {
-    tabPathname = `/reports/count-assets/${reportNumber}?location=${parseInt(location?.toString()!)}`
-  } else {
-    tabPathname = `${pathname}${params?.toString() ? `?${params?.toString()}` : ""}`
-  }
   const [locationId, setLocationId] = useState(parseInt(location?.toString()!))
-  const selected = useRef(tabPathname)
+  const selected = useRef(pathname)
   const router = useRouter();
   function handleOnChange(event: SyntheticEvent, newValue: string) {
     selected.current = newValue
@@ -69,7 +62,7 @@ export default function TableLayout({
   }, [locationId])
 
   return <>
-    <Card className='w-screen h-screen lg:w-4/6 lg:h-3/4 absolute lg:top-22'
+    <Card className='w-screen h-screen absolute'
       sx={{
         borderRadius: {
           lg: 4
@@ -82,21 +75,23 @@ export default function TableLayout({
       />
       <CardContent className="space-y-4">
         <Tabs
-          value={tabPathname}
+          value={pathname}
           className="pl-2"
           onChange={handleOnChange}
         >
           <Tab value={
-            `/reports?location=${locationId}`
+            `/reports`
           }
-            label="reports">
-          </Tab>
+            label="Document list" />
+          <Tab value={`/setup/${reportNumber}`}
+          disabled
+          label="Setup"
+          />
             <Tab value={
-             `/reports/count-assets/${reportNumber}?location=${locationId}`
+             `/reports/count-assets/${reportNumber}`
           }
             disabled
-            label="new count">
-          </Tab>
+            label="new count" />
         </Tabs>
         <Paper elevation={10}>
           <TableContainer className="w-full lg:max-h-[55vh] max-h-[75vh]">

@@ -21,7 +21,7 @@ import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "./utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { useRouter } from "next/navigation";
-import { CreatAssetCountLine } from "@/_libs/search-asset-component";
+import { CreatAssetCountLine } from "@/_libs/search-asset.utils";
 
 export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;

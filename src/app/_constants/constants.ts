@@ -1,5 +1,5 @@
 import { HeadersAssetTable } from "@/_types/interfaces"
-import { blue, green, grey, red, deepOrange } from "@mui/material/colors"
+import { blue, green, grey, red, deepOrange, brown } from "@mui/material/colors"
 
 export const INLOCATION = "INLOCATION"
 export const OUTLOCATION = "OUTLOCATION"
@@ -26,6 +26,7 @@ export enum ReportState {
 
 export const MapActionColor: Record<string, { [key: number]: string }> = {
     "เริ่ม" : blue,
+    "ตรวจนับ" : brown,
     "แก้ไข": red,
     "เรียกดู": grey,
 }

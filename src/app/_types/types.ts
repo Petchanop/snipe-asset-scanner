@@ -1,3 +1,4 @@
+import { ReportState } from "@/_constants/constants";
 import { asset_count, asset_count_line, asset_count_location, assets, locations, users } from "@/prisma/generated/prisma";
 
 export type TSnipeDocument = {
@@ -10,6 +11,7 @@ export type TSnipeDocument = {
 
 export type locationTableData = {
     date: string;
+    name: string;
     documentNumber: number;
     location: string;
     state: string;
@@ -31,6 +33,14 @@ export type TAssetRow = {
     assignIncorrect: boolean;
     status: number;
 };
+
+export type TReportForm = {
+    document_number?: number,
+    document_name: string,
+    document_date: Date | null,
+    state: ReportState,
+    asset_count_location: number[]
+}
 
 export type AssetCount = asset_count;
 export type AssetCountLine = asset_count_line;

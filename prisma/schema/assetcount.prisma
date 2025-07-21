@@ -14,6 +14,7 @@ datasource db {
 model asset_count {
   id                 String                 @id @default(uuid()) @db.Char(36)
   document_number    Int                    @unique @default(autoincrement())
+  document_name      String?
   document_date      DateTime               @default(now())
   rtd_location_id    Int?
   location_id        Int?
