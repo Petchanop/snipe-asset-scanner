@@ -24,21 +24,21 @@ model asset_count {
 }
 
 model asset_count_line {
-  id                         String       @id @default(uuid()) @db.Char(36)
-  asset_count_id             String       @db.Char(36)
-  asset_id                   Int
-  asset_code                 String       
-  asset_name                 String
-  assigned_to                Int?
-  asset_check                Boolean
-  checked_by                 Int?
-  checked_on                 DateTime     @db.Timestamp(0)
-  is_not_asset_loc           Boolean
-  asset_name_not_correct     Boolean
-  asset_count_line_location_id String?     @db.Char(36)
-  location_id       asset_count_location? @relation(fields: [asset_count_line_location_id], references: [id])
-  asset_count_line_status_id Int          @default(0)
-  status_id                  asset_status @relation(fields: [asset_count_line_status_id], references: [id])
+  id                           String                @id @default(uuid()) @db.Char(36)
+  asset_count_id               String                @db.Char(36)
+  asset_id                     Int
+  asset_code                   String
+  asset_name                   String
+  assigned_to                  Int?
+  asset_check                  Boolean
+  checked_by                   Int?
+  checked_on                   DateTime              @db.Timestamp(0)
+  is_not_asset_loc             Boolean
+  asset_name_not_correct       Boolean
+  asset_count_line_location_id String?               @db.Char(36)
+  location_id                  asset_count_location? @relation(fields: [asset_count_line_location_id], references: [id])
+  asset_count_line_status_id   Int                   @default(0)
+  status_id                    asset_status          @relation(fields: [asset_count_line_status_id], references: [id])
 
   @@index([asset_count_id], map: "asset_count_line_asset_count_id_index")
   @@index([asset_count_line_status_id], map: "asset_count_line_status_id_index")
@@ -54,11 +54,11 @@ model asset_status {
 }
 
 model asset_count_location {
-  id              String      @id @default(uuid()) @db.Char(36)
-  asset_count_id  String      @db.Char(36)
+  id              String             @id @default(uuid()) @db.Char(36)
+  asset_count_id  String             @db.Char(36)
   rtd_location_id Int?
   location_id     Int
-  count_id        asset_count @relation(fields: [asset_count_id], references: [id])
+  count_id        asset_count        @relation(fields: [asset_count_id], references: [id])
   AssetCountLine  asset_count_line[]
 
   @@index([asset_count_id], map: "asset_count_location_asset_count_id_index")

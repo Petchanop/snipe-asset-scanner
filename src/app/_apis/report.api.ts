@@ -15,7 +15,7 @@ export async function getReportFromChildLocation(location: number): Promise<Asse
     include: {
         count_id: true, // This pulls the related asset_count
     }})
-    return result.map(item => item.count_id);
+    return result.map((item: { count_id: any; }) => item.count_id);
 }
 
 export async function getReportFromParentLocation(location: number): Promise<AssetCount[]> {
@@ -26,7 +26,7 @@ export async function getReportFromParentLocation(location: number): Promise<Ass
     include: {
         count_id: true, // This pulls the related asset_count
     }})
-    return result.map(item => item.count_id);
+    return result.map((item: { count_id: any; }) => item.count_id);
 }
 
 export async function getAssetsByLocation(
