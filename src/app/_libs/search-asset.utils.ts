@@ -12,7 +12,7 @@ export async function CreatAssetCountLine(
     const extendTypeAsset: ExtendAssetResponse = {
         ...data,
         asset_name_not_correct: false,
-        is_not_asset_loc: data.location?.id != assetCountReport.location_id,
+        is_not_asset_loc: data.location?.id != locationId.location_id,
         asset_check: false,
         in_report: assetInReport.find((report) => report.asset_code === data.asset_tag) ? true : false,
         location_id: locationId.id,

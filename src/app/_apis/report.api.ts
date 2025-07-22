@@ -4,7 +4,7 @@ import { prisma } from "@/_libs/prisma"
 import { TResponse } from "@/_apis/next.api";
 import dayjs from "dayjs";
 import { ExtendAssetResponse } from "@/_components/tables/search-asset";
-import { assetStatusOptions } from "@/_constants/constants";
+import { AssetStatusEnum, assetStatusOptions } from "@/_constants/constants";
 import { createAssetCountLine } from "@/_libs/report.utils";
 
 export async function getReportFromChildLocation(location: number): Promise<AssetCount[]> {
@@ -66,7 +66,7 @@ export async function getUserByIdPrisma(userId: number): Promise<Partial<User> |
 }
 
 export async function findStatusId(data: ExtendAssetResponse): Promise<number> {
-    return assetStatusOptions.find((status) => status.value == data.status)!.id || 0;
+    return assetStatusOptions.find((status) => status.value == data.status)?.id || 2;
 }
 
 export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountReport: AssetCount): Promise<AssetCountLine> {
@@ -90,7 +90,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             is_not_asset_loc: data.is_not_asset_loc,
             asset_name_not_correct: false,
             asset_count_line_location_id: data.location_id,
-            asset_count_line_status_id: await findStatusId(data)
+            asset_count_line_status_id: AssetStatusEnum.DEPLOYABLE 
         })
     }
     return await prisma.asset_count_line.upsert({
@@ -116,7 +116,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             is_not_asset_loc: data.is_not_asset_loc,
             checked_on: dayjs().toDate(),
             asset_count_line_location_id: data.location_id,
-            asset_count_line_status_id: await findStatusId(data)
+            asset_count_line_status_id: await findStatusId(data) 
         }
     })
 }

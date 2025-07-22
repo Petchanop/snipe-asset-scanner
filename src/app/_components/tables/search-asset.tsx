@@ -4,7 +4,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow"
-import { tableHeaders } from "@/_constants/constants";
+import { AssetStatusEnum, assetStatusOptions, tableHeaders } from "@/_constants/constants";
 import { ChangeEvent, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Table from "@mui/material/Table";
@@ -29,7 +29,7 @@ export type ExtendAssetResponse = AssetResponse & {
   asset_check: boolean;
   location_id: string;
   in_report: boolean;
-  status: string; 
+  status: string;
 }
 
 function CreateSearchAssetTableCell(props: {
@@ -38,9 +38,10 @@ function CreateSearchAssetTableCell(props: {
   // assetCountReport: AssetCount
 }) {
   const { data } = props
-  const { id, assetCode, assetName, assignedTo, countCheck, assignIncorrect } = data;
+  const { id, assetCode, assetName, assignedTo, countCheck, assignIncorrect, status} = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
+  const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
 
   useEffect(() => {
     UpdateAssetCountLine(id!, { asset_check: count })
@@ -73,6 +74,12 @@ function CreateSearchAssetTableCell(props: {
             setIncorrect((pre) => !pre)
           }}
         />
+      </TableCell>
+      <TableCell>
+        <Checkbox
+          checked={assetStatus}
+          onChange={() => setAssetStatus(pre => !pre)}
+        ></Checkbox>
       </TableCell>
     </>
   )
@@ -278,10 +285,10 @@ export default function SearchAsset(
         toast.success(`${searchInput} was found.`)
         if (!IsInLocation) {
           const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId)
-          await UpdateAssetCountLine(asset.id as string, { asset_check: true})
+          await UpdateAssetCountLine(asset.id as string, { asset_check: true })
           setSearchResult([asset, ...searchResult])
         } else {
-          await UpdateAssetCountLine(IsInLocation.id, { asset_check: true})
+          await UpdateAssetCountLine(IsInLocation.id, { asset_check: true })
         }
         toast.success(`${searchInput} has been checked.`)
         setSearchInput("")
@@ -306,10 +313,10 @@ export default function SearchAsset(
           const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
           if (!IsInLocation) {
             const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId)
-            await UpdateAssetCountLine(asset.id as string, { asset_check: true})
+            await UpdateAssetCountLine(asset.id as string, { asset_check: true })
             setSearchResult([asset, ...searchResult])
           } else {
-            await UpdateAssetCountLine(IsInLocation.id, { asset_check: true})
+            await UpdateAssetCountLine(IsInLocation.id, { asset_check: true })
           }
           toast.success(`${result.rawValue} has been checked.`)
         }
