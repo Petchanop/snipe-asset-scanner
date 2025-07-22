@@ -13,7 +13,7 @@ import { AssetCount, INLOCATION, OUTLOCATION, TAssetRow, TAssetTab, User } from 
 import { AddAssetCountLine, GetAssetCountLocationByAssetCountReport } from "@/_apis/report.api";
 import dayjs, { Dayjs } from "dayjs";
 import { ReportContext, useReportContext } from "@/_components/tableLayout";
-import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation";
+import { usePathname, useRouter, useParams } from "next/navigation";
 import {
   CheckAllDataCount,
   getAssetByLocationId,
