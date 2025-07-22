@@ -2,12 +2,11 @@
 
 import { TLocation } from "@/_types/snipe-it.type"
 import { Button } from "@mui/material"
-import LocationTable, { ChildrenSelectComponent } from "@/_components/tables/location-table"
+import LocationTable from "@/_components/tables/location-table"
 import { useState, createContext, Dispatch, SetStateAction, useContext, useEffect } from "react"
 import CreatePlanComponent from "@/_components/planComponent"
 import dayjs, { Dayjs } from "dayjs"
 import { AssetCount } from "@/_types/types"
-import { prisma } from "@/_libs/prisma"
 import { getAllAssetCount } from "@/_libs/report.utils"
 
 type TDateValueContext = {
@@ -46,7 +45,6 @@ export default function ReportComponent(props: {
   useEffect(() => {
     const fetchReports = async () => {
       if (show) {
-        console.log("refetch")
         const reports = await getAllAssetCount()
         setReports(reports)
       }

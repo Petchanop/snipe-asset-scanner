@@ -18,7 +18,7 @@ import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
-import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "./utility";
+import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { useRouter } from "next/navigation";
 import { CreatAssetCountLine } from "@/_libs/search-asset.utils";

@@ -11,7 +11,7 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
+import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { MapActionColor, MapColor, ReportState } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
@@ -104,7 +104,7 @@ export function ChildrenSelectComponent(props: {
 
   const childrenLocationChange = useMemo(() => {
     return locationByParent.filter((loc) =>
-      //@ts-expect-error
+      //@ts-expect-error some use parent_id some parent.id
       loc.parent_id === parent.id || loc.parent.id == parent.id
     )
   }, [parent, locationByParent])
@@ -140,7 +140,7 @@ export function ChildrenSelectComponent(props: {
             label="sub location"
             name={parent.name}
             value={childLocation.current}
-            className="mt-3 p-4"
+            className="mt-3 p-4 lg:w-3/5 w-full"
             onChange={(event) => handleOnClick(event.target)}
             disabled={isCheckTable}
           >
@@ -170,7 +170,7 @@ export function ParentSelectComponent(props: {
       select
       label="location"
       value={parentProp.name}
-      className="mt-3 p-4"
+      className="mt-3 p-4 lg:w-3/5 w-full" 
       disabled={isCheckTable}
       onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const newParent = parentLocation.find((loc) => loc.name == event.target.value);
@@ -240,7 +240,7 @@ export default function LocationTable(props: {
         <TableBody sx={{ overflow: 'hidden' }}>
           {
             reports.length ?
-              reports.map((mockData: AssetCount) => {
+              dataPerPage(reports, page, rowsPerPage).map((mockData: AssetCount) => {
                 let locationName = parentLocation.find((loc) =>
                   loc.id == mockData.location_id
                 )

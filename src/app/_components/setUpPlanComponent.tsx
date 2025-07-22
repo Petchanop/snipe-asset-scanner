@@ -10,14 +10,15 @@ import dayjs from "dayjs";
 import { ChangeEvent, useEffect, useState } from "react";
 import { updateAssetCountReport } from "@/_libs/report.utils";
 import { useRouter } from "next/navigation";
-import { ChildrenSelectComponent, ParentSelectComponent } from "./tables/location-table";
+import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
 import AddIcon from "@mui/icons-material/Add"
 import IconButton from "@mui/material/IconButton";
 import { TLocation } from "@/_types/snipe-it.type";
+import { ObjectList } from "@/_components/planComponent";
 
 export default function SetupPlanComponent(
     props: {
-        assetCountReport: AssetCount & { asset_count_location:  AssetCountLocation[] },
+        assetCountReport: AssetCount & { AssetCountLocation: AssetCountLocation[] },
         assetCountLocation: AssetCountLocation[],
         parentLocation: TLocation[],
         childrenLocation: TLocation[],
@@ -37,9 +38,13 @@ export default function SetupPlanComponent(
     const [parent, setParent] = useState(parentProp)
     const [childId, setChildId] = useState<number | null>()
     const [selected, setSelected] = useState(false)
-    const [documentLocation, setDocumentLocation] = useState<TLocation[]>(assetCountReport.asset_count_location?.map((countLocation) => {
-        return childrenLocation.find((loc) => loc.id === countLocation.id) || parentLocation.find((loc) => loc.id === countLocation.id) as TLocation
-    }))
+    const [documentLocation, setDocumentLocation] = useState<TLocation[]>(
+        assetCountReport.AssetCountLocation?.map((countLocation) => {
+            return childrenLocation
+                .find((loc) => loc.id === countLocation.location_id) ||
+                parentLocation.find((loc) => loc.id === countLocation.location_id) as TLocation
+        }))
+
     const [reportForm, setReportForm] = useState<TReportForm>({
         document_date: document_date,
         document_name: document_name as string,
@@ -99,7 +104,7 @@ export default function SetupPlanComponent(
                     <DatePicker label="Select Date"
                         value={date}
                         format="DD/MM/YYYY"
-                        className="lg:w-2/3 mt-3 p-4"
+                        className="lg:w-3/5 mt-3 p-4"
                         slotProps={{ textField: { size: 'medium' } }}
                         onChange={handleDateOnChange}
                     />
@@ -107,7 +112,7 @@ export default function SetupPlanComponent(
                 <TextField required
                     id="document_name"
                     label="ตั้งชื่อรายงานตรวจนับ"
-                    className="lg:w-2/3 mt-3 p-4"
+                    className="lg:w-3/5 mt-3 p-4"
                     onChange={handleDocumentNameChange}
                     value={reportForm.document_name}
                 />
@@ -115,7 +120,7 @@ export default function SetupPlanComponent(
                     parentLocation={parentLocation}
                     parentProp={parent!}
                     setParent={setParent} />
-                <div className="flex flex-row items-center space-x-2">
+                <div className="flex flex-row max-md:flex-col items-center space-x-2">
                     <ChildrenSelectComponent
                         parent={parent!}
                         locationByParent={childrenLocation}
@@ -128,7 +133,13 @@ export default function SetupPlanComponent(
                         <AddIcon />
                     </IconButton>
                 </div>
-                <div className="flex flex-row justify-end p-4 space-x-4">
+                <div className="flex flex-row pl-4">
+                    <ObjectList
+                        items={documentLocation}
+                        setItems={setDocumentLocation}
+                    />
+                </div>
+                <div className="flex flex-row justify-center p-4 space-x-4">
                     <Button
                         onClick={handleSubmit}
                         variant="contained"

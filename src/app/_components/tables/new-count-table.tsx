@@ -23,11 +23,11 @@ import {
 import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api";
 import toast from "react-hot-toast";
 import { TLocation } from "@/_types/snipe-it.type";
-import { ChildrenSelectComponent, ParentSelectComponent } from "./location-table";
-import { ExtendAssetResponse } from "./search-asset";
+import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
+import { ExtendAssetResponse } from "@/_components/tables/search-asset";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { LoadingTableSkeleton } from "../loading";
+import { LoadingTableSkeleton } from "@/_components/loading";
 import { ReportState } from "@/_constants/constants";
 
 function CheckAssetButton(props: {
