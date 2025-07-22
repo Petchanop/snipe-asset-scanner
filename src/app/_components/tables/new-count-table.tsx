@@ -227,7 +227,7 @@ export function NewCountInput(props: {
         {
           isCheckTable ?
             assetTab ?
-              <CheckAssetButton setIsCheckTable={setIsCheckTable} childId={childId} />
+              <CheckAssetButton setIsCheckTable={setIsCheckTable} childId={childId!} />
               : <></>
             : <SelectCountButton
               selectedLocation={location}
