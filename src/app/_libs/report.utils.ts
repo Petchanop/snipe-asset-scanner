@@ -29,6 +29,10 @@ export type FCreateAssetCountReport = {
     state: string;
 }
 
+export async function getAllAssetCount(): Promise<AssetCount[]> {
+    return await prisma.asset_count.findMany()
+}
+
 export async function findAssetCount(document_number: number): Promise<AssetCount | null> {
     return await prisma.asset_count.findFirst({
         where: {
@@ -85,6 +89,9 @@ export async function getAssetCountReport(
     return await prisma.asset_count.findFirst({
         where: {
            document_number: documentNumber
+        },
+        include: {
+            AssetCountLocation: true
         }
     }) 
 }

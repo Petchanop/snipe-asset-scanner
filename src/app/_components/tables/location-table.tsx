@@ -93,7 +93,6 @@ export function ChildrenSelectComponent(props: {
   const childLocation = useRef("")
   const [childrenLocation, setChildrenLocation] = useState<TLocation[]>([])
   const context = useLocationUrlContext()
-
   const handleOnClick = (target: EventTarget & (HTMLInputElement | HTMLTextAreaElement)) => {
     const locationByName = childrenLocation.filter((loc) => loc.name == target.value)[0] as unknown as Location
     setChildId(locationByName.id)
@@ -105,8 +104,8 @@ export function ChildrenSelectComponent(props: {
 
   const childrenLocationChange = useMemo(() => {
     return locationByParent.filter((loc) =>
-      // @ts-expect-error cause it not wrong type the object has => id in parent properties
-      loc.parent.id === parent.id
+      //@ts-expect-error
+      loc.parent_id === parent.id || loc.parent.id == parent.id
     )
   }, [parent, locationByParent])
   // locationByParent
@@ -198,9 +197,6 @@ export default function LocationTable(props: {
   const { parentLocation, childrenLocation, parentProp, childProp, reports } = props
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-  const [parent, setParent] = useState(parentProp)
-  const [report, setReport] = useState(reports as AssetCount[])
-  const [childId, setChildId] = useState<number | null>(childProp?.id!)
   useEffect(() => {
     // const filterReportByChildId = () => {
     //   if (childId) {
@@ -210,7 +206,7 @@ export default function LocationTable(props: {
 
     // filterReportByChildId();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [childId, parent])
+  }, [childProp?.id, parentProp])
 
   useEffect(() => {
     // const fetchReportByParent = async () => {
@@ -226,7 +222,7 @@ export default function LocationTable(props: {
     // }
     // fetchReportByParent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parent, childId])
+  }, [parentProp, childProp?.id])
   return (
     <>
       {/* <ParentSelectComponent parentLocation={parentLocation} parentProp={parent!} setParent={setParent} />
@@ -243,15 +239,15 @@ export default function LocationTable(props: {
         </TableHead>
         <TableBody sx={{ overflow: 'hidden' }}>
           {
-            report.length ?
-              report.map((mockData: AssetCount) => {
+            reports.length ?
+              reports.map((mockData: AssetCount) => {
                 let locationName = parentLocation.find((loc) =>
                   loc.id == mockData.location_id
                 )
                 if (!locationName)
-                  locationName = childrenLocation.find((loc) => loc.id == childId || loc.id == parent?.id)
+                  locationName = childrenLocation.find((loc) => loc.id == childProp?.id || loc.id == parentProp?.id)
                 const mapData: locationTableData = {
-                  date: mockData.document_date.toDateString(),
+                  date: mockData.document_date.toLocaleDateString('th-BK'),
                   name: mockData.document_name as string,
                   documentNumber: mockData.document_number,
                   location: (locationName as TLocation)?.name!,
@@ -265,11 +261,11 @@ export default function LocationTable(props: {
                 )
               })
               : <TableRow sx={{
-                height: '8rem',
-                maxHeight: '8rem'
+                height: '9rem',
+                maxHeight: '9rem'
               }}>
-                <TableCell colSpan={2} />
-                <TableCell colSpan={2} rowSpan={4}>
+                <TableCell colSpan={3} />
+                <TableCell colSpan={2} rowSpan={5}>
                   No asset report
                 </TableCell>
                 <TableCell colSpan={2} />
@@ -282,11 +278,11 @@ export default function LocationTable(props: {
               showFirstButton
               showLastButton
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={4}
-              count={report.length}
+              colSpan={8}
+              count={reports.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              onPageChange={(event, page) => handleChangePage(event, page, setPage, report.length, rowsPerPage)}
+              onPageChange={(event, page) => handleChangePage(event, page, setPage, reports.length, rowsPerPage)}
               onRowsPerPageChange={(event) =>
                 handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
               }

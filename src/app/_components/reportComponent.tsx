@@ -2,11 +2,13 @@
 
 import { TLocation } from "@/_types/snipe-it.type"
 import { Button } from "@mui/material"
-import LocationTable from "@/_components/tables/location-table"
+import LocationTable, { ChildrenSelectComponent } from "@/_components/tables/location-table"
 import { useState, createContext, Dispatch, SetStateAction, useContext, useEffect } from "react"
 import CreatePlanComponent from "@/_components/planComponent"
 import dayjs, { Dayjs } from "dayjs"
 import { AssetCount } from "@/_types/types"
+import { prisma } from "@/_libs/prisma"
+import { getAllAssetCount } from "@/_libs/report.utils"
 
 type TDateValueContext = {
   dateValue: Dayjs;
@@ -29,18 +31,28 @@ export default function ReportComponent(props: {
   childrenLocation: TLocation[],
   parentProp: TLocation | null,
   childProp: TLocation | null,
-  reports: AssetCount[]
 }) {
-  const { locations, parentLocation, childrenLocation, parentProp, childProp, reports } = props
+  const { locations, parentLocation, childrenLocation, parentProp, childProp } = props
   const [show, setShow] = useState(true)
+  const [reports, setReports] = useState<AssetCount[]>([])
   const [dateValue, setDateValue] = useState<Dayjs | null>(null)
-
   useEffect(() => {
     if (!dateValue) {
       //eslint-disable-next-line react-hooks/exhaustive-deps
       setDateValue(dayjs())
     }
   }, [dateValue])
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      if (show) {
+        console.log("refetch")
+        const reports = await getAllAssetCount()
+        setReports(reports)
+      }
+    }
+    fetchReports()
+  }, [show])
   return (
     <>
       <div className="flex flex-col space-x-4">

@@ -227,14 +227,11 @@ export default function CreatePlanComponent(props: {
   const { push } = useRouter()
 
   const handleNext = async () => {
-    console.log("Report Form", reportForm, activeStep === steps.length - 1, activeStep, steps.length)
     if (activeStep < steps.length) {
       setActiveStep((prev) => prev + 1)
       if (activeStep === steps.length - 1) {
         if (reportForm !== null && typeof reportForm !== 'undefined') {
-          console.log("Create Report Form", reportForm)
           const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
-          console.log(assetCountReport)
           for (const location of (reportForm as unknown as TReportForm).asset_count_location) {
             await CreateAssetCountLocation(location, assetCountReport.id)
           }

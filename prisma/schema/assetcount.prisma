@@ -22,11 +22,13 @@ model asset_count {
   created_by         Int?
   created_at         DateTime               @default(now())
   AssetCountLocation asset_count_location[]
+  AssetCountLine     asset_count_line[]
 }
 
 model asset_count_line {
   id                           String                @id @default(uuid()) @db.Char(36)
   asset_count_id               String                @db.Char(36)
+  count_id                     asset_count           @relation(fields: [asset_count_id], references: [id])
   asset_id                     Int
   asset_code                   String
   asset_name                   String

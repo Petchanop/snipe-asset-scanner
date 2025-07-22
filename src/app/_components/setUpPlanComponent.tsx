@@ -7,17 +7,39 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { updateAssetCountReport } from "@/_libs/report.utils";
 import { useRouter } from "next/navigation";
+import { ChildrenSelectComponent, ParentSelectComponent } from "./tables/location-table";
+import AddIcon from "@mui/icons-material/Add"
+import IconButton from "@mui/material/IconButton";
+import { TLocation } from "@/_types/snipe-it.type";
 
 export default function SetupPlanComponent(
-    props: { assetCountReport: AssetCount, assetCountLocation: AssetCountLocation[] }
+    props: {
+        assetCountReport: AssetCount & { asset_count_location:  AssetCountLocation[] },
+        assetCountLocation: AssetCountLocation[],
+        parentLocation: TLocation[],
+        childrenLocation: TLocation[],
+        parentProp: TLocation | null
+    }
 ) {
-    const { assetCountReport, assetCountLocation } = props
+    const {
+        assetCountReport,
+        assetCountLocation,
+        parentLocation,
+        childrenLocation,
+        parentProp
+    } = props
     const { document_date, document_name, state } = assetCountReport
     const { back } = useRouter()
     const [date, setDate] = useState(dayjs(document_date))
+    const [parent, setParent] = useState(parentProp)
+    const [childId, setChildId] = useState<number | null>()
+    const [selected, setSelected] = useState(false)
+    const [documentLocation, setDocumentLocation] = useState<TLocation[]>(assetCountReport.asset_count_location?.map((countLocation) => {
+        return childrenLocation.find((loc) => loc.id === countLocation.id) || parentLocation.find((loc) => loc.id === countLocation.id) as TLocation
+    }))
     const [reportForm, setReportForm] = useState<TReportForm>({
         document_date: document_date,
         document_name: document_name as string,
@@ -54,6 +76,22 @@ export default function SetupPlanComponent(
         back()
     }
 
+    useEffect(() => {
+        if (selected && childId && documentLocation.find((loc: TLocation) => loc.id == childId) == null) {
+            let location = childrenLocation.find((loc) => loc.id == childId) as TLocation
+            if (!location) {
+                location = parentLocation.find((loc) => loc.id == childId) as TLocation
+            }
+            setDocumentLocation([...documentLocation, location])
+            setReportForm((prev: TReportForm) => ({
+                ...prev,
+                asset_count_location: [...prev.asset_count_location, location.id!]
+            }))
+        }
+        setSelected(false)
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selected, childId])
+
     return (
         <>
             <div className="flex flex-col">
@@ -73,6 +111,23 @@ export default function SetupPlanComponent(
                     onChange={handleDocumentNameChange}
                     value={reportForm.document_name}
                 />
+                <ParentSelectComponent
+                    parentLocation={parentLocation}
+                    parentProp={parent!}
+                    setParent={setParent} />
+                <div className="flex flex-row items-center space-x-2">
+                    <ChildrenSelectComponent
+                        parent={parent!}
+                        locationByParent={childrenLocation}
+                        childId={childId!}
+                        setChildId={setChildId} />
+                    <IconButton
+                        color="primary"
+                        onClick={() => setSelected(true)}
+                    >
+                        <AddIcon />
+                    </IconButton>
+                </div>
                 <div className="flex flex-row justify-end p-4 space-x-4">
                     <Button
                         onClick={handleSubmit}
@@ -81,7 +136,7 @@ export default function SetupPlanComponent(
                     >
                         ยืนยัน
                     </Button>
-                     <Button
+                    <Button
                         onClick={handleCancel}
                         variant="contained"
                         color="error"

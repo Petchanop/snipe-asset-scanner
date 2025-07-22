@@ -25,7 +25,6 @@ export default async function ReportTablePage({ searchParams }: {
     }
     else
         parentProp = parentLocation[0]
-    const reports = await prisma.asset_count.findMany()
     return (
         <ReportComponent
             locations={locations.data!.rows}
@@ -33,7 +32,6 @@ export default async function ReportTablePage({ searchParams }: {
             childrenLocation={childrenLocation}
             parentProp={parentProp!}
             childProp={childProp!}
-            reports={reports}
         />
     )
 }

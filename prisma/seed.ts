@@ -1,13 +1,8 @@
 import { PrismaClient } from './generated/prisma';
 
  const assetStatusOptions: { value: string, label: string }[] = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'deployable', label: 'Deployable' },
-  { value: 'deployed', label: 'Deployed' },
-  { value: 'sold out', label: 'Sold Out' },
-  { value: 'unavailable', label: 'Unavailable' },
-  { value: 'archived', label: 'Archived' },
-  { value: 'disposed', label: 'Disposed' }
+  { value: 'Malfunctioning', label: 'ชำรุด' },
+  { value: 'Deployable', label: 'ปกติ' },
 ];
 
 const prisma = new PrismaClient()

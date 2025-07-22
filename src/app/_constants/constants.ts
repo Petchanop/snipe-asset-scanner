@@ -58,29 +58,24 @@ export const tableHeaders: HeadersAssetTable[] = [
         fontColor: ["black"]
     },
     {
-        label: "Status",
+        label: "ชำรุด",
         isSelectBox: true,
         fontColor: ["black"]
     }
 ]
 
 export type AssetStatus =
-  | 'pending'
-  | 'deployable'
-  | 'deployed'
-  | 'sold out'
-  | 'unavailable'
-  | 'archived'
-  | 'disposed';
+  | 'Malfunctioning'
+  | 'Deployable'
+
+export enum AssetStatusEnum {
+    MALFUNCTIONING = 1,
+    DEPLOYABLE = 2
+}
 
 export const assetStatusOptions: { id: number; value: AssetStatus; label: string }[] = [
-  { id: 1 ,value: 'pending', label: 'Pending' },
-  { id: 2, value: 'deployable', label: 'Deployable' },
-  { id: 3, value: 'deployed', label: 'Deployed' },
-  { id: 4, value: 'sold out', label: 'Sold Out' },
-  { id: 5, value: 'unavailable', label: 'Unavailable' },
-  { id: 6, value: 'archived', label: 'Archived' },
-  { id: 7, value: 'disposed', label: 'Disposed' }
+  { id: 1, value: 'Malfunctioning', label: 'ชำรุด' },
+  { id: 2, value: 'Deployable', label: 'ปกติ' },
 ];
 
 export const tableHeadersAdditional: HeadersAssetTable[] = [
@@ -105,7 +100,7 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         fontColor: ["black"]
     },
     {
-        label: "Action",
+        label: "ชำรุด",
         isSelectBox: true,
         fontColor: ["black"]
     }

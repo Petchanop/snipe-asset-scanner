@@ -1,4 +1,5 @@
 import {
+  AssetStatusEnum,
   INLOCATION,
   assetStatusOptions,
   tableHeaders,
@@ -22,8 +23,6 @@ import {
   handleChangeRowsPerPage
 } from "@/_components/tables/utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
-import Select from "@mui/material/Select";
-import { MenuItem } from "@mui/material";
 
 
 export function CreateAssetTableCell(
@@ -38,26 +37,42 @@ export function CreateAssetTableCell(
   const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, status } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
-  const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.value)
+  const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !assignIncorrect ? INLOCATION : OUTLOCATION
-
   useEffect(() => {
     const updateData = async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       data.countCheck = count,
-      data.assignIncorrect = incorrect
-      const id = assetStatusOptions.find((status) => status.value == assetStatus)?.id as number
       await UpdateAssetCountLine(data.id as string, {
         asset_check: data.countCheck,
-        is_not_asset_loc: data.assignIncorrect,
-        asset_count_line_status_id: id
       })
     }
-
+    
     updateData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count, incorrect, assetStatus])
-
+  }, [count])
+  
+  useEffect(() => {
+    const updateIncorrectLocation = async () => {
+      data.assignIncorrect = incorrect
+      await UpdateAssetCountLine(data.id as string, {
+        is_not_asset_loc: incorrect,
+      })
+    }
+    
+    updateIncorrectLocation()
+  }, [incorrect])
+  
+  useEffect(() => {
+    const updateAssetStatus = async() => {
+      data.status = assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+      await UpdateAssetCountLine(data.id as string, {
+        asset_count_line_status_id: assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+      })
+    }
+    updateAssetStatus()
+  }, [assetStatus])
+  
   return (
     <>
       {
@@ -95,18 +110,19 @@ export function CreateAssetTableCell(
                 : <></>
             }
             <TableCell>
-              <Select value={assetStatus}
-                onChange={(event) => setAssetStatus(event.target.value)}
+              <Checkbox 
+                checked={assetStatus}
+                onChange={() => setAssetStatus(pre => !pre)}
                 disabled={!isCheckTable}
               >
-                {
+                {/* {
                   assetStatusOptions.map((choice) =>
                       <MenuItem value={choice.value} key={choice.label}>
                         {choice.label}
                       </MenuItem>
                   )
-                }
-              </Select>
+                } */}
+              </Checkbox>
             </TableCell>
           </>
           : <></>
@@ -147,11 +163,14 @@ export default function ListAsset(props: {
               </TableRow>
             ) :
             <TableRow sx={{
-              height: '8rem',
-              maxHeight: '8rem'
+              height: '9rem',
+              maxHeight: '9rem'
             }}>
               <TableCell colSpan={2} />
-              <TableCell colSpan={2} rowSpan={4}>
+              <TableCell 
+                className="justify-center" 
+                colSpan={3} 
+                rowSpan={8}>
                 No asset report
               </TableCell>
               <TableCell colSpan={2} />

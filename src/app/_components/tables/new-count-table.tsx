@@ -49,40 +49,36 @@ function CheckAssetButton(props: {
       <div className="flex flex-col">
         <Button className={
           `hover:bg-blue-200 max-md:w-1/3
-        max-md:text-xs max-md:font-medium`
+        max-md:text-sm max-md:font-medium`
         }
           variant="text"
           onClick={() => {
             push(`${pathname}/check?location=${location!.toString()}`)
           }}
-        >Search</Button>
+        >ค้นหา</Button>
       </div>
       <div className="flex flex-col">
         <Button className={
           `hover:bg-blue-200 max-md:w-1/3 
-        max-md:text-xs max-md:font-medium`
+        max-md:text-sm max-md:font-medium`
         }
           onClick={handleFinishbutton}
-        >Finish</Button>
+        >บันทึก</Button>
       </div>
       <div className="flex flex-col">
         <Button className={
           `hover:bg-blue-200 max-md:w-1/3 
-        max-md:text-xs max-md:font-medium`
+        max-md:text-sm max-md:font-medium`
         }
           onClick={() => setIsCheckTable((pre) => !pre)}
-        >Cancel</Button>
+        >ยกเลิก</Button>
       </div>
     </div>
   )
 }
 
 function SelectCountInput(props: {
-  locations: PNewCountTableProps[],
-  selectedLocation: PNewCountTableProps,
-  setSelectedLocation: (value: PNewCountTableProps) => void,
   isCheckTable: boolean,
-  defaultLocation: TLocation
 }) {
   const {
     isCheckTable,
@@ -97,13 +93,13 @@ function SelectCountInput(props: {
 
   return (
     <>
-      <div className="flex flex-row items-center">
+      <div className="flex md:flex-row flex-col md:items-center">
         <Typography className="w-29 max-lg:w-25">Date</Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker label="Select Date"
             value={dateContext.dateValue}
             format="DD/MM/YYYY"
-            className="lg:w-2/3 w-3/5"
+            className="lg:w-2/3 w-4/5 max-md:mt-4 max-md:p-4"
             slotProps={{ textField: { size: 'small' } }}
             onChange={handleDateOnChange}
             disabled={isCheckTable}
@@ -144,25 +140,25 @@ function SelectCountButton(props: {
   }
 
   return (
-    <div className="flex flex-col pt-2 max-md:w-2/5 justify-center space-y-2">
+    <div className="flex flex-row md:flex-col pt-2 max-md:w-4/5 md:justify-center md:space-y-2 max-md:space-x-2 max-md:pl-4">
       <div className="flex flex-row">
         <Button className={
-          `hover:bg-blue-200 max-md:w-2/5 
-          max-md:text-xs max-md:font-medium`
+          `hover:bg-blue-200 max-md:w-full
+          max-md:text-sm max-md:font-medium`
         }
           onClick={handleGetData}
         >
-          Get Data
+          เรียกดูข้อมูล
         </Button>
       </div>
       <div className="flex flex-row">
         <Button className={
-          `hover:bg-blue-200 max-md:w-2/5
-          max-md:text-xs max-md:font-medium
+          `hover:bg-blue-200 max-md:w-full
+          max-md:text-sm max-md:font-medium
           `}
           onClick={handleClickStart}
         >
-          Start
+          เริ่มตรวจนับ
         </Button>
       </div>
     </div>
@@ -195,27 +191,25 @@ export function NewCountInput(props: {
   } = props
   const [parent, setParent] = useState(parentProp)
   const [childId, setChildId] = useState<number | null>(defaultLocation!.id as unknown as number)
-  const [selectedLocation, setSelectedLocation] = useState(location)
   const documentContext = useReportContext()
 
+  useEffect(() => {
+    setLocation(locations?.find((loc) => loc.id == childId)!);
+  }, [childId, locations])
   return (
-    <div className="flex flex-row w-full py-2 pl-2 lg:pl-10 content-center">
-      <div className="flex flex-col basis-lg space-y-2">
+    <div className="flex md:flex-row flex-col w-full py-2 pl-2 lg:pl-10 content-center">
+      <div className="flex flex-col md:basis-lg space-y-2">
         {
           isCheckTable ?
-            <Typography className="mt-2 mb-4">{documentContext.DocumentNumber}</Typography>
+            <Typography className="mt-2 mb-4">รายงานหมายเลข {documentContext.DocumentNumber}</Typography>
             : <></>
         }
-        <div className="flex flex-row">
+        <div className="flex md:flex-row flex-col md:items-center">
           <SelectCountInput
-            locations={locations}
-            selectedLocation={selectedLocation}
-            setSelectedLocation={setSelectedLocation}
             isCheckTable={isCheckTable}
-            defaultLocation={defaultLocation}
           />
         </div>
-        <div className="flex flex-row items-center">
+        <div className="flex md:flex-row flex-col md:items-center">
           <Typography className="w-25 max-lg:w-21">Location</Typography>
           <ParentSelectComponent
             parentLocation={parentLocation}
@@ -230,14 +224,14 @@ export function NewCountInput(props: {
             setChildId={setChildId} />
         </div>
       </div>
-      <div className="flex flex-col basis-md pt-10">
+      <div className="flex flex-row md:flex-col md:basis-md md:pt-10">
         {
           isCheckTable ?
             assetTab ?
               <CheckAssetButton setIsCheckTable={setIsCheckTable} />
               : <></>
             : <SelectCountButton
-              selectedLocation={selectedLocation}
+              selectedLocation={location}
               setLocation={setLocation}
               setIsCheckTable={setIsCheckTable}
             />
@@ -280,7 +274,6 @@ export default function NewCountTable(props: {
 
   useEffect(() => {
     if (!dateValue) {
-      //eslint-disable-next-line react-hooks/exhaustive-deps
       setDateValue(dayjs(report?.document_date))
     }
   }, [dateValue, report])
@@ -297,12 +290,10 @@ export default function NewCountTable(props: {
       } else {
         setDocumentNumber(report.document_number)
         const locationIds = await GetAssetCountLocationByAssetCountReport(report.id)
-        const assetLocationId = locationIds.find((loc) => loc.location_id == locationId)
-        console.log("fetch asset from location id ", locationId, locationIds, assetLocationId)
+        const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
         let assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
-        console.log(assetCountLineReport)
         if (assetCountLineReport.length == 0) {
-          const { data, error } = await getAssetByLocationId(locationId)
+          const { data, error } = await getAssetByLocationId(location.id)
           if (error || data) {
             toast.error(`${report.document_number} asset data not found.`)
           }
@@ -310,7 +301,7 @@ export default function NewCountTable(props: {
             const extendTypeAsset: ExtendAssetResponse = {
               ...asset,
               asset_name_not_correct: false,
-              is_not_asset_loc: asset.location?.id != locationId,
+              is_not_asset_loc: asset.location?.id != location.id,
               asset_check: false,
               in_report: false,
               location_id: assetLocationId?.id as string,
@@ -366,7 +357,6 @@ export default function NewCountTable(props: {
     }
 
     updateAssetCountLine()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [update])
 
   function handleSelectValue(event: SyntheticEvent, newValue: string) {
