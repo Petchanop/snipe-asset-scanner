@@ -18,6 +18,9 @@ export default async function CheckAssetPage(
     const assetCountReport : AssetCount | null = await prisma.asset_count.findUnique( {
         where: {
             document_number : parseInt(documentNumber)
+        },
+        include : {
+            AssetCountLocation: true
         }
     })
     const locationIds = await GetAssetCountLocationByAssetCountReport(assetCountReport!.id)

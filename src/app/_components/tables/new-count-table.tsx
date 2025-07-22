@@ -31,13 +31,12 @@ import { LoadingTableSkeleton } from "@/_components/loading";
 import { ReportState } from "@/_constants/constants";
 
 function CheckAssetButton(props: {
-  setIsCheckTable: (value: SetStateAction<boolean>) => void
+  setIsCheckTable: (value: SetStateAction<boolean>) => void,
+  childId: number
 }) {
-  const { setIsCheckTable } = props
+  const { setIsCheckTable, childId } = props
   const reportContext = useReportContext()
   const pathname = usePathname()
-  const searchParam = useSearchParams()
-  const location = searchParam.get('location')
   const { push } = useRouter()
 
   const handleFinishbutton = () => {
@@ -53,7 +52,7 @@ function CheckAssetButton(props: {
         }
           variant="text"
           onClick={() => {
-            push(`${pathname}/check?location=${location!.toString()}`)
+            push(`${pathname}/check?location=${childId}`)
           }}
         >ค้นหา</Button>
       </div>
@@ -228,7 +227,7 @@ export function NewCountInput(props: {
         {
           isCheckTable ?
             assetTab ?
-              <CheckAssetButton setIsCheckTable={setIsCheckTable} />
+              <CheckAssetButton setIsCheckTable={setIsCheckTable} childId={childId} />
               : <></>
             : <SelectCountButton
               selectedLocation={location}
