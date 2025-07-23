@@ -15,6 +15,7 @@ import AddIcon from "@mui/icons-material/Add"
 import IconButton from "@mui/material/IconButton";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ObjectList } from "@/_components/planComponent";
+import { CreateAssetCountLocation, DeleteAssetCountLocationByAssetCountId } from "@/_apis/report.api";
 
 export default function SetupPlanComponent(
     props: {
@@ -54,6 +55,8 @@ export default function SetupPlanComponent(
         })
     })
 
+    const { push } = useRouter()
+
     const handleDateOnChange = (value: dayjs.Dayjs | null) => {
         if (value) {
             setDate(value)
@@ -75,6 +78,32 @@ export default function SetupPlanComponent(
 
     const handleSubmit = async () => {
         await updateAssetCountReport(assetCountReport.document_number, reportForm)
+        const assetCountLocation = assetCountReport.AssetCountLocation
+        const newLocation = documentLocation
+        for (let i = 0; i < newLocation.length; i++) {
+            const findLocation = assetCountLocation.find((loc) => loc.location_id == newLocation[i]?.id)
+            if (findLocation == null) {
+                if (i < newLocation.length && newLocation[i] != undefined) {
+                    await CreateAssetCountLocation(newLocation[i]?.id!, assetCountReport.id)
+                }
+            }
+        }
+        for (let i = 0; i < assetCountLocation.length; i++) {
+            const findLocation = newLocation.find((loc) => loc.id == assetCountLocation[i]?.location_id)
+            if (findLocation == null) {
+                await DeleteAssetCountLocationByAssetCountId(
+                    assetCountLocation[i]!.id, 
+                    assetCountReport.id, 
+                    assetCountLocation[i]!.location_id
+                )
+            }
+        }
+        setReportForm((prev: TReportForm) => ({
+            ...prev,
+            asset_count_location: documentLocation.map((loc: TLocation) => {
+                return loc?.id! as number
+            })
+        }))
     }
 
     const handleCancel = () => {
@@ -92,6 +121,7 @@ export default function SetupPlanComponent(
                 ...prev,
                 asset_count_location: [...prev.asset_count_location, location.id!]
             }))
+            console.log(reportForm)
         }
         setSelected(false)
         //eslint-disable-next-line react-hooks/exhaustive-deps
@@ -155,6 +185,12 @@ export default function SetupPlanComponent(
                     >
                         ยกเลิก
                     </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() =>
+                            push(`/reports/count-assets/${assetCountReport.document_number}`)}
+                        className="w-[8rem] p-4"
+                    >เริ่มทำการตรวจนับ</Button>
                 </div>
             </div>
         </>

@@ -7,7 +7,7 @@ import { Dispatch, SetStateAction } from 'react';
 export default function ScannerComponent(
   props: {
     scanData: IDetectedBarcode[],
-    setScanData: Dispatch<SetStateAction<IDetectedBarcode[] | undefined>>
+    setScanData: Dispatch<SetStateAction<IDetectedBarcode[]>>
   }
 ) {
   const { scanData, setScanData } = props

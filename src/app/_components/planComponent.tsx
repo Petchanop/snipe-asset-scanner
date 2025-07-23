@@ -50,10 +50,9 @@ export function ObjectList(props: {
   setItems: Dispatch<SetStateAction<Exclude<TLocation[], undefined>>>
 }) {
   const { items, setItems } = props
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     setItems((prev) => prev.filter((item: TLocation) => item.id !== id));
   };
-
   return (
     <Box sx={{ maxWidth: 500, mt: 4 }}>
       <Typography variant="h6" gutterBottom>

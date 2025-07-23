@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { AssetResponse } from '@/_apis/snipe-it/snipe-it.api';
 import { createGateway, TResponse } from '@/_apis/next.api';
 
+
 export async function changeDateToIsoString(date: Date): Promise<string> {
     date.setUTCHours(0,0,0,0)
     return date.toISOString()

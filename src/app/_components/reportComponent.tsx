@@ -37,7 +37,6 @@ export default function ReportComponent(props: {
   const [dateValue, setDateValue] = useState<Dayjs | null>(null)
   useEffect(() => {
     if (!dateValue) {
-      //eslint-disable-next-line react-hooks/exhaustive-deps
       setDateValue(dayjs())
     }
   }, [dateValue])

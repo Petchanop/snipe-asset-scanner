@@ -2,13 +2,14 @@ import { AddAssetCountLine } from "@/_apis/report.api"
 import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api"
 import { ExtendAssetResponse } from "@/_components/tables/search-asset"
 import { assetStatusOptions } from "@/_constants/constants"
-import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation } from "@/_types/types"
+import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User, assetUser } from "@/_types/types"
+import { UpdateAssetCountLine } from "./report.utils"
 
 export async function CreatAssetCountLine(
-    data : AssetResponse, 
-    assetCountReport : AssetCount , 
-    assetInReport : AssetCountLine[], 
-    locationId: AssetCountLocation) : Promise<TAssetRow> {
+    data: AssetResponse,
+    assetCountReport: AssetCount,
+    assetInReport: AssetCountLine[],
+    locationId: AssetCountLocation): Promise<TAssetRow> {
     const extendTypeAsset: ExtendAssetResponse = {
         ...data,
         asset_name_not_correct: false,
@@ -32,5 +33,31 @@ export async function CreatAssetCountLine(
         assignIncorrect: assetCountLine.is_not_asset_loc ? assetCountLine.is_not_asset_loc : false,
         status: assetCountLine.asset_count_line_status_id
     } as unknown as TAssetRow
+    return asset
+}
+
+export async function UpdateAssetCountLineForSearchAssetPage(
+    assetInReport:AssetCountLine[], 
+    data : AssetResponse,
+    assetCountReport : AssetCount,
+    users: User[],
+    locationId : AssetCountLocation) {
+    const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
+    let asset: TAssetRow
+    if (!IsInLocation) {
+        asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId)
+        await UpdateAssetCountLine(asset.id as string, { asset_check: true })
+    } else {
+        const result = await UpdateAssetCountLine(IsInLocation.id, { asset_check: true })
+        asset = {
+            id: result?.id,
+            assetCode: result?.asset_code as string,
+            assetName: result?.asset_name as string,
+            assignedTo: users.find((data: User) => data.id = result?.assigned_to as number) as assetUser,
+            countCheck: result?.asset_check as boolean,
+            assignIncorrect: result?.is_not_asset_loc as boolean,
+            status: result?.asset_count_line_status_id as number
+        }
+    }
     return asset
 }

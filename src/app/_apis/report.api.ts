@@ -9,23 +9,25 @@ import { createAssetCountLine } from "@/_libs/report.utils";
 
 export async function getReportFromChildLocation(location: number): Promise<AssetCount[]> {
     const result = await prisma.asset_count_location.findMany({
-    where: {
-        location_id: location, // Replace with actual ID
-    }, 
-    include: {
-        count_id: true, // This pulls the related asset_count
-    }})
+        where: {
+            location_id: location, // Replace with actual ID
+        },
+        include: {
+            count_id: true, // This pulls the related asset_count
+        }
+    })
     return result.map((item: { count_id: any; }) => item.count_id);
 }
 
 export async function getReportFromParentLocation(location: number): Promise<AssetCount[]> {
     const result = await prisma.asset_count_location.findMany({
-    where: {
-        location_id: location, // Replace with actual ID
-    }, 
-    include: {
-        count_id: true, // This pulls the related asset_count
-    }})
+        where: {
+            location_id: location, // Replace with actual ID
+        },
+        include: {
+            count_id: true, // This pulls the related asset_count
+        }
+    })
     return result.map((item: { count_id: any; }) => item.count_id);
 }
 
@@ -90,7 +92,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             is_not_asset_loc: data.is_not_asset_loc,
             asset_name_not_correct: false,
             asset_count_line_location_id: data.location_id,
-            asset_count_line_status_id: AssetStatusEnum.DEPLOYABLE 
+            asset_count_line_status_id: AssetStatusEnum.DEPLOYABLE
         })
     }
     return await prisma.asset_count_line.upsert({
@@ -116,7 +118,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             is_not_asset_loc: data.is_not_asset_loc,
             checked_on: dayjs().toDate(),
             asset_count_line_location_id: data.location_id,
-            asset_count_line_status_id: await findStatusId(data) 
+            asset_count_line_status_id: await findStatusId(data)
         }
     })
 }
@@ -143,10 +145,52 @@ export async function CreateAssetCountLocation(locationId: number, assetCountId:
     })
 }
 
-export async function GetAssetCountLocationByAssetCountReport(assetCountId: string): Promise<AssetCountLocation[]>{
+export async function GetAssetCountLocationByAssetCountReport(assetCountId: string): Promise<AssetCountLocation[]> {
     return await prisma.asset_count_location.findMany({
-        where : {
+        where: {
             asset_count_id: assetCountId
         }
     })
+}
+
+export async function UpdateAssetCountLocationByAssetCountId(
+    assetCountId: string,
+    asestCountLocationId: string,
+    locationId: number): Promise<AssetCountLocation> {
+    return await prisma.asset_count_location.upsert({
+        where: {
+            id: asestCountLocationId
+        },
+        update: {
+            location_id: locationId
+        },
+        create: {
+            asset_count_id: assetCountId,
+            location_id: locationId
+        }
+    })
+}
+
+export async function FindAssetCountLocationByAssetCountId(assetCountId: string, locationId: number): Promise<AssetCountLocation | null> {
+    return await prisma.asset_count_location.findFirst({
+        where: {
+            asset_count_id: assetCountId,
+            location_id: locationId
+        }
+    })
+}
+
+export async function DeleteAssetCountLocationByAssetCountId(assetCountLocationId: string, assetCountId: string, locationId: number) {
+    try {
+        await prisma.asset_count_location.delete({
+            where: {
+                id: assetCountLocationId,
+                asset_count_id: assetCountId,
+                location_id: locationId
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        return error
+    }
 }

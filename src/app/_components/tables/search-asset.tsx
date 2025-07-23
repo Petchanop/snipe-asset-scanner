@@ -12,7 +12,7 @@ import { blue } from "@mui/material/colors";
 import Button from "@mui/material/Button";
 import { AssetResponse, fetchSearchAsset } from "@/_apis/snipe-it/snipe-it.api";
 import { toast, ToastBar, Toaster } from 'react-hot-toast';
-import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation } from "@/_types/types";
+import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
 import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
@@ -21,7 +21,7 @@ import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { useRouter } from "next/navigation";
-import { CreatAssetCountLine } from "@/_libs/search-asset.utils";
+import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/search-asset.utils";
 
 export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
@@ -38,7 +38,7 @@ function CreateSearchAssetTableCell(props: {
   // assetCountReport: AssetCount
 }) {
   const { data } = props
-  const { id, assetCode, assetName, assignedTo, countCheck, assignIncorrect, status} = data;
+  const { id, assetCode, assetName, assignedTo, countCheck, assignIncorrect, status } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
@@ -144,7 +144,7 @@ function SearchAssetTable(props: {
 
 export function SearchComponent() {
   const [searchInput, setSearchInput] = useState<string>("")
-  const [scanData, setScanData] = useState<IDetectedBarcode[]>()
+  const [scanData, setScanData] = useState<IDetectedBarcode[]>([])
   const [fetchData, setFetchData] = useState<boolean>(false)
   const [searchResult, setSearchResult] = useState<AssetResponse[]>([])
   const [show, setShow] = useState(false)
@@ -265,11 +265,12 @@ export default function SearchAsset(
     assetCountReport: AssetCount
     assetInReport: AssetCountLine[]
     locationId: AssetCountLocation
+    users: User[]
   }
 ) {
-  const { assetCountReport, assetInReport, locationId } = props
+  const { assetCountReport, assetInReport, locationId, users } = props
   const [searchInput, setSearchInput] = useState<string>("")
-  const [scanData, setScanData] = useState<IDetectedBarcode[]>()
+  const [scanData, setScanData] = useState<IDetectedBarcode[]>([])
   const [fetchData, setFetchData] = useState<boolean>(false)
   const [searchResult, setSearchResult] = useState<TAssetRow[]>([])
   const [show, setShow] = useState(true)
@@ -281,18 +282,12 @@ export default function SearchAsset(
       if (error) {
         toast.error(`${searchInput} not found.`)
       } else {
-        const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
+        const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId)
         toast.success(`${searchInput} was found.`)
-        if (!IsInLocation) {
-          const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId)
-          await UpdateAssetCountLine(asset.id as string, { asset_check: true })
-          setSearchResult([asset, ...searchResult])
-        } else {
-          await UpdateAssetCountLine(IsInLocation.id, { asset_check: true })
-        }
+        setSearchResult([asset, ...searchResult])
         toast.success(`${searchInput} has been checked.`)
-        setSearchInput("")
       }
+      setSearchInput("")
     }
     setFetchData(false)
   }
@@ -309,15 +304,9 @@ export default function SearchAsset(
         if (error) {
           toast.error(`${result.rawValue} not found.`)
         } else {
+          const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId)
           toast.success(`${result.rawValue} was found.`)
-          const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
-          if (!IsInLocation) {
-            const asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId)
-            await UpdateAssetCountLine(asset.id as string, { asset_check: true })
-            setSearchResult([asset, ...searchResult])
-          } else {
-            await UpdateAssetCountLine(IsInLocation.id, { asset_check: true })
-          }
+          setSearchResult([asset, ...searchResult])
           toast.success(`${result.rawValue} has been checked.`)
         }
         setScanData([])

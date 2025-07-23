@@ -61,7 +61,7 @@ export function CreateAssetTableCell(
     }
     
     updateIncorrectLocation()
-  }, [incorrect])
+  }, [incorrect, data])
   
   useEffect(() => {
     const updateAssetStatus = async() => {
@@ -71,7 +71,7 @@ export function CreateAssetTableCell(
       })
     }
     updateAssetStatus()
-  }, [assetStatus])
+  }, [assetStatus, data])
   
   return (
     <>

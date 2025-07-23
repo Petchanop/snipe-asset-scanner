@@ -1,5 +1,10 @@
 import { ReportState } from "@/_constants/constants";
 import { asset_count, asset_count_line, asset_count_location, assets, locations, users } from "@/prisma/generated/prisma";
+//eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export function hasOwnProperty<X extends {}, Y extends PropertyKey>
+ (obj: X, prop: Y): obj is X & Record<Y, unknown> {
+    return obj.hasOwnProperty(prop)
+}
 
 export type TSnipeDocument = {
     date: string;

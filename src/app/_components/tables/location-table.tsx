@@ -105,10 +105,9 @@ export function ChildrenSelectComponent(props: {
   const childrenLocationChange = useMemo(() => {
     return locationByParent.filter((loc) =>
       //@ts-expect-error some use parent_id some parent.id
-      loc.parent_id === parent.id || loc.parent.id == parent.id
+      loc.parent_id === parent.id || loc.parent?.id == parent.id
     )
   }, [parent, locationByParent])
-  // locationByParent
 
   useEffect(() => {
     const setDefaultValue = () => {
@@ -197,36 +196,9 @@ export default function LocationTable(props: {
   const { parentLocation, childrenLocation, parentProp, childProp, reports } = props
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-  useEffect(() => {
-    // const filterReportByChildId = () => {
-    //   if (childId) {
-    //     setReport(report.filter((report) => report.location_id == childId))
-    //   }
-    // }
 
-    // filterReportByChildId();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [childProp?.id, parentProp])
-
-  useEffect(() => {
-    // const fetchReportByParent = async () => {
-    //   const parentId = parentLocation.find((loc) => loc.name === (parent as TLocation).name) as TLocation
-    //   let newReport = await getReportFromParentLocation(parentId.id!)
-    //   if (newReport.length == 0) {
-    //     if (typeof childId !== 'undefined')
-    //       newReport = await getReportFromChildLocation(childId!)
-    //   }
-    //   console.log("report", newReport, childId)
-    //   setReport(newReport.sort((a, b) => a.document_number - b.document_number));
-
-    // }
-    // fetchReportByParent();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parentProp, childProp?.id])
   return (
     <>
-      {/* <ParentSelectComponent parentLocation={parentLocation} parentProp={parent!} setParent={setParent} />
-      <ChildrenSelectComponent parent={parent!} locationByParent={childrenLocation} childId={childId!} setChildId={setChildId} /> */}
       <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
