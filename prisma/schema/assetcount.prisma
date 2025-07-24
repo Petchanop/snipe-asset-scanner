@@ -38,6 +38,7 @@ model asset_count_line {
   checked_on                   DateTime              @db.Timestamp(0)
   is_not_asset_loc             Boolean
   asset_name_not_correct       Boolean
+  is_assigned_incorrectly      Boolean               @default(false)
   asset_count_line_location_id String?               @db.Char(36)
   location_id                  asset_count_location? @relation(fields: [asset_count_line_location_id], references: [id])
   asset_count_line_status_id   Int                   @default(0)

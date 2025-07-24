@@ -36,6 +36,7 @@ export type TAssetRow = {
     assignedTo: assetUser;
     countCheck: boolean;
     assignIncorrect: boolean;
+    notInLocation: boolean;
     status: number;
 };
 

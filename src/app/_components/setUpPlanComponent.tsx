@@ -68,12 +68,11 @@ export default function SetupPlanComponent(
     }
 
     const handleDocumentNameChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        if (event.target.value) {
-            setReportForm((prev: TReportForm) => ({
-                ...prev,
-                document_name: event.target.value
-            }))
-        }
+        event.preventDefault()
+        setReportForm((prev: TReportForm) => ({
+            ...prev,
+            document_name: event.target.value
+        }))
     }
 
     const handleSubmit = async () => {
@@ -92,8 +91,8 @@ export default function SetupPlanComponent(
             const findLocation = newLocation.find((loc) => loc.id == assetCountLocation[i]?.location_id)
             if (findLocation == null) {
                 await DeleteAssetCountLocationByAssetCountId(
-                    assetCountLocation[i]!.id, 
-                    assetCountReport.id, 
+                    assetCountLocation[i]!.id,
+                    assetCountReport.id,
                     assetCountLocation[i]!.location_id
                 )
             }

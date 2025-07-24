@@ -30,6 +30,7 @@ export type ExtendAssetResponse = AssetResponse & {
   location_id: string;
   in_report: boolean;
   status: string;
+  is_assigned_incorrectly: boolean;
 }
 
 function CreateSearchAssetTableCell(props: {
@@ -38,9 +39,10 @@ function CreateSearchAssetTableCell(props: {
   // assetCountReport: AssetCount
 }) {
   const { data } = props
-  const { id, assetCode, assetName, assignedTo, countCheck, assignIncorrect, status } = data;
+  const { id, assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
+  const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
 
   useEffect(() => {
@@ -48,8 +50,17 @@ function CreateSearchAssetTableCell(props: {
   }, [count, id])
 
   useEffect(() => {
-    UpdateAssetCountLine(id!, { is_not_asset_loc: incorrect })
+    UpdateAssetCountLine(id!, { is_assigned_incorrectly: incorrect })
   }, [incorrect, id])
+
+  useEffect(() => {
+    UpdateAssetCountLine(id!, { is_not_asset_loc: wrongLocation })
+  }, [wrongLocation, id])
+
+  useEffect(() => {
+    UpdateAssetCountLine(id!, { asset_count_line_status_id: assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE})
+  }, [assetStatus, id])
+
   return (
     <>
       <TableCell>
@@ -61,21 +72,26 @@ function CreateSearchAssetTableCell(props: {
       <TableCell>
         {assignedTo?.first_name} {assignedTo?.last_name}
       </TableCell>
-      <TableCell className="relative place-content-center justify-center items-center justify-content-center">
+      <TableCell align="center" padding="checkbox">
         <Checkbox checked={count}
           onChange={async () => {
             setCount((pre) => !pre)
           }}
         />
       </TableCell>
-      <TableCell className="p-0">
+      <TableCell align="center" padding="checkbox">
         <Checkbox checked={incorrect}
           onChange={async () => {
             setIncorrect((pre) => !pre)
           }}
         />
       </TableCell>
-      <TableCell>
+      <TableCell align="center" padding="checkbox">
+        <Checkbox
+          checked={wrongLocation}
+          onChange={() => setWrongLocation(pre => !pre)} />
+      </TableCell>
+      <TableCell align="center" padding="checkbox">
         <Checkbox
           checked={assetStatus}
           onChange={() => setAssetStatus(pre => !pre)}
@@ -138,124 +154,6 @@ function SearchAssetTable(props: {
           />
         </TableRow>
       </TableFooter>
-    </>
-  )
-}
-
-export function SearchComponent() {
-  const [searchInput, setSearchInput] = useState<string>("")
-  const [scanData, setScanData] = useState<IDetectedBarcode[]>([])
-  const [fetchData, setFetchData] = useState<boolean>(false)
-  const [searchResult, setSearchResult] = useState<AssetResponse[]>([])
-  const [show, setShow] = useState(false)
-
-  async function callFetchAssetSearch() {
-    if (searchInput && fetchData) {
-      const { data, error } = await fetchSearchAsset(searchInput);
-      if (error) {
-        toast.error(`${searchInput} not found.`)
-      } else {
-        const IsInLocation = searchResult.find((result) => result.asset_tag == data.asset_tag)
-        if (!IsInLocation) {
-          toast.success(`${searchInput} was found.`)
-          setSearchResult([data, ...searchResult])
-        } else {
-          toast.error(`${searchInput} is already on the list.`)
-        }
-        setSearchInput("")
-      }
-    }
-    setFetchData(false)
-  }
-
-  useEffect(() => {
-    callFetchAssetSearch()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchData])
-
-  useEffect(() => {
-    const fetchAssetFromScanData = async () => {
-      scanData?.map(async (result) => {
-        const { data, error } = await fetchSearchAsset(encodeURIComponent(result.rawValue));
-        if (error) {
-          toast.error(`${result.rawValue} not found.`)
-        } else {
-          toast.success(`${result.rawValue} was found.`)
-          const IsInLocation = searchResult.find((result) => result.asset_tag == data.asset_tag)
-          if (!IsInLocation) {
-            setSearchResult([data, ...searchResult])
-          } else {
-            toast.error(`${result.rawValue} is already on the list.`)
-          }
-        }
-        setScanData([])
-      })
-    }
-    fetchAssetFromScanData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scanData])
-
-  return (
-    <>
-      <Toaster
-        containerStyle={{
-          position: 'relative'
-        }}
-        toastOptions={{
-          error: {
-            duration: 1500,
-            style: {
-              background: '#ea7259',
-              color: '#fff'
-            }
-          },
-          success: {
-            duration: 1500,
-            style: {
-              background: '#45b42fff',
-              color: '#fff',
-            }
-          }
-        }}
-      >
-        {(t) => (
-          <ToastBar
-            toast={t}
-            style={{
-              ...t.style,
-              animation: t.visible
-                ? 'custom-enter 2s ease-in-out'
-                : 'custom-exit 2s ease-in',
-            }}
-          />
-        )}
-      </Toaster>
-      <div className="space-y-2">
-        <div className="flex flex-row w-full py-2 pl-2 space-x-2 content-center">
-          <TextField
-            id="search-asset"
-            label="Search asset"
-            variant="outlined"
-            size="small"
-            className="w-1/2"
-            onChange={(event) => setSearchInput(event.target.value)}
-            disabled={show}
-            value={searchInput}
-          />
-          <Button onClick={() => setFetchData(true)}>Search</Button>
-          <Typography className="content-center">OR</Typography>
-          <Button onClick={() => setShow((pre) => !pre)}>Scan</Button>
-
-        </div>
-        {
-          show ?
-            <ScannerComponent
-              scanData={scanData!}
-              setScanData={setScanData}
-            />
-            : <></>
-        }
-      </div>
     </>
   )
 }

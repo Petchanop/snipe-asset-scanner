@@ -39,9 +39,14 @@ function CheckAssetButton(props: {
   const pathname = usePathname()
   const { push } = useRouter()
 
-  const handleFinishbutton = () => {
+  const handleSavebutton = () => {
     setIsCheckTable(false)
     reportContext.setUpdate(true)
+  }
+
+  const handleFinishButton = async () => {
+     await updateAssetCountReport(reportContext.DocumentNumber!, {
+            state: ReportState.COMPLETED })
   }
   return (
     <div className="flex flex-row w-full lg:pl-4 lg:space-x-4 justify-start content-center items-center">
@@ -61,7 +66,7 @@ function CheckAssetButton(props: {
           `hover:bg-blue-200 max-md:w-1/3 
         max-md:text-sm max-md:font-medium`
         }
-          onClick={handleFinishbutton}
+          onClick={handleSavebutton}
         >บันทึก</Button>
       </div>
       <div className="flex flex-col">
@@ -71,6 +76,14 @@ function CheckAssetButton(props: {
         }
           onClick={() => setIsCheckTable((pre) => !pre)}
         >ยกเลิก</Button>
+      </div>
+        <div className="flex flex-col">
+        <Button className={
+          `hover:bg-blue-200 max-md:w-1/3 
+        max-md:text-sm max-md:font-medium`
+        }
+          onClick={handleFinishButton}
+        >จบการตรวจนับ</Button>
       </div>
     </div>
   )
@@ -93,7 +106,7 @@ function SelectCountInput(props: {
   return (
     <>
       <div className="flex md:flex-row flex-col md:items-center">
-        <Typography className="w-29 max-lg:w-25">Date</Typography>
+        <Typography className="w-22 max-lg:w-25">Date</Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker label="Select Date"
             value={dateContext.dateValue}
@@ -301,6 +314,7 @@ export default function NewCountTable(props: {
               ...asset,
               asset_name_not_correct: false,
               is_not_asset_loc: asset.location?.id != location.id,
+              is_assigned_incorrectly: false,
               asset_check: false,
               in_report: false,
               location_id: assetLocationId?.id as string,
@@ -322,7 +336,8 @@ export default function NewCountTable(props: {
                 last_name: data ? data!.last_name : null
               },
               countCheck: asset.asset_check ? asset.asset_check : false,
-              assignIncorrect: asset.is_not_asset_loc ? asset.is_not_asset_loc : false,
+              notInLocation: asset.is_not_asset_loc ? asset.is_not_asset_loc : false,
+              assignIncorrect: asset.is_assigned_incorrectly,
               status: asset.asset_count_line_status_id
             } as unknown as TAssetRow
           }))
@@ -402,14 +417,14 @@ export default function NewCountTable(props: {
               :
               <>
                 <AssetTable
-                  data={data.filter((loc) => loc.assignIncorrect == false) as TAssetRow[]}
+                  data={data.filter((loc) => loc.notInLocation == false) as TAssetRow[]}
                   isCheckTable={isCheckTable}
                   assetTab={assetTab}
                   setAssetTab={setAssetTab}
                   tabValue={INLOCATION}
                 />
                 <AssetTable
-                  data={data.filter((loc) => loc.assignIncorrect == true) as TAssetRow[]}
+                  data={data.filter((loc) => loc.notInLocation == true) as TAssetRow[]}
                   isCheckTable={isCheckTable}
                   assetTab={assetTab}
                   setAssetTab={setAssetTab}

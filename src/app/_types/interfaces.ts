@@ -1,3 +1,5 @@
+import { AssetCount, AssetCountLocation } from "@/_types/types";
+
 export interface HeadersLocationTable {
     label: string;
     isSelectBox: boolean;
@@ -23,4 +25,8 @@ export interface AssetFormData {
   assignedTo: AssignedTo;
   countCheck: boolean;
   assignIncorrect: boolean;
+}
+
+export interface AssetCountWithAssetLocation extends AssetCount {
+  AssetCountLocation: AssetCountLocation[]
 }

@@ -75,7 +75,8 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
     const findLatest = await prisma.asset_count_line.findFirst({
         where: {
             asset_count_id: assetCountReport.id!,
-            asset_code: data.asset_tag
+            asset_code: data.asset_tag,
+            asset_count_line_location_id: data.location_id
         },
         orderBy: {}
     })
@@ -86,7 +87,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             asset_code: data.asset_tag!,
             asset_name: data.name!,
             assigned_to: data.assigned_to?.id || null,
-            asset_check: false,
+            asset_check: data.asset_check,
             checked_by: null,
             checked_on: dayjs().toDate(),
             is_not_asset_loc: data.is_not_asset_loc,
@@ -105,7 +106,10 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             asset_count_id: assetCountReport.id,
             asset_name: data.name!,
             checked_on: dayjs().toDate(),
+            is_assigned_incorrectly: data.is_assigned_incorrectly,
             is_not_asset_loc: data.is_not_asset_loc,
+            asset_check: data.asset_check,
+            asset_count_line_status_id: await findStatusId(data)
         },
         create: {
             asset_check: false,

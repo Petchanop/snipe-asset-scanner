@@ -25,9 +25,9 @@ export async function createDocumentNumber(locationId: number, date: string): Pr
 }
 
 export type FCreateAssetCountReport = {
-    document_name: string | null;
-    document_date: Date | null;
-    state: string;
+    document_name?: string | null;
+    document_date?: Date | null;
+    state?: string;
 }
 
 export async function getAllAssetCount(): Promise<AssetCount[]> {
@@ -49,7 +49,7 @@ export async function createAssetCountReport(
         data: {
             document_name: payload.document_name,
             document_date: await changeDateToIsoString(payload.document_date!),
-            state: payload.state
+            state: payload.state as string
         }
     })
 }
@@ -123,6 +123,7 @@ type FUpdateAssetCountLine = {
     checked_by?: number | null;
     checked_on?: Date;
     is_not_asset_loc?: boolean;
+    is_assigned_incorrectly?: boolean;
     asset_name_not_correct?: boolean;
     asset_count_line_status_id?: number;
 }

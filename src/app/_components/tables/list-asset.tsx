@@ -34,37 +34,49 @@ export function CreateAssetTableCell(
     isCheckTable: boolean
   }) {
   const { data, assetTab, actionLabel, action, isCheckTable } = props
-  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, status } = data;
+  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
+  const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
-  const tabType = !assignIncorrect ? INLOCATION : OUTLOCATION
+  const tabType = !notInLocation ? INLOCATION : OUTLOCATION
   useEffect(() => {
     const updateData = async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       data.countCheck = count,
-      await UpdateAssetCountLine(data.id as string, {
-        asset_check: data.countCheck,
-      })
+        await UpdateAssetCountLine(data.id as string, {
+          asset_check: data.countCheck,
+        })
     }
-    
+
     updateData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count])
-  
+
   useEffect(() => {
-    const updateIncorrectLocation = async () => {
+    const updateAssignNotCorrect = async () => {
       data.assignIncorrect = incorrect
       await UpdateAssetCountLine(data.id as string, {
-        is_not_asset_loc: incorrect,
+        is_assigned_incorrectly: incorrect,
       })
     }
-    
-    updateIncorrectLocation()
+
+    updateAssignNotCorrect()
   }, [incorrect, data])
-  
+
   useEffect(() => {
-    const updateAssetStatus = async() => {
+    const updateIncorrectLocation = async () => {
+      data.notInLocation = wrongLocation
+      await UpdateAssetCountLine(data.id as string, {
+        is_not_asset_loc: wrongLocation,
+      })
+    }
+
+    updateIncorrectLocation()
+  }, [wrongLocation, data])
+
+  useEffect(() => {
+    const updateAssetStatus = async () => {
       data.status = assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
       await UpdateAssetCountLine(data.id as string, {
         asset_count_line_status_id: assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
@@ -72,7 +84,6 @@ export function CreateAssetTableCell(
     }
     updateAssetStatus()
   }, [assetStatus, data])
-  
   return (
     <>
       {
@@ -89,18 +100,24 @@ export function CreateAssetTableCell(
             </TableCell>
             {
               assetTab ?
-                <TableCell>
+                <TableCell className="" align="center" padding="checkbox">
                   <Checkbox checked={count}
                     disabled={!isCheckTable}
                     onChange={() => setCount(pre => !pre)} />
                 </TableCell>
                 : <></>
             }
-            <TableCell className="place-content-center">
+            <TableCell className="" align="center" padding="checkbox">
               <Checkbox
                 checked={incorrect}
                 disabled={!isCheckTable}
                 onChange={() => setIncorrect(pre => !pre)} />
+            </TableCell>
+            <TableCell className="" align="center" padding="checkbox">
+              <Checkbox
+                checked={wrongLocation}
+                disabled={!isCheckTable}
+                onChange={() => setWrongLocation(pre => !pre)} />
             </TableCell>
             {
               !assetTab ?
@@ -109,8 +126,8 @@ export function CreateAssetTableCell(
                 </TableCell>
                 : <></>
             }
-            <TableCell>
-              <Checkbox 
+            <TableCell align="center" padding="checkbox">
+              <Checkbox
                 checked={assetStatus}
                 onChange={() => setAssetStatus(pre => !pre)}
                 disabled={!isCheckTable}
@@ -142,7 +159,9 @@ export default function ListAsset(props: {
       <TableHead>
         <TableRow className="place-content-center">
           {headers.map((header) => (
-            <TableCell key={header.label}>
+            <TableCell key={header.label} 
+            className="bg-blue-300 font-medium"
+            >
               {header.label}
             </TableCell>
           ))}
@@ -152,7 +171,7 @@ export default function ListAsset(props: {
         {
           data.length ?
             dataPerPage(data, page, rowsPerPage).map((mockData: TAssetRow) =>
-              <TableRow key={mockData.assetCode}>
+              <TableRow key={mockData.assetCode} className="divide-x-1 divide-solid divide-gray-300">
                 <CreateAssetTableCell
                   data={mockData}
                   assetTab={assetTab}
@@ -167,9 +186,9 @@ export default function ListAsset(props: {
               maxHeight: '9rem'
             }}>
               <TableCell colSpan={2} />
-              <TableCell 
-                className="justify-center" 
-                colSpan={3} 
+              <TableCell
+                className="justify-center"
+                colSpan={3}
                 rowSpan={8}>
                 No asset report
               </TableCell>
@@ -206,7 +225,7 @@ export function AssetTable(props: {
         borderRight: 'none',
         borderBottom: 'none',
         borderWidth: 1,
-        borderColor: blue[400]
+        borderColor: blue[400],
       }}
         className={tabValue == assetTab ? "" : "hidden"}
       >

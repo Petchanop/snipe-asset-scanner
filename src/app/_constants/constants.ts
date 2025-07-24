@@ -4,6 +4,13 @@ import { blue, green, grey, red, deepOrange, brown } from "@mui/material/colors"
 export const INLOCATION = "INLOCATION"
 export const OUTLOCATION = "OUTLOCATION"
 
+export enum CreateDocumentStep {
+    CHOOSEDATE = 0,
+    REPORTNAME = 1,
+    ADDLOCATION = 2,
+    CONFIRM = 3
+}
+
 export const timeFormat = {
     day: '2-digit',
     month: '2-digit',
@@ -54,6 +61,11 @@ export const tableHeaders: HeadersAssetTable[] = [
     },
     {
         label: "Assign Incorrect",
+        isSelectBox: true,
+        fontColor: ["black"]
+    },
+     {
+        label: "Not in Location",
         isSelectBox: true,
         fontColor: ["black"]
     },

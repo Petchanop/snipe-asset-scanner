@@ -22,10 +22,10 @@ import Divider from "@mui/material/Divider";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add"
 import { createAssetCountReport } from "@/_libs/report.utils";
-import { ReportState } from "@/_constants/constants";
+import { CreateDocumentStep, ReportState } from "@/_constants/constants";
 import { CreateAssetCountLocation } from "@/_apis/report.api";
 import { useRouter } from "next/navigation";
-import { TextField } from "@mui/material";
+import TextField from "@mui/material/TextField";
 import { TReportForm } from "@/_types/types";
 
 type TCreateReportContext = {
@@ -87,16 +87,17 @@ export function ObjectList(props: {
   );
 }
 
-
 function StepComponent(props: {
   step: number,
   reportForm: any,
   parentLocation: TLocation[],
   childrenLocation: TLocation[],
   parentProp: TLocation | null,
-  childProp: TLocation | null
+  childProp: TLocation | null,
+  disableButton: boolean,
+  setDisableButton: Dispatch<SetStateAction<boolean>>
 }) {
-  const { step, parentLocation, childrenLocation, parentProp } = props
+  const { step, parentLocation, childrenLocation, parentProp, disableButton, setDisableButton } = props
   const CreateReportContext = useCreateReportContext()
   const [parent, setParent] = useState(parentProp)
   const [childId, setChildId] = useState<number | null>()
@@ -116,11 +117,15 @@ function StepComponent(props: {
   }
 
   const handleDocumentNameChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (event.target.value) {
-      CreateReportContext.setReport((prev: TReportForm) => ({
-        ...prev,
-        document_name: event.target.value
-      }))
+    event.preventDefault()
+    CreateReportContext.setReport((prev: TReportForm) => ({
+      ...prev,
+      document_name: event.target.value
+    }))
+    if (event.target.value.length == 0) {
+      setDisableButton(true)
+    } else {
+      setDisableButton(false)
     }
   }
 
@@ -139,8 +144,16 @@ function StepComponent(props: {
     setSelected(false)
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected, childId])
+
+  useEffect(() => {
+    if (documentLocation.length == 0 && step == CreateDocumentStep.ADDLOCATION)
+      setDisableButton(true)
+    else if (documentLocation.length && step == CreateDocumentStep.ADDLOCATION)
+      setDisableButton(false)
+  }, [documentLocation, setDisableButton, step])
+
   switch (step) {
-    case 0:
+    case CreateDocumentStep.CHOOSEDATE:
       return (
         <>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -154,10 +167,11 @@ function StepComponent(props: {
           </LocalizationProvider>
         </>
       )
-    case 1:
+    case CreateDocumentStep.REPORTNAME:
       return (
         <>
           <TextField required
+            error={disableButton}
             id="document_name"
             label="ตั้งชื่อรายงานตรวจนับ"
             className="w-full mt-3 p-4"
@@ -166,7 +180,7 @@ function StepComponent(props: {
           />
         </>
       )
-    case 2:
+    case CreateDocumentStep.ADDLOCATION:
       return (
         <>
           <div className="flex flex-col">
@@ -198,13 +212,41 @@ function StepComponent(props: {
           </div>
         </>
       )
-    case 3:
+    case CreateDocumentStep.CONFIRM:
       return (
         <>
-          {"Document"}
+          <div className="flex flex-col">
+            <div className="flex flex-row">
+              ชื่อเอกสาร {CreateReportContext.report.document_name}
+            </div>
+            <div className="flex flex-row">
+              วันที่ {CreateReportContext.report.document_date?.toLocaleDateString('th-TH')}
+            </div>
+            สถานที่
+            <List className="mb-4">
+              {
+                documentLocation.map((item) => (
+                  <div key={item.id}>
+                    <ListItem>
+                      <ListItemText
+                        primary={item.name}
+                      />
+                    </ListItem>
+                    <Divider />
+                  </div>
+                ))}
+            </List>
+          </div>
         </>
       )
   }
+}
+
+function ValidReportForm(reportForm: TReportForm): boolean {
+  if (reportForm.asset_count_location.length != 0 && reportForm.document_name.length != 0) {
+    return true
+  }
+  return false
 }
 
 
@@ -223,12 +265,51 @@ export default function CreatePlanComponent(props: {
     asset_count_location: []
   })
   const [activeStep, setActiveStep] = useState(0);
+  const [disableButton, setDisableButton] = useState(false)
   const { push } = useRouter()
 
   const handleNext = async () => {
+    console.log("active step ", activeStep)
     if (activeStep < steps.length) {
       setActiveStep((prev) => prev + 1)
-      if (activeStep === steps.length - 1) {
+      if (!ValidReportForm(reportForm))
+        setDisableButton(true)
+    }
+  }
+
+  const handleBack = () => {
+    if (activeStep > 0) {
+      setActiveStep((prev) => prev - 1);
+      if (!ValidReportForm(reportForm))
+        setDisableButton(false)
+    }
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+  };
+
+  const handleNewRequest = () => {
+    setActiveStep(0)
+    setReportForm({
+      document_date: null,
+      document_name: "",
+      state: ReportState.NEW,
+      asset_count_location: []
+    })
+  }
+
+  useEffect(() => {
+    setReportForm((prev) => ({
+      ...prev,
+      document_date: dayjs().toDate(),
+    }))
+  }, [])
+
+  useEffect(() => {
+    const CreateReport = async () => {
+      if (activeStep === CreateDocumentStep.CONFIRM) {
+        setDisableButton(false)
         if (reportForm !== null && typeof reportForm !== 'undefined') {
           const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
           for (const location of (reportForm as unknown as TReportForm).asset_count_location) {
@@ -244,22 +325,9 @@ export default function CreatePlanComponent(props: {
         }
       }
     }
-  };
 
-  const handleBack = () => {
-    if (activeStep > 0) setActiveStep((prev) => prev - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
-  useEffect(() => {
-    setReportForm((prev) => ({
-      ...prev,
-      document_date: dayjs().toDate(),
-    }))
-  }, [])
+    CreateReport()
+  }, [activeStep])
   return (
     <div className="flex flex-col w-full py-2 pl-2 lg:pl-10 place-items-center space-y-2">
       <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", mt: 4 }}>
@@ -276,7 +344,7 @@ export default function CreatePlanComponent(props: {
             <>
               <Typography sx={{ mb: 2 }}>🎉 เสร็จสิ้นขั้นตอนทั้งหมด</Typography>
               <Button onClick={handleReset} variant="outlined">แก้ไขรายงาน</Button>
-              <Button variant="outlined">สร้างรายงานใหม่</Button>
+              <Button variant="outlined" onClick={handleNewRequest}>สร้างรายงานใหม่</Button>
               <Button variant="outlined"
                 onClick={() =>
                   push(`/reports/count-assets/${reportForm.document_number}`)}
@@ -300,6 +368,8 @@ export default function CreatePlanComponent(props: {
                       childrenLocation={childrenLocation}
                       parentProp={parentProp!}
                       childProp={childProp!}
+                      disableButton={disableButton}
+                      setDisableButton={setDisableButton}
                     />
                   </Stepper>
                 </CreateReportContext>
@@ -313,7 +383,7 @@ export default function CreatePlanComponent(props: {
                 >
                   ย้อนกลับ
                 </Button>
-                <Button onClick={handleNext} variant="contained">
+                <Button onClick={handleNext} variant="contained" disabled={disableButton}>
                   {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
                 </Button>
               </Box>
