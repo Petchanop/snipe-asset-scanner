@@ -41,6 +41,7 @@ export type TAssetRow = {
 };
 
 export type TReportForm = {
+    id?: string,
     document_number?: number,
     document_name: string,
     document_date: Date | null,

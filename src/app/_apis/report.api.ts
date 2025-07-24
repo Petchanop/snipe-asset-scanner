@@ -140,13 +140,18 @@ export async function GetAllUserPrisma(): Promise<User[]> {
     return await prisma.users.findMany()
 }
 
-export async function CreateAssetCountLocation(locationId: number, assetCountId: string): Promise<AssetCountLocation> {
-    return await prisma.asset_count_location.create({
-        data: {
-            location_id: locationId,
-            asset_count_id: assetCountId,
-        }
-    })
+export async function CreateAssetCountLocation(locationId: number, assetCountId: string): Promise<AssetCountLocation | Error> {
+    try {
+        return await prisma.asset_count_location.create({
+            data: {
+                location_id: locationId,
+                asset_count_id: assetCountId,
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        return error as Error
+    }
 }
 
 export async function GetAssetCountLocationByAssetCountReport(assetCountId: string): Promise<AssetCountLocation[]> {

@@ -4,10 +4,11 @@ import { prisma } from '@/_libs/prisma';
 import dayjs from 'dayjs';
 import { AssetResponse } from '@/_apis/snipe-it/snipe-it.api';
 import { createGateway, TResponse } from '@/_apis/next.api';
+import { unstable_useId } from '@mui/material';
 
 
 export async function changeDateToIsoString(date: Date): Promise<string> {
-    date.setUTCHours(0,0,0,0)
+    date.setUTCHours(0, 0, 0, 0)
     return date.toISOString()
 }
 
@@ -25,6 +26,7 @@ export async function createDocumentNumber(locationId: number, date: string): Pr
 }
 
 export type FCreateAssetCountReport = {
+    id?: string;
     document_name?: string | null;
     document_date?: Date | null;
     state?: string;
@@ -45,13 +47,27 @@ export async function findAssetCount(document_number: number): Promise<AssetCoun
 export async function createAssetCountReport(
     payload: FCreateAssetCountReport)
     : Promise<AssetCount> {
-    return await prisma.asset_count.create({
-        data: {
-            document_name: payload.document_name,
-            document_date: await changeDateToIsoString(payload.document_date!),
-            state: payload.state as string
-        }
-    })
+    if (payload.id) {
+        return await prisma.asset_count.update({
+            where: {
+                id: payload.id,
+            },
+            data: {
+                document_name: payload.document_name,
+                document_date: await changeDateToIsoString(payload.document_date!),
+                state: payload.state as string
+            }
+        })
+    } else {
+        return await prisma.asset_count.create({
+
+            data: {
+                document_name: payload.document_name,
+                document_date: await changeDateToIsoString(payload.document_date!),
+                state: payload.state as string
+            }
+        })
+    }
 }
 
 export async function updateAssetCountReport(
@@ -89,12 +105,12 @@ export async function getAssetCountReport(
     : Promise<AssetCount | null> {
     return await prisma.asset_count.findFirst({
         where: {
-           document_number: documentNumber
+            document_number: documentNumber
         },
         include: {
             AssetCountLocation: true
         }
-    }) 
+    })
 }
 
 type FCreateAssetCountLine = {
@@ -175,15 +191,15 @@ export async function getAssetByLocationId(
             query: { location_id: locationId }
         }
     })
-    if (error){
-        return { data: null, error: error}
+    if (error) {
+        return { data: null, error: error }
     }
-    return { data: data.rows as AssetResponse[] , error: null}
+    return { data: data.rows as AssetResponse[], error: null }
 }
 
-export async function CheckAllDataCount(assetCountId: string) : Promise<boolean>{
+export async function CheckAllDataCount(assetCountId: string): Promise<boolean> {
     const assetInReport = await prisma.asset_count_line.findMany({
-        where : {
+        where: {
             asset_count_id: assetCountId
         }
     })

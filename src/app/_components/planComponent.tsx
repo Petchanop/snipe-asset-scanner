@@ -273,7 +273,25 @@ export default function CreatePlanComponent(props: {
     if (activeStep < steps.length) {
       setActiveStep((prev) => prev + 1)
       if (!ValidReportForm(reportForm))
-        setDisableButton(true)
+        setDisableButton(true) 
+      if (activeStep === CreateDocumentStep.CONFIRM) {
+        setDisableButton(false)
+        if (reportForm !== null && typeof reportForm !== 'undefined') {
+          console.log('create report form ', reportForm.document_name)
+          const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
+          for (const location of (reportForm as unknown as TReportForm).asset_count_location) {
+            await CreateAssetCountLocation(location, assetCountReport.id)
+          }
+          setReportForm((prev) => ({
+            ...prev,
+            id: assetCountReport.id,
+            document_number: assetCountReport.document_number,
+            document_date: assetCountReport.document_date,
+            state: assetCountReport.state as ReportState,
+            asset_count_location: (reportForm as unknown as TReportForm).asset_count_location
+          }))
+        }
+      }
     }
   }
 
@@ -292,6 +310,7 @@ export default function CreatePlanComponent(props: {
   const handleNewRequest = () => {
     setActiveStep(0)
     setReportForm({
+      id: "",
       document_date: null,
       document_name: "",
       state: ReportState.NEW,
@@ -308,22 +327,7 @@ export default function CreatePlanComponent(props: {
 
   useEffect(() => {
     const CreateReport = async () => {
-      if (activeStep === CreateDocumentStep.CONFIRM) {
-        setDisableButton(false)
-        if (reportForm !== null && typeof reportForm !== 'undefined') {
-          const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
-          for (const location of (reportForm as unknown as TReportForm).asset_count_location) {
-            await CreateAssetCountLocation(location, assetCountReport.id)
-          }
-          setReportForm((prev) => ({
-            ...prev,
-            document_number: assetCountReport.document_number,
-            document_date: assetCountReport.document_date,
-            state: assetCountReport.state as ReportState,
-            asset_count_location: (reportForm as unknown as TReportForm).asset_count_location
-          }))
-        }
-      }
+      
     }
 
     CreateReport()
