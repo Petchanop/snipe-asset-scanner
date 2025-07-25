@@ -4,6 +4,7 @@ export interface HeadersLocationTable {
     label: string;
     isSelectBox: boolean;
     fontColor: string[];
+    value: keyof AssetCount & "action" & string; 
 }
 
 export interface HeadersAssetTable {

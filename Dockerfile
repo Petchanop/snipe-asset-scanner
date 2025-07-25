@@ -10,7 +10,7 @@ RUN mkdir -p /snipeit
 WORKDIR /snipeit
 COPY . .
 RUN npm install
-RUN npx prisma migrate deploy
+# RUN npx prisma migrate deploy
 RUN npm run build
 RUN cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
 # ENTRYPOINT ["npm", "start"]

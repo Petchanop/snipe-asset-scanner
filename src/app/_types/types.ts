@@ -18,7 +18,6 @@ export type locationTableData = {
     date: string;
     name: string;
     documentNumber: number;
-    location: string;
     state: string;
     action: string;
 }

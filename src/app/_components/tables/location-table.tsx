@@ -1,5 +1,5 @@
 'use client';
-import { useState, ChangeEvent, useEffect, useMemo, useRef } from "react";
+import { useState, ChangeEvent, useEffect, useMemo, useRef, MouseEvent } from "react";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
@@ -11,7 +11,7 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
+import { dataPerPage, getComparator, handleChangePage, handleChangeRowsPerPage, Order } from "@/_components/tables/utility";
 import { MapActionColor, MapColor, ReportState } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
@@ -19,6 +19,7 @@ import { TLocation } from "@/_types/snipe-it.type";
 import { AssetCount, Location } from "@/_types/types";
 import { useLocationUrlContext } from "@/_components/tableLayout";
 import { useRouter } from "next/navigation";
+import { TableSortLabel } from "@mui/material";
 
 function CreateLocationTableCell(props: {
   data: locationTableData
@@ -28,18 +29,18 @@ function CreateLocationTableCell(props: {
   const { push } = useRouter()
   const reportState = processAction(state);
 
-  function processAction(state: string):{ label:string, value: string} {
+  function processAction(state: string): { label: string, value: string } {
     switch (state) {
       case ReportState.NEW:
         return { label: "แก้ไข", value: "edit" }
       case ReportState.INPROGRESS:
-        return{ label: "ตรวจนับ", value: "count" }
+        return { label: "ตรวจนับ", value: "count" }
       case ReportState.COMPLETED:
         return { label: "เรียกดู", value: "view" }
       case ReportState.CANCEL:
         return { label: "เรียกดู", value: "view" }
     }
-    return { label : "", value : "" }
+    return { label: "", value: "" }
   }
   const context = useLocationUrlContext()
   //change location to document name
@@ -169,7 +170,7 @@ export function ParentSelectComponent(props: {
       select
       label="location"
       value={parentProp.name}
-      className="mt-3 p-4 lg:w-3/5 w-full" 
+      className="mt-3 p-4 lg:w-3/5 w-full"
       disabled={isCheckTable}
       onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const newParent = parentLocation.find((loc) => loc.name == event.target.value);
@@ -187,61 +188,92 @@ export function ParentSelectComponent(props: {
 }
 
 export default function LocationTable(props: {
-  parentLocation: TLocation[],
-  childrenLocation: TLocation[],
-  parentProp: TLocation | null,
-  childProp: TLocation | null
   reports: AssetCount[]
 }) {
-  const { parentLocation, childrenLocation, parentProp, childProp, reports } = props
+  const { reports } = props
+  const [order, setOrder] = useState<Order>('asc')
+  const [orderBy, setOrderBy] = useState<keyof AssetCount>('document_number')
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
+  const handleRequestSort = (
+    event: MouseEvent<unknown>,
+    property: keyof AssetCount
+  ) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
+  const tableData = useMemo(() => reports
+    .sort(getComparator<AssetCount, keyof AssetCount>(order, orderBy)),
+    [order, orderBy, reports]
+  )
+
+  const createSortHandler = (property: keyof AssetCount) => (event: MouseEvent<unknown>) => {
+    handleRequestSort(event, property)
+  }
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - reports.length) : 0
   return (
     <>
       <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
-            {tableHeaders.map((header) => (
-              <TableCell key={header.label}>
-                {header.label}
-              </TableCell>
-            ))}
+            {
+              tableHeaders.map((header) => (
+                <TableCell key={header.label}
+                  className="bg-blue-300 font-medium"
+                >
+                  <TableSortLabel
+                    active={orderBy === header.value}
+                    direction={orderBy === header.value ? order : 'asc'}
+                    onClick={createSortHandler(header.value)}>
+                    {header.label}
+                  </TableSortLabel>
+                </TableCell>
+              ))
+            }
           </TableRow>
         </TableHead>
         <TableBody sx={{ overflow: 'hidden' }}>
           {
-            reports.length ?
-              dataPerPage(reports, page, rowsPerPage).map((mockData: AssetCount) => {
-                let locationName = parentLocation.find((loc) =>
-                  loc.id == mockData.location_id
-                )
-                if (!locationName)
-                  locationName = childrenLocation.find((loc) => loc.id == childProp?.id || loc.id == parentProp?.id)
+            tableData.length ?
+              dataPerPage(tableData, page, rowsPerPage).map((mockData: AssetCount) => {
                 const mapData: locationTableData = {
                   date: mockData.document_date.toLocaleDateString('th-BK'),
-                  name: mockData.document_name as string,
-                  documentNumber: mockData.document_number,
-                  location: (locationName as TLocation)?.name!,
-                  state: mockData.state,
-                  action: ""
+                name: mockData.document_name as string,
+                documentNumber: mockData.document_number,
+                state: mockData.state,
+                action: ""
                 }
                 return (
-                  <TableRow key={mapData.documentNumber} >
-                    <CreateLocationTableCell data={mapData} />
-                  </TableRow>
+                <TableRow key={mapData.documentNumber} >
+                  <CreateLocationTableCell data={mapData} />
+                </TableRow>
                 )
               })
-              : <TableRow sx={{
+              :
+              <TableRow sx={{
                 height: '9rem',
                 maxHeight: '9rem'
               }}>
-                <TableCell colSpan={3} />
-                <TableCell colSpan={2} rowSpan={5}>
+                <TableCell colSpan={2} />
+                <TableCell colSpan={1}>
                   No asset report
                 </TableCell>
                 <TableCell colSpan={2} />
               </TableRow>
+          }
+          {
+            emptyRows > 0 && (
+              <TableRow
+              style={{
+                height: 33 * emptyRows
+              }} >
+                <TableCell colSpan={6} />
+              </TableRow>
+            )
           }
         </TableBody>
         <TableFooter>

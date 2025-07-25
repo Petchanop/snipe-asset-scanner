@@ -48,6 +48,7 @@ export default function ReportComponent(props: {
         setReports(reports)
       }
     }
+    console.log("fetch report",show)
     fetchReports()
   }, [show])
   return (
@@ -68,10 +69,6 @@ export default function ReportComponent(props: {
             show ?
               <div className="flex flex-col w-full">
                 <LocationTable
-                  parentLocation={parentLocation}
-                  childrenLocation={childrenLocation}
-                  parentProp={parentProp!}
-                  childProp={childProp!}
                   reports={reports}
                 />
               </div>

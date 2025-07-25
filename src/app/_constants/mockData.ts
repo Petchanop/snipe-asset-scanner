@@ -81,26 +81,31 @@ export const tableHeaders: HeadersLocationTable[] = [
   {
     label: "Document No.",
     isSelectBox: false,
-    fontColor: ["black"]
+    fontColor: ["black"],
+    value: "document_number" as never
   },
   {
     label: "ชื่อแผน",
     isSelectBox: false,
-    fontColor: ["black"]
+    fontColor: ["black"],
+    value: "document_name" as never
   },
     {
     label: "วันที่ตรวจนับ",
     isSelectBox: false,
-    fontColor: ["black"]
+    fontColor: ["black"],
+    value: "document_date" as never
   },
   {
     label: "Status",
     isSelectBox: true,
-    fontColor: ["blue", "yellow", "green", "red"]
+    fontColor: ["blue", "yellow", "green", "red"],
+    value: "state" as never
   },
   {
     label: "Actions",
     isSelectBox: true,
-    fontColor: ["black"]
+    fontColor: ["black"],
+    value: "action" as never
   }
 ]
