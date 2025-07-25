@@ -42,37 +42,44 @@ export const tableHeaders: HeadersAssetTable[] = [
     {
         label: "Asset code",
         isSelectBox: false,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "assetCode"
     },
     {
         label: "Asset Name",
         isSelectBox: false,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "assetName"
     },
     {
         label: "Assigned to",
         isSelectBox: false,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "assignedTo"
     },
     {
         label: "Count Check",
         isSelectBox: true,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "countCheck"
     },
     {
         label: "Assign Incorrect",
         isSelectBox: true,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "assignIncorrect"
     },
      {
         label: "Not in Location",
         isSelectBox: true,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "notInLocation"
     },
     {
         label: "ชำรุด",
         isSelectBox: true,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "status"
     }
 ]
 
@@ -94,26 +101,31 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
     {
         label: "Asset code",
         isSelectBox: false,
-        fontColor: ["black"]
+        fontColor: ["black"],
+         value: "assetCode"
     },
     {
         label: "Asset Name",
         isSelectBox: false,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "assetName"
     },
     {
         label: "Assigned to",
         isSelectBox: false,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "assignedTo"
     },
     {
         label: "Assign Incorrect",
         isSelectBox: true,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "countCheck"
     },
     {
         label: "ชำรุด",
         isSelectBox: true,
-        fontColor: ["black"]
+        fontColor: ["black"],
+        value: "status"
     }
 ]

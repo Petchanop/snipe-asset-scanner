@@ -32,7 +32,13 @@ export function handleChangeRowsPerPage(
 };
 
 function Comparator<T>(a: T, b: T, orderBy: keyof T) {
-    return b[orderBy] < a[orderBy] ? -1 : b[orderBy] > a[orderBy] ? 1 : 0
+    const result = b[orderBy] < a[orderBy] ? -1 : b[orderBy] > a[orderBy] ? 1 : 0
+    if (orderBy == 'assignedTo') {
+        for (const key in a[orderBy]) {
+            return b[orderBy][key] < a[orderBy][key] ? -1 : b[orderBy][key] > a[orderBy][key] ? 1 : 0
+        }
+    }
+    return result
 }
 
 export type Order = 'asc' | 'desc'

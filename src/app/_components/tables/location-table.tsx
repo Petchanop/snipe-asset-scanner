@@ -1,5 +1,19 @@
 'use client';
-import { useState, ChangeEvent, useEffect, useMemo, useRef, MouseEvent } from "react";
+import {
+  useState,
+  ChangeEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  MouseEvent
+} from "react";
+import {
+  dataPerPage,
+  getComparator,
+  handleChangePage,
+  handleChangeRowsPerPage,
+  Order
+} from "@/_components/tables/utility";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
@@ -11,7 +25,6 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { dataPerPage, getComparator, handleChangePage, handleChangeRowsPerPage, Order } from "@/_components/tables/utility";
 import { MapActionColor, MapColor, ReportState } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
@@ -242,15 +255,15 @@ export default function LocationTable(props: {
               dataPerPage(tableData, page, rowsPerPage).map((mockData: AssetCount) => {
                 const mapData: locationTableData = {
                   date: mockData.document_date.toLocaleDateString('th-BK'),
-                name: mockData.document_name as string,
-                documentNumber: mockData.document_number,
-                state: mockData.state,
-                action: ""
+                  name: mockData.document_name as string,
+                  documentNumber: mockData.document_number,
+                  state: mockData.state,
+                  action: ""
                 }
                 return (
-                <TableRow key={mapData.documentNumber} >
-                  <CreateLocationTableCell data={mapData} />
-                </TableRow>
+                  <TableRow key={mapData.documentNumber} >
+                    <CreateLocationTableCell data={mapData} />
+                  </TableRow>
                 )
               })
               :
@@ -268,9 +281,9 @@ export default function LocationTable(props: {
           {
             emptyRows > 0 && (
               <TableRow
-              style={{
-                height: 33 * emptyRows
-              }} >
+                style={{
+                  height: 33 * emptyRows
+                }} >
                 <TableCell colSpan={6} />
               </TableRow>
             )

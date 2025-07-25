@@ -5,6 +5,21 @@ import {
   tableHeaders,
   tableHeadersAdditional
 } from "@/_constants/constants";
+import {
+  ChangeEvent,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+  MouseEvent
+} from "react";
+import {
+  dataPerPage,
+  getComparator,
+  handleChangePage,
+  handleChangeRowsPerPage,
+  Order
+} from "@/_components/tables/utility";
 import { OUTLOCATION, TAssetRow, TAssetTab } from "@/_types/types";
 import { JSX } from "@emotion/react/jsx-runtime";
 import Checkbox from "@mui/material/Checkbox";
@@ -16,13 +31,8 @@ import TableFooter from "@mui/material/TableFooter";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow"
-import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
-import {
-  dataPerPage,
-  handleChangePage,
-  handleChangeRowsPerPage
-} from "@/_components/tables/utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
+import TableSortLabel from "@mui/material/TableSortLabel";
 
 
 export function CreateAssetTableCell(
@@ -153,24 +163,49 @@ export default function ListAsset(props: {
   page: number, rowsPerPage: number
 }) {
   const { data, isCheckTable, assetTab, page, rowsPerPage } = props
+  const [order, setOrder] = useState<Order>('asc')
+  const [orderBy, setOrderBy] = useState<keyof TAssetRow>('assetCode')
   const headers = assetTab ? tableHeaders : tableHeadersAdditional
+
+  const handleRequestSort = (
+    event: MouseEvent<unknown>,
+    property: keyof TAssetRow
+  ) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
+  const createSortHandler = (property: keyof TAssetRow) => (event: MouseEvent<unknown>) => {
+    handleRequestSort(event, property)
+  }
+
+  const tableData = useMemo(() => data
+    .sort(getComparator<TAssetRow, keyof TAssetRow>(order, orderBy)),
+    [order, orderBy, data]
+  )
   return (
     <>
       <TableHead>
         <TableRow className="place-content-center">
           {headers.map((header) => (
-            <TableCell key={header.label} 
-            className="bg-blue-300 font-medium"
+            <TableCell key={header.label}
+              className="bg-blue-300 font-medium"
             >
-              {header.label}
+              <TableSortLabel
+                active={orderBy === header.value}
+                direction={orderBy === header.value ? order : 'asc'}
+                onClick={createSortHandler(header.value)}>
+                {header.label}
+              </TableSortLabel>
             </TableCell>
           ))}
         </TableRow>
       </TableHead>
       <TableBody sx={{ overflow: 'hidden' }} className="place-content-center">
         {
-          data.length ?
-            dataPerPage(data, page, rowsPerPage).map((mockData: TAssetRow) =>
+          tableData.length ?
+            dataPerPage(tableData, page, rowsPerPage).map((mockData: TAssetRow) =>
               <TableRow key={mockData.assetCode} className="divide-x-1 divide-solid divide-gray-300">
                 <CreateAssetTableCell
                   data={mockData}

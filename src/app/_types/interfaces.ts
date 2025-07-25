@@ -1,4 +1,4 @@
-import { AssetCount, AssetCountLocation } from "@/_types/types";
+import { AssetCount, AssetCountLocation, TAssetRow } from "@/_types/types";
 
 export interface HeadersLocationTable {
     label: string;
@@ -10,7 +10,8 @@ export interface HeadersLocationTable {
 export interface HeadersAssetTable {
     label: string,
     isSelectBox: boolean,
-    fontColor: string[]
+    fontColor: string[],
+    value: keyof TAssetRow
 }
 
 export interface AssignedTo {
