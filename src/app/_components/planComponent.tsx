@@ -169,6 +169,8 @@ function StepComponent(props: {
         </>
       )
     case CreateDocumentStep.REPORTNAME:
+      if (CreateReportContext.report.document_name)
+        setDisableButton(false)
       return (
         <>
           <TextField required
