@@ -3,6 +3,8 @@ import { asset_count, asset_count_line, asset_count_location, assets, locations,
 //eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export function hasOwnProperty<X extends {}, Y extends PropertyKey>
  (obj: X, prop: Y): obj is X & Record<Y, unknown> {
+    if (obj == null)
+        return false
     return obj.hasOwnProperty(prop)
 }
 

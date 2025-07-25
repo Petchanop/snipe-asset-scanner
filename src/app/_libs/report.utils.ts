@@ -202,6 +202,5 @@ export async function CheckAllDataCount(assetCountId: string): Promise<boolean> 
             asset_count_id: assetCountId
         }
     })
-    console.log("check all count ", assetInReport.every((asset) => asset.asset_check == true))
     return assetInReport.every((asset) => asset.asset_check == true)
 }

@@ -48,7 +48,6 @@ export default function ReportComponent(props: {
         setReports(reports)
       }
     }
-    console.log("fetch report",show)
     fetchReports()
   }, [show])
   return (

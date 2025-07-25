@@ -206,7 +206,7 @@ export function NewCountInput(props: {
   const documentContext = useReportContext()
 
   useEffect(() => {
-    setLocation(locations?.find((loc) => loc.id == childId)!);
+    setLocation(locations?.find((loc) => childId ? loc.id == childId : loc.id == parent.id)!);
   }, [childId, locations, setLocation])
   return (
     <div className="flex md:flex-row flex-col w-full py-2 pl-2 lg:pl-10 content-center">
@@ -295,6 +295,7 @@ export default function NewCountTable(props: {
 
   useEffect(() => {
     const fetchReport = async () => {
+      console.log(location.id)
       setData([])
       setLoading(true)
       if (!report) {

@@ -272,7 +272,6 @@ export default function CreatePlanComponent(props: {
   const { push } = useRouter()
 
   const handleNext = async () => {
-    console.log("active step ", activeStep)
     if (activeStep < steps.length) {
       setActiveStep((prev) => prev + 1)
       if (!ValidReportForm(reportForm))
@@ -280,7 +279,6 @@ export default function CreatePlanComponent(props: {
       if (activeStep === CreateDocumentStep.CONFIRM) {
         setDisableButton(false)
         if (reportForm !== null && typeof reportForm !== 'undefined') {
-          console.log('create report form ', reportForm.document_name)
           const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
           for (const location of (reportForm as unknown as TReportForm).asset_count_location) {
             await CreateAssetCountLocation(location, assetCountReport.id)

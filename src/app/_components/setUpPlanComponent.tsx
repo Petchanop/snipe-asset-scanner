@@ -123,7 +123,6 @@ export default function SetupPlanComponent(
                 ...prev,
                 asset_count_location: [...prev.asset_count_location, location.id!]
             }))
-            console.log(reportForm)
         }
         setSelected(false)
         //eslint-disable-next-line react-hooks/exhaustive-deps

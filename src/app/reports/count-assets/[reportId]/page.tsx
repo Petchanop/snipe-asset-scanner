@@ -46,6 +46,9 @@ export default async function AssetsTablePage({ params }: {
             } else {
                 listOfParent.push(data as unknown as Location)
             }
+        } else {
+            locationData.push(data as unknown as Location)
+            listOfParent.push(data as unknown as Location)
         }
     }
     const users = await GetAllUserPrisma()

@@ -20,9 +20,7 @@ export async function CreatAssetCountLine(
         is_assigned_incorrectly: false,
         status: assetStatusOptions.find((status) => status.value.toLowerCase() == data.status_label?.status_meta as string)?.value as string
     }
-    console.log('create payload ', extendTypeAsset)
     const assetCountLine = await AddAssetCountLine(extendTypeAsset, assetCountReport)
-    console.log("create asset count line ", assetCountLine)
     const asset = {
         id: assetCountLine.id,
         assetCode: assetCountLine.asset_code,
