@@ -23,6 +23,7 @@ export default function SetupPlanComponent(
         assetCountLocation: AssetCountLocation[],
         parentLocation: TLocation[],
         childrenLocation: TLocation[],
+        otherLocation: TLocation[],
         parentProp: TLocation | null
     }
 ) {
@@ -31,6 +32,7 @@ export default function SetupPlanComponent(
         assetCountLocation,
         parentLocation,
         childrenLocation,
+        otherLocation,
         parentProp
     } = props
     const { document_date, document_name, state } = assetCountReport
@@ -43,7 +45,8 @@ export default function SetupPlanComponent(
         assetCountReport.AssetCountLocation?.map((countLocation) => {
             return childrenLocation
                 .find((loc) => loc.id === countLocation.location_id) ||
-                parentLocation.find((loc) => loc.id === countLocation.location_id) as TLocation
+                parentLocation.find((loc) => loc.id === countLocation.location_id) ||
+                otherLocation.find((loc) => loc.id === countLocation.location_id) as TLocation
         }))
 
     const [reportForm, setReportForm] = useState<TReportForm>({

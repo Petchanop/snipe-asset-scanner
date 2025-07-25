@@ -92,6 +92,7 @@ function StepComponent(props: {
   reportForm: any,
   parentLocation: TLocation[],
   childrenLocation: TLocation[],
+  otherLocation?: TLocation[],
   parentProp: TLocation | null,
   childProp: TLocation | null,
   disableButton: boolean,
