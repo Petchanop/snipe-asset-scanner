@@ -22,6 +22,7 @@ import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_compo
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { useRouter } from "next/navigation";
 import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/search-asset.utils";
+import { TLocation } from "@/_types/snipe-it.type";
 
 export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
@@ -31,6 +32,7 @@ export type ExtendAssetResponse = AssetResponse & {
   in_report: boolean;
   status: string;
   is_assigned_incorrectly: boolean;
+  prev_location: TLocation;
 }
 
 function CreateSearchAssetTableCell(props: {
@@ -58,7 +60,9 @@ function CreateSearchAssetTableCell(props: {
   }, [wrongLocation, id])
 
   useEffect(() => {
-    UpdateAssetCountLine(id!, { asset_count_line_status_id: assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE})
+    UpdateAssetCountLine(id!, 
+      { asset_count_line_status_id: assetStatus ? 
+        AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE})
   }, [assetStatus, id])
 
   return (

@@ -125,6 +125,7 @@ type FCreateAssetCountLine = {
     asset_name_not_correct: boolean;
     asset_count_line_location_id: string;
     asset_count_line_status_id: number;
+    previous_loc_id?: number;
 }
 
 export async function createAssetCountLine(payload: FCreateAssetCountLine)

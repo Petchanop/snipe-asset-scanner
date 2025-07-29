@@ -15,13 +15,13 @@ import {
 export default function LoadingTable(){
   const [loading, setLoading] = useState(true);
 
-//   useEffect(() => {
-//     // Simulate a 3-second loading time
-//     const timer = setTimeout(() => {
-//       setLoading(false);
-//     }, 3000);
-//     return () => clearTimeout(timer);
-//   }, []);
+  useEffect(() => {
+    // Simulate a 3-second loading time
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Dummy data for demonstration after loading finishes
   const data = Array.from({ length: 5 }, (_, i) => ({

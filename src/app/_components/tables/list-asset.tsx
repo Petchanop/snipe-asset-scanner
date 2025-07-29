@@ -33,6 +33,8 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow"
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import TableSortLabel from "@mui/material/TableSortLabel";
+import Button from "@mui/material/Button"
+import Tooltip from "@mui/material/Tooltip"
 
 
 export function CreateAssetTableCell(
@@ -44,7 +46,7 @@ export function CreateAssetTableCell(
     isCheckTable: boolean
   }) {
   const { data, assetTab, actionLabel, action, isCheckTable } = props
-  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status } = data;
+  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, prev_location } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
@@ -142,15 +144,20 @@ export function CreateAssetTableCell(
                 onChange={() => setAssetStatus(pre => !pre)}
                 disabled={!isCheckTable}
               >
-                {/* {
-                  assetStatusOptions.map((choice) =>
-                      <MenuItem value={choice.value} key={choice.label}>
-                        {choice.label}
-                      </MenuItem>
-                  )
-                } */}
               </Checkbox>
             </TableCell>
+            {
+              tabType == OUTLOCATION ?
+                <TableCell align="center">
+                  <Tooltip title={prev_location}
+                  placement="top-start"
+                  >
+                    <Button variant="text">{prev_location}</Button>
+                  </Tooltip>
+                </TableCell>
+                : <></>
+            }
+
           </>
           : <></>
       }
@@ -165,7 +172,7 @@ export default function ListAsset(props: {
   const { data, isCheckTable, assetTab, page, rowsPerPage } = props
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof TAssetRow>('assetCode')
-  const headers = assetTab ? tableHeaders : tableHeadersAdditional
+  const headers = assetTab == INLOCATION ? tableHeaders : tableHeadersAdditional
 
   const handleRequestSort = (
     event: MouseEvent<unknown>,
@@ -250,7 +257,6 @@ export function AssetTable(props: {
   } = props
   const [tablePage, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-
   return (
     <>
       <Table stickyHeader size="small" sx={{

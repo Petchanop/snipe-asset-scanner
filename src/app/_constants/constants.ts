@@ -32,8 +32,8 @@ export enum ReportState {
 }
 
 export const MapActionColor: Record<string, { [key: number]: string }> = {
-    "เริ่ม" : blue,
-    "ตรวจนับ" : brown,
+    "เริ่ม": blue,
+    "ตรวจนับ": brown,
     "แก้ไข": red,
     "เรียกดู": grey,
 }
@@ -69,7 +69,7 @@ export const tableHeaders: HeadersAssetTable[] = [
         fontColor: ["black"],
         value: "assignIncorrect"
     },
-     {
+    {
         label: "Not in Location",
         isSelectBox: true,
         fontColor: ["black"],
@@ -84,8 +84,8 @@ export const tableHeaders: HeadersAssetTable[] = [
 ]
 
 export type AssetStatus =
-  | 'Malfunctioning'
-  | 'Deployable'
+    | 'Malfunctioning'
+    | 'Deployable'
 
 export enum AssetStatusEnum {
     MALFUNCTIONING = 1,
@@ -93,8 +93,8 @@ export enum AssetStatusEnum {
 }
 
 export const assetStatusOptions: { id: number; value: AssetStatus; label: string }[] = [
-  { id: 1, value: 'Malfunctioning', label: 'ชำรุด' },
-  { id: 2, value: 'Deployable', label: 'ปกติ' },
+    { id: 1, value: 'Malfunctioning', label: 'ชำรุด' },
+    { id: 2, value: 'Deployable', label: 'ปกติ' },
 ];
 
 export const tableHeadersAdditional: HeadersAssetTable[] = [
@@ -102,7 +102,7 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         label: "Asset code",
         isSelectBox: false,
         fontColor: ["black"],
-         value: "assetCode"
+        value: "assetCode"
     },
     {
         label: "Asset Name",
@@ -117,15 +117,33 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         value: "assignedTo"
     },
     {
-        label: "Assign Incorrect",
+        label: "Count Check",
         isSelectBox: true,
         fontColor: ["black"],
         value: "countCheck"
+    },
+    {
+        label: "Assign Incorrect",
+        isSelectBox: true,
+        fontColor: ["black"],
+        value: "assignIncorrect"
+    },
+    {
+        label: "Not in Location",
+        isSelectBox: true,
+        fontColor: ["black"],
+        value: "notInLocation"
     },
     {
         label: "ชำรุด",
         isSelectBox: true,
         fontColor: ["black"],
         value: "status"
+    },
+    {
+        label: "remarks",
+        isSelectBox: true,
+        fontColor: ["black"],
+        value: "prev_location"
     }
 ]

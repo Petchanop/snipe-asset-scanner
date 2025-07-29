@@ -39,6 +39,7 @@ export type TAssetRow = {
     assignIncorrect: boolean;
     notInLocation: boolean;
     status: number;
+    prev_location?: string;
 };
 
 export type TReportForm = {

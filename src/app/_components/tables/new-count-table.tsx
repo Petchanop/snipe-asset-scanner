@@ -20,7 +20,7 @@ import {
   getAssetCountLineByAssetCount,
   updateAssetCountReport,
 } from "@/_libs/report.utils";
-import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api";
+import { AssetResponse, getAssetById } from "@/_apis/snipe-it/snipe-it.api";
 import toast from "react-hot-toast";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
@@ -45,8 +45,9 @@ function CheckAssetButton(props: {
   }
 
   const handleFinishButton = async () => {
-     await updateAssetCountReport(reportContext.DocumentNumber!, {
-            state: ReportState.COMPLETED })
+    await updateAssetCountReport(reportContext.DocumentNumber!, {
+      state: ReportState.COMPLETED
+    })
   }
   return (
     <div className="flex flex-row w-full lg:pl-4 lg:space-x-4 justify-start content-center items-center">
@@ -77,7 +78,7 @@ function CheckAssetButton(props: {
           onClick={() => setIsCheckTable((pre) => !pre)}
         >ยกเลิก</Button>
       </div>
-        <div className="flex flex-col">
+      <div className="flex flex-col">
         <Button className={
           `hover:bg-blue-200 max-md:w-1/3 
         max-md:text-sm max-md:font-medium`
@@ -264,6 +265,7 @@ type TDateValueContext = {
 export const DateValueContext = createContext<TDateValueContext | null>(null)
 
 export default function NewCountTable(props: {
+  allLocation: TLocation[],
   parentLocation: TLocation[],
   childrenLocation: TLocation[],
   locations: PNewCountTableProps[],
@@ -273,7 +275,16 @@ export default function NewCountTable(props: {
   users: User[];
   report: AssetCount | null;
 }) {
-  const { parentLocation, childrenLocation, locations, defaultLocation, locationId, parentProp, users, report } = props
+  const {
+    allLocation,
+    parentLocation,
+    childrenLocation,
+    locations,
+    defaultLocation,
+    locationId,
+    parentProp,
+    users,
+    report } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
@@ -295,7 +306,6 @@ export default function NewCountTable(props: {
 
   useEffect(() => {
     const fetchReport = async () => {
-      console.log(location.id)
       setData([])
       setLoading(true)
       if (!report) {
@@ -319,7 +329,8 @@ export default function NewCountTable(props: {
               asset_check: false,
               in_report: false,
               location_id: assetLocationId?.id as string,
-              status: asset.status_label?.status_meta as string
+              status: asset.status_label?.status_meta as string,
+              prev_location: allLocation.find((loc) => loc.id == asset.location) as TLocation
             }
             return await AddAssetCountLine(extendTypeAsset, report)
           }))
@@ -327,6 +338,11 @@ export default function NewCountTable(props: {
         const mapAssetData = await Promise.all(
           assetCountLineReport.map(async (asset) => {
             const data = users.find((user) => user.id as number == asset.assigned_to)
+            let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
+            if (!asset.previous_loc_id && asset.is_not_asset_loc) {
+              const assetData = await getAssetById(asset.asset_id)
+              prev_loc = assetData.data?.location as unknown as TLocation
+            }
             return {
               id: asset.id,
               assetCode: asset.asset_code,
@@ -339,18 +355,21 @@ export default function NewCountTable(props: {
               countCheck: asset.asset_check ? asset.asset_check : false,
               notInLocation: asset.is_not_asset_loc ? asset.is_not_asset_loc : false,
               assignIncorrect: asset.is_assigned_incorrectly,
-              status: asset.asset_count_line_status_id
+              status: asset.asset_count_line_status_id,
+              prev_location: prev_loc?.name
             } as unknown as TAssetRow
           }))
 
         if (await CheckAllDataCount(report.id) == true) {
           await updateAssetCountReport(report.document_number, {
             ...report,
-            state: ReportState.COMPLETED})
+            state: ReportState.COMPLETED
+          })
         } else {
-           await updateAssetCountReport(report.document_number, {
+          await updateAssetCountReport(report.document_number, {
             ...report,
-            state: ReportState.INPROGRESS})
+            state: ReportState.INPROGRESS
+          })
         }
 
         setData(mapAssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck)))

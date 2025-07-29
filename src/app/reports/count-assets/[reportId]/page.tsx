@@ -65,7 +65,7 @@ export default async function AssetsTablePage({ params }: {
 
     return (
         <NewCountTable
-            // parentLocation={parentLocation.filter((loc) => loc.id == parent.id)}
+            allLocation={locations.data!.rows}
             parentLocation={listOfParent as unknown as TLocation[]}
             childrenLocation={locationData as unknown as TLocation[]}
             locations={locationData as PNewCountTableProps[]}

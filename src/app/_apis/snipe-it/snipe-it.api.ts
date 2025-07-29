@@ -37,6 +37,18 @@ export async function fetchSearchAsset(searchInput: string) : Promise<TResponse<
     return { data: data as AssetResponse, error: null }
 }
 
+export async function getAssetById(assetId: number) : Promise<TResponse<AssetResponse>>{
+    const { data, error } = await client.GET("/hardware/{id}", {
+        params: {
+            path: { id: assetId}
+        }
+    })
+    if (error) {
+        return {data: null,  error: error}
+    }
+    return { data: data as AssetResponse, error: null}
+}
+
 type TArrayResponse<T> = {
     total: number;
     rows:  T[];
