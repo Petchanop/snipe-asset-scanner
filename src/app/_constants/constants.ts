@@ -147,3 +147,5 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         value: "prev_location"
     }
 ]
+
+

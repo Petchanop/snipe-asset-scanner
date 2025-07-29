@@ -178,7 +178,7 @@ export async function getAssetCountLineByAssetCount(
         where: {
             asset_count_id: assetCountId,
             asset_count_line_location_id: location_id
-        }
+        },
     })
     return result
 }

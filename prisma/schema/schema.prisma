@@ -531,27 +531,28 @@ model licenses {
 }
 
 model locations {
-  id         Int       @id @default(autoincrement()) @db.UnsignedInt
-  name       String?
-  city       String?
-  state      String?
-  country    String?
-  created_at DateTime? @db.Timestamp(0)
-  updated_at DateTime? @db.Timestamp(0)
-  created_by Int?
-  address    String?
-  address2   String?
-  zip        String?   @db.VarChar(10)
-  fax        String?   @db.VarChar(20)
-  phone      String?   @db.VarChar(20)
-  deleted_at DateTime? @db.Timestamp(0)
-  parent_id  Int?
-  currency   String?   @db.VarChar(10)
-  ldap_ou    String?
-  manager_id Int?
-  image      String?
-  company_id Int?      @db.UnsignedInt
-  notes      String?   @db.Text
+  id                 Int                    @id @default(autoincrement()) @db.UnsignedInt
+  name               String?
+  city               String?
+  state              String?
+  country            String?
+  created_at         DateTime?              @db.Timestamp(0)
+  updated_at         DateTime?              @db.Timestamp(0)
+  created_by         Int?
+  address            String?
+  address2           String?
+  zip                String?                @db.VarChar(10)
+  fax                String?                @db.VarChar(20)
+  phone              String?                @db.VarChar(20)
+  deleted_at         DateTime?              @db.Timestamp(0)
+  parent_id          Int?
+  currency           String?                @db.VarChar(10)
+  ldap_ou            String?
+  manager_id         Int?
+  image              String?
+  company_id         Int?                   @db.UnsignedInt
+  notes              String?                @db.Text
+  AssetCountLocation asset_count_location[]
 
   @@index([company_id], map: "locations_company_id_index")
   @@index([manager_id, deleted_at], map: "locations_manager_id_deleted_at_index")
@@ -941,22 +942,22 @@ model throttle {
 }
 
 model users {
-  id                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  id                  Int                @id @default(autoincrement()) @db.UnsignedInt
   email               String?
   password            String
-  permissions         String?   @db.Text
-  activated           Boolean   @default(false)
+  permissions         String?            @db.Text
+  activated           Boolean            @default(false)
   created_by          Int?
   activation_code     String?
-  activated_at        DateTime? @db.Timestamp(0)
-  last_login          DateTime? @db.Timestamp(0)
+  activated_at        DateTime?          @db.Timestamp(0)
+  last_login          DateTime?          @db.Timestamp(0)
   persist_code        String?
   reset_password_code String?
   first_name          String?
   last_name           String?
-  created_at          DateTime? @db.Timestamp(0)
-  updated_at          DateTime? @db.Timestamp(0)
-  deleted_at          DateTime? @db.Timestamp(0)
+  created_at          DateTime?          @db.Timestamp(0)
+  updated_at          DateTime?          @db.Timestamp(0)
+  deleted_at          DateTime?          @db.Timestamp(0)
   website             String?
   country             String?
   gravatar            String?
@@ -964,32 +965,32 @@ model users {
   phone               String?
   jobtitle            String?
   manager_id          Int?
-  employee_num        String?   @db.Text
+  employee_num        String?            @db.Text
   avatar              String?
   username            String?
-  notes               String?   @db.Text
-  company_id          Int?      @db.UnsignedInt
-  remember_token      String?   @db.Text
-  ldap_import         Boolean   @default(false)
-  locale              String?   @default("en-US") @db.VarChar(10)
-  show_in_list        Boolean   @default(true)
-  two_factor_secret   String?   @db.VarChar(32)
-  two_factor_enrolled Boolean   @default(false)
-  two_factor_optin    Boolean   @default(false)
+  notes               String?            @db.Text
+  company_id          Int?               @db.UnsignedInt
+  remember_token      String?            @db.Text
+  ldap_import         Boolean            @default(false)
+  locale              String?            @default("en-US") @db.VarChar(10)
+  show_in_list        Boolean            @default(true)
+  two_factor_secret   String?            @db.VarChar(32)
+  two_factor_enrolled Boolean            @default(false)
+  two_factor_optin    Boolean            @default(false)
   department_id       Int?
   address             String?
   city                String?
   state               String?
-  zip                 String?   @db.VarChar(10)
+  zip                 String?            @db.VarChar(10)
   skin                String?
-  remote              Boolean?  @default(false)
-  start_date          DateTime? @db.Date
-  end_date            DateTime? @db.Date
+  remote              Boolean?           @default(false)
+  start_date          DateTime?          @db.Date
+  end_date            DateTime?          @db.Date
   scim_externalid     String?
-  autoassign_licenses Boolean   @default(true)
-  vip                 Boolean?  @default(false)
-  enable_sounds       Boolean   @default(false)
-  enable_confetti     Boolean   @default(false)
+  autoassign_licenses Boolean            @default(true)
+  vip                 Boolean?           @default(false)
+  enable_sounds       Boolean            @default(false)
+  enable_confetti     Boolean            @default(false)
 
   @@index([activation_code], map: "users_activation_code_index")
   @@index([company_id], map: "users_company_id_index")
