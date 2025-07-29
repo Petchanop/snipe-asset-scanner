@@ -1,5 +1,5 @@
-import { GetAssetCountLocationByAssetCountReport } from "@/_apis/report.api"
-import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api"
+import { GetAssetCountLocationByAssetCountReport } from "@/api/report.api"
+import { fetchLocations } from "@/api/snipe-it/snipe-it.api"
 import SetupPlanComponent from "@/_components/setUpPlanComponent"
 import { ReportState } from "@/_constants/constants"
 import { getChildrenLocation, getOtherLocation, getParentLocation } from "@/_libs/location.utils"

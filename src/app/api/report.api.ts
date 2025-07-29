@@ -1,7 +1,7 @@
 "use server"
 import { AssetCount, AssetCountLine, AssetCountLocation, User } from "@/_types/types";
 import { prisma } from "@/_libs/prisma"
-import { TResponse } from "@/_apis/next.api";
+import { TResponse } from "@/api/next.api";
 import dayjs from "dayjs";
 import { ExtendAssetResponse } from "@/_components/tables/search-asset";
 import { AssetStatusEnum, assetStatusOptions } from "@/_constants/constants";

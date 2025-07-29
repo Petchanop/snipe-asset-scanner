@@ -2,7 +2,7 @@ import SearchAsset from "@/_components/tables/search-asset"
 import { prisma } from "@/_libs/prisma"
 import { getAssetCountLineByAssetCount } from "@/_libs/report.utils"
 import Typography from "@mui/material/Typography"
-import { GetAllUserPrisma } from "@/_apis/report.api"
+import { GetAllUserPrisma } from "@/api/report.api"
 import { notFound } from "next/navigation"
 import { AssetCountWithAssetLocation } from "@/_types/interfaces"
 

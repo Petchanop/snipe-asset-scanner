@@ -1,6 +1,6 @@
 'use server'
 
-import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } from "@/_apis/next.api";
+import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } from "@/api/next.api";
 import { TAsset, TLocation, TUser, TUserList } from "@/_types/snipe-it.type";
 
 const client = await createGateway();

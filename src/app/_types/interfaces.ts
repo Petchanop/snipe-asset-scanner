@@ -1,4 +1,4 @@
-import { AssetCount, AssetCountLocation, TAssetRow } from "@/_types/types";
+import { AssetCount, AssetCountLine, AssetCountLocation, TAssetRow } from "@/_types/types";
 
 export interface HeadersLocationTable {
     label: string;
@@ -31,4 +31,8 @@ export interface AssetFormData {
 
 export interface AssetCountWithAssetLocation extends AssetCount {
   AssetCountLocation: AssetCountLocation[]
+}
+
+export interface AssetCountWithLineAndLocation extends AssetCountWithAssetLocation {
+  AssetCountLine:  AssetCountLine[]
 }

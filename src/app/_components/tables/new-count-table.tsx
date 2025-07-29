@@ -10,7 +10,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Button from "@mui/material/Button";
 import { AssetTable } from "@/_components/tables/list-asset";
 import { AssetCount, INLOCATION, OUTLOCATION, TAssetRow, TAssetTab, User } from "@/_types/types";
-import { AddAssetCountLine, GetAssetCountLocationByAssetCountReport } from "@/_apis/report.api";
+import { AddAssetCountLine, GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
 import dayjs, { Dayjs } from "dayjs";
 import { ReportContext, useReportContext } from "@/_components/tableLayout";
 import { usePathname, useRouter, useParams } from "next/navigation";
@@ -20,7 +20,7 @@ import {
   getAssetCountLineByAssetCount,
   updateAssetCountReport,
 } from "@/_libs/report.utils";
-import { AssetResponse, getAssetById } from "@/_apis/snipe-it/snipe-it.api";
+import { AssetResponse, getAssetById } from "@/api/snipe-it/snipe-it.api";
 import toast from "react-hot-toast";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";

@@ -2,8 +2,8 @@
 import { AssetCount, AssetCountLine } from '@/_types/types'
 import { prisma } from '@/_libs/prisma';
 import dayjs from 'dayjs';
-import { AssetResponse } from '@/_apis/snipe-it/snipe-it.api';
-import { createGateway, TResponse } from '@/_apis/next.api';
+import { AssetResponse } from '@/api/snipe-it/snipe-it.api';
+import { createGateway, TResponse } from '@/api/next.api';
 
 
 export async function changeDateToIsoString(date: Date): Promise<string> {
@@ -100,14 +100,15 @@ export async function getAssetCountReportList(
 }
 
 export async function getAssetCountReport(
-    documentNumber: number)
+    documentNumber: number, location?: boolean, assetCountLine?: boolean)
     : Promise<AssetCount | null> {
     return await prisma.asset_count.findFirst({
         where: {
             document_number: documentNumber
         },
         include: {
-            AssetCountLocation: true
+            AssetCountLocation: location ? location : true,
+            AssetCountLine: assetCountLine ? assetCountLine : false
         }
     })
 }

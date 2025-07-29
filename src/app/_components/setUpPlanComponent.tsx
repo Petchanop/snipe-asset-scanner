@@ -15,7 +15,7 @@ import AddIcon from "@mui/icons-material/Add"
 import IconButton from "@mui/material/IconButton";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ObjectList } from "@/_components/planComponent";
-import { CreateAssetCountLocation, DeleteAssetCountLocationByAssetCountId } from "@/_apis/report.api";
+import { CreateAssetCountLocation, DeleteAssetCountLocationByAssetCountId } from "@/api/report.api";
 
 export default function SetupPlanComponent(
     props: {

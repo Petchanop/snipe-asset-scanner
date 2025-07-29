@@ -1,5 +1,5 @@
 import { TLocation } from "@/_types/snipe-it.type";
-import { createGateway } from "@/_apis/next.api";
+import { createGateway } from "@/api/next.api";
 
 export function getParentLocation(data: TLocation[]) : TLocation[] {
     return data.filter((loc) =>

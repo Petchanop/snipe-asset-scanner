@@ -1,9 +1,9 @@
 import NewCountTable, { PNewCountTableProps } from "@/_components/tables/new-count-table";
-import { fetchLocations } from "@/_apis/snipe-it/snipe-it.api";
+import { fetchLocations } from "@/api/snipe-it/snipe-it.api";
 import { getParentLocation } from "@/_libs/location.utils";
 import { TLocation } from "@/_types/snipe-it.type";
-import { getLocationByIdSnipeIt } from "@/_apis/location.api";
-import { GetAllUserPrisma, GetAssetCountLocationByAssetCountReport } from "@/_apis/report.api";
+import { getLocationByIdSnipeIt } from "@/api/location.api";
+import { GetAllUserPrisma, GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
 import { findAssetCount, getAssetCountReport, updateAssetCountReport } from "@/_libs/report.utils";
 import { ReportState } from "@/_constants/constants";
 import { notFound } from "next/navigation";

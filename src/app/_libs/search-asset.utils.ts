@@ -1,9 +1,10 @@
-import { AddAssetCountLine } from "@/_apis/report.api"
-import { AssetResponse } from "@/_apis/snipe-it/snipe-it.api"
+import { AddAssetCountLine } from "@/api/report.api"
+import { AssetResponse } from "@/api/snipe-it/snipe-it.api"
 import { ExtendAssetResponse } from "@/_components/tables/search-asset"
 import { assetStatusOptions } from "@/_constants/constants"
 import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User, assetUser } from "@/_types/types"
 import { UpdateAssetCountLine } from "./report.utils"
+import { TLocation } from "@/_types/snipe-it.type"
 
 export async function CreatAssetCountLine(
     data: AssetResponse,
@@ -18,7 +19,8 @@ export async function CreatAssetCountLine(
         in_report: assetInReport.find((report) => report.asset_code === data.asset_tag) ? true : false,
         location_id: locationId.id,
         is_assigned_incorrectly: false,
-        status: assetStatusOptions.find((status) => status.value.toLowerCase() == data.status_label?.status_meta as string)?.value as string
+        status: assetStatusOptions.find((status) => status.value.toLowerCase() == data.status_label?.status_meta as string)?.value as string,
+        prev_location: data.location as unknown as TLocation
     }
     const assetCountLine = await AddAssetCountLine(extendTypeAsset, assetCountReport)
     const asset = {
@@ -33,7 +35,8 @@ export async function CreatAssetCountLine(
         countCheck: assetCountLine.asset_check ? assetCountLine.asset_check : false,
         assignIncorrect: assetCountLine.is_assigned_incorrectly,
         notInLocation: assetCountLine.is_not_asset_loc ? assetCountLine.is_not_asset_loc : false,
-        status: assetCountLine.asset_count_line_status_id
+        status: assetCountLine.asset_count_line_status_id,
+        prev_location: data.location
     } as unknown as TAssetRow
     return asset
 }
@@ -59,7 +62,8 @@ export async function UpdateAssetCountLineForSearchAssetPage(
             countCheck: result?.asset_check as boolean,
             assignIncorrect: result?.is_assigned_incorrectly as boolean,
             notInLocation: result?.is_not_asset_loc as boolean,
-            status: result?.asset_count_line_status_id as number
+            status: result?.asset_count_line_status_id as number,
+            prev_location: data.location?.name as string
         }
     }
     return asset

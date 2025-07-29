@@ -23,7 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add"
 import { createAssetCountReport } from "@/_libs/report.utils";
 import { CreateDocumentStep, ReportState } from "@/_constants/constants";
-import { CreateAssetCountLocation } from "@/_apis/report.api";
+import { CreateAssetCountLocation } from "@/api/report.api";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
 import { TReportForm } from "@/_types/types";
