@@ -10,7 +10,7 @@ import { GetAllUserPrisma } from "@/api/report.api";
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { reportId: string } }
+    { params }: { params: Promise<{ reportId: string }> }
 ) {
     try {
         const { reportId } = await params
@@ -58,15 +58,16 @@ async function CreateAssetCountReportFile(
     let i = 0
     const users = await GetAllUserPrisma()
     const locations = await fetchLocations();
+    
     for (let j = 0; j < assetCountReport.AssetCountLocation.length; j++) {
-        let location = assetCountReport.AssetCountLocation[j]
-        let assetCountLine = await getAssetCountLineByAssetCount(assetCountReport.id, location!.id)
-        let getLocation = locations.data?.rows.find((loc) => loc.id == location?.location_id)
+        const location = assetCountReport.AssetCountLocation[j]
+        const assetCountLine = await getAssetCountLineByAssetCount(assetCountReport.id, location!.id)
+        const getLocation = locations.data?.rows.find((loc) => loc.id == location?.location_id)
         assetQuantity += assetCountLine.length
         for (const countLine of assetCountLine) {
-            let getUser = users.find((user) => user.id == countLine.assigned_to)
-            let countCheck = countLine.asset_check ? "Yes" : "No"
-            let assingedInCorrect = countLine.is_assigned_incorrectly ? "Yes" : "No"
+            const getUser = users.find((user) => user.id == countLine.assigned_to)
+            const countCheck = countLine.asset_check ? "Yes" : "No"
+            const assingedInCorrect = countLine.is_assigned_incorrectly ? "Yes" : "No"
             XLSX.utils.sheet_add_aoa(dataSheet, [[i + 1]], { origin: `A${assetCodeCol}` })
             XLSX.utils.sheet_add_aoa(dataSheet, [[countLine.asset_code]], { origin: `B${assetCodeCol}` })
             XLSX.utils.sheet_add_aoa(dataSheet, [[countLine.asset_name]], { origin: `C${assetCodeCol}` })
@@ -80,6 +81,6 @@ async function CreateAssetCountReportFile(
         }
     }
     XLSX.utils.sheet_add_aoa(dataSheet, [[assetQuantity]], { origin: "B9" })
-    // console.log(dataSheet)
+    dataSheet['!cols'] = [ { wch: 15}, { wch: 25}, { wch: 50}, { wch: 25}, { wch: 12}, { wch: 12}, { wch: 12}, { wch: 25}] 
     return dataSheet
 }

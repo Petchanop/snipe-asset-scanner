@@ -208,7 +208,7 @@ export function NewCountInput(props: {
 
   useEffect(() => {
     setLocation(locations?.find((loc) => childId ? loc.id == childId : loc.id == parent.id)!);
-  }, [childId, locations, setLocation])
+  }, [childId, locations, setLocation, parent.id])
   return (
     <div className="flex md:flex-row flex-col w-full py-2 pl-2 lg:pl-10 content-center">
       <div className="flex flex-col md:basis-lg space-y-2">
