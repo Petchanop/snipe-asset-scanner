@@ -24,11 +24,12 @@ export async function GET(
             return
         await CreateAssetCountReportFile(assetCountReport, sheet)
         const newbuffer = await newWorkBook.xlsx.writeBuffer()
+        const filename = encodeURIComponent(`${assetCountReport?.document_name}.xlsx`)
         return new Response(newbuffer, {
             status: 200,
             headers: {
-                'Content-Disposition': `attachment; filename="${assetCountReport?.document_name}.xlsx"`,
-                'Content-Type': 'application/vnd.ms-excel'
+                'Content-Disposition': "attachment; filename=" + filename,
+                'Content-Type': 'application/vnd.ms-excel; charset=utf-8'
             }
         })
     } catch (e) {
