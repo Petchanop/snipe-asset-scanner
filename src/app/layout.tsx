@@ -9,6 +9,7 @@ import Providers from "@/provider";
 import { getSession } from "auth";
 import Image from "next/image";
 import CititexLogo from "@/public/cititexlogo.png"
+import TopBar from "@/_components/topBar";
 
 export const metadata: Metadata = {
   title: "Snipe-it asset tracker",
@@ -38,24 +39,8 @@ export default async function RootLayout({
                   }
                 }}
               >
-                <CardHeader
-                  className='h-1/8 bg-blue-400 text-white'
-                  avatar={
-                    <Image
-                      width={150}
-                      height={50}
-                      src={CititexLogo.src}
-                      alt="cititex logo"
-                    />
-                  }
-                  slotProps={{
-                    title: {
-                       className: 'max-md:text-xl lg:text-2xl pl-'
-                    } 
-                  }}
-                  title="Asset Count"
-                />
                 <Providers session={session}>
+                  {session ? <TopBar session={session} /> : <TopBar />}
                   {children}
                 </Providers>
               </Card>
