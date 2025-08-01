@@ -28,7 +28,12 @@ export default function TopBar(props: { session?: any }) {
         title="Asset Count"
       />
       {
-        session ? <Button className="absolute end-5" onClick={() => signOut()}>Sign out</Button>: <></>
+        session ? 
+          <Button 
+            className="absolute end-5" 
+            onClick={() => signOut()}
+          >Sign out
+          </Button>: <></>
       }
     </>
   )
