@@ -62,7 +62,7 @@ export default function TableLayout({
   }, [locationId])
 
   return <>
-    <Card className='w-screen h-screen absolute'
+    {/* <Card className='w-screen h-screen absolute'
       sx={{
         borderRadius: {
           lg: 4
@@ -72,7 +72,7 @@ export default function TableLayout({
       <CardHeader
         className='h-1/8 bg-blue-400 text-white'
         title="Asset Count"
-      />
+      /> */}
       <CardContent className="space-y-4">
         <Tabs
           value={pathname}
@@ -106,7 +106,7 @@ export default function TableLayout({
           </TableContainer>
         </Paper>
       </CardContent>
-    </Card >
+    {/* </Card > */}
   </>
 }
 
