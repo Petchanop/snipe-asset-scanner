@@ -1,6 +1,4 @@
-
-'use client';
-
+'use client'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button'
@@ -9,16 +7,10 @@ import Container from '@mui/material/Container'
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 
-export default function RegisterComponent() {
+export default function RegisterComponent( props: { handleRegister: (data: any) => void }) {
+    const { handleRegister } = props
     const { register, handleSubmit, formState: { errors } } = useForm()
     const { push } = useRouter()
-
-    const handleRegister = async (data: any) => {
-        console.log('Form submitted:', data);
-        // const user = 
-        // You can send this to an API route or backend here
-        push(`/auth/login`)
-    };
 
     return (
         <Container className="lg:w-1/3 h-screen mt-15 justify-center">
@@ -28,17 +20,18 @@ export default function RegisterComponent() {
                 </Typography>
                 <form onSubmit={handleSubmit(handleRegister)}>
                     <TextField
-                        {...register("Firstname")}
+                        {...register("FirstName")}
                         label="First Name"
-                        name="firstName"
+                        name="FirstName"
                         fullWidth
                         className="mb-4"
                         required
                     />
+                    {errors.FirstName?.message as string}
                     <TextField
-                        {...register("Lastname")}
+                        {...register("LastName")}
                         label="Last Name"
-                        name="lastName"
+                        name="LastName"
                         fullWidth
                         className="mb-4"
                         required

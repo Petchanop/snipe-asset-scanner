@@ -152,7 +152,6 @@ export async function CreateAssetCountLocation(locationId: number, assetCountId:
             }
         })
     } catch (error) {
-        console.log(error)
         return error as Error
     }
 }
@@ -202,7 +201,6 @@ export async function DeleteAssetCountLocationByAssetCountId(assetCountLocationI
             }
         })
     } catch (error) {
-        console.log(error)
         return error
     }
 }

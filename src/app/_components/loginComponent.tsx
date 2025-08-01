@@ -38,6 +38,7 @@ export default function LoginComponent() {
                         className="mb-4"
                         required
                     />
+                    {errors.Username?.message as string}
                     <TextField
                         {...register("Password")}
                         label="Password"

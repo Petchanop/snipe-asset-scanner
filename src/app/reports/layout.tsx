@@ -10,7 +10,6 @@ export default function ReportLayout({
     children: ReactNode;
 }>) {
     const { data: session } = useSession()
-    console.log("report layout", session)
     if (!session)
         redirect('/auth/login')
     return (

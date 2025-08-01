@@ -1,8 +1,6 @@
 'use client'
 import { checkSamePathName, checkTabPathname } from "@/_libs/location.utils";
-import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import Paper from "@mui/material/Paper";
 import Tab from "@mui/material/Tab";
 import TableContainer from "@mui/material/TableContainer";
