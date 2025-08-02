@@ -6,7 +6,6 @@ export default async function RegisterPage(){
 
      const handleRegister = async (data: any) => {
         'use server'
-        console.log('Form submitted:', data);
         const payload = {
             method: "POST",
             body: JSON.stringify(data),

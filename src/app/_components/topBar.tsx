@@ -22,15 +22,16 @@ export default function TopBar(props: { session?: any }) {
         }
         slotProps={{
           title: {
-            className: 'max-md:text-xl lg:text-2xl pl-'
+            className: 'max-md:text-xl text-lg lg:text-2xl max-md:hidden max-lg:mx-6'
           }
         }}
         title="Asset Count"
-      />
-      {
+      >
+      </CardHeader>
+       {
         session ? 
           <Button 
-            className="absolute end-5" 
+            className="absolute end-5 max-lg:top-5.5 lg:top-10 text-white text-lg" 
             onClick={() => signOut()}
           >Sign out
           </Button>: <></>

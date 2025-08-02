@@ -2,13 +2,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
 import { getServerSession } from "next-auth";
 import { GetAssetCountUser } from "@/api/auth.api";
-import { redirect } from "next/navigation";
 import * as bcrypt from 'bcrypt'
+import { User } from "next-auth";
 
 export const authOptions = {
   providers: [
     CredentialsProvider({
-      name: "LDAP",
+      name: "Asset Count",
       credentials: {
         username: {
           label: "UserName",
@@ -17,23 +17,31 @@ export const authOptions = {
         password: { label: "Password", type: "password" }
       },
 
+
       async authorize(credentials, req) {
         const user = await GetAssetCountUser(credentials)
+        if (!user)
+          throw new Error('Invalid username or password') 
         const comparePassword = await bcrypt.compare(credentials?.password as string, user?.password as string)
         if (user && comparePassword) {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             resolve({
-            id: user?.id.toString() as string,
-            name: user?.username as string
-          })})
+              id: user?.id.toString() as string,
+              name: user?.username as string,
+              // @ts-ignore
+              firstName: user?.user.first_name as string,
+              lastName: user?.user.last_name
+            })
+          })
         } else {
-          return redirect('unauthorized')
-        }}
+          throw new Error('Invalid username or password') 
+        }
       }
-  )],
-  session : {
+    }
+    )],
+  session: {
     jwt: true,
-    maxAge:5*60
+    maxAge: 5 * 60
   },
   callbacks: {
     async jwt({ token, user }: { token: JWT, user: any }) {
@@ -41,11 +49,13 @@ export const authOptions = {
       if (isSignIn) {
         token.id = user!.id
         token.name = user!.name
+        token.firstName = user!.firstName
+        token.lastName = user!.lastName
       }
       return token
     },
     async session({ session, token }: { session: any, token: any }) {
-      return {...session, user: { id: token.id, name : token.name } }
+      return { ...session, user: { ...token } }
     },
   }
 }

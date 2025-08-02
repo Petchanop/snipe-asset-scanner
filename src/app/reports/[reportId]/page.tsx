@@ -4,12 +4,14 @@ import { AssetCountWithLineAndLocation } from '@/_types/interfaces'
 import { AssetCountLine, User } from '@/_types/types'
 import { GetAllUserPrisma } from '@/api/report.api'
 import { fetchLocations } from '@/api/snipe-it/snipe-it.api'
+import { getSession } from 'auth'
 import { notFound } from 'next/navigation'
 
 export default async function ReportPage({ params }: { params: Promise<{ reportId: string }> }) {
     const { reportId } = await params
     if (!reportId)
         return notFound()
+    const session = await getSession()
     const assetCountReport = await getAssetCountReport(parseInt(reportId), true) as AssetCountWithLineAndLocation
     const allAssetCountLine: AssetCountLine[] = []
     const locations = await fetchLocations();
@@ -29,8 +31,8 @@ export default async function ReportPage({ params }: { params: Promise<{ reportI
     let user = users.find((user) => user.id == assetCountReport.created_by) as User
     if (!user) {
         user = {
-            first_name: '',
-            last_name: ''
+            first_name: session.user.firstName,
+            last_name: session.user.LastName
         } as User
     }
     return (

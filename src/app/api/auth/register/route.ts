@@ -10,6 +10,12 @@ export const POST = async (request: NextRequest) => {
     }
     try {
         const user = await CreateAssetCountUser(newUser)
+        if (!user) {
+            return new Response(JSON.stringify({ message: `Cannot register ${FirstName} ${LastName}.` }), {
+                status: 403,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
         return new Response(JSON.stringify({ message: `User ${user?.username} has been created and verification email sent.` }), {
             status: 201,
             headers: { 'Content-Type': 'application/json' },
