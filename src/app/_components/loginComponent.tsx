@@ -7,7 +7,6 @@ import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
 import { signIn, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation";
-import Alert from "@mui/material/Alert";
 
 export default function LoginComponent() {
   const { data: session } = useSession()

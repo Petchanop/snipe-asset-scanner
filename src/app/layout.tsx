@@ -4,11 +4,8 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ReactNode, Suspense } from "react";
 import { LoadingSkeleton } from "@/_components/loading";
 import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
 import Providers from "@/provider";
 import { getSession } from "auth";
-import Image from "next/image";
-import CititexLogo from "@/public/cititexlogo.png"
 import TopBar from "@/_components/topBar";
 
 export const metadata: Metadata = {

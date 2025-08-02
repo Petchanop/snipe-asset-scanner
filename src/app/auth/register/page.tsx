@@ -1,6 +1,5 @@
 import RegisterComponent from "@/_components/registerComponent";
 import { redirect } from 'next/navigation'
-import toast from 'react-hot-toast';
 
 export default async function RegisterPage(){
 
