@@ -40,7 +40,7 @@ export default function TableLayout({
   const params = useSearchParams()
   const location = params.get('location')
   const reportId = useParams()
-  const reportNumber = reportId.reportId ? reportId.reportId : undefined
+  const reportNumber = reportId.reportId ? reportId.reportId : "" 
   const [locationId, setLocationId] = useState(parseInt(location?.toString()!))
   const selected = useRef(pathname)
   const router = useRouter();
@@ -60,17 +60,6 @@ export default function TableLayout({
   }, [locationId])
 
   return <>
-    {/* <Card className='w-screen h-screen absolute'
-      sx={{
-        borderRadius: {
-          lg: 4
-        }
-      }}
-    >
-      <CardHeader
-        className='h-1/8 bg-blue-400 text-white'
-        title="Asset Count"
-      /> */}
       <CardContent className="space-y-4">
         <Tabs
           value={pathname}

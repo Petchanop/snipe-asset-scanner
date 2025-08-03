@@ -34,6 +34,7 @@ export type ExtendAssetResponse = AssetResponse & {
   status: string;
   is_assigned_incorrectly: boolean;
   prev_location: TLocation;
+  image?: string;
 }
 
 function CreateSearchAssetTableCell(props: {

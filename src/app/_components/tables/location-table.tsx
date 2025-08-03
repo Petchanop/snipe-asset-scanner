@@ -84,6 +84,8 @@ function CreateLocationTableCell(props: {
           } else if (reportState.value == "edit") {
             context.selected.current = ""
             push(`/setup/${documentNumber}`)
+          } else if (reportState.value == "view") {
+            push(`/reports/${documentNumber}`)
           }
         }}>
           <Typography sx={{ color: MapActionColor[reportState.label]![500] }}>

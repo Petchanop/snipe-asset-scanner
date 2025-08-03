@@ -5,14 +5,18 @@ import { AssetCountLine, User } from '@/_types/types'
 import { GetAllUserPrisma } from '@/api/report.api'
 import { fetchLocations } from '@/api/snipe-it/snipe-it.api'
 import { getSession } from 'auth'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 export default async function ReportPage({ params }: { params: Promise<{ reportId: string }> }) {
     const { reportId } = await params
+    const session = await getSession()
+    console.log(session)
+    if (!session)
+        return redirect('/auth/unauthorized')
     if (!reportId)
         return notFound()
-    const session = await getSession()
-    const assetCountReport = await getAssetCountReport(parseInt(reportId), true) as AssetCountWithLineAndLocation
+    const reportIdNumber = Number(reportId)
+    const assetCountReport = await getAssetCountReport(reportIdNumber, true) as AssetCountWithLineAndLocation
     const allAssetCountLine: AssetCountLine[] = []
     const locations = await fetchLocations();
     const locationsProp = []

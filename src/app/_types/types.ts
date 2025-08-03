@@ -40,6 +40,7 @@ export type TAssetRow = {
     notInLocation: boolean;
     status: number;
     prev_location?: string;
+    image?: string;
 };
 
 export type TReportForm = {

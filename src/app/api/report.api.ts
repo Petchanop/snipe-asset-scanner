@@ -94,7 +94,8 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             asset_name_not_correct: false,
             asset_count_line_location_id: data.location_id,
             asset_count_line_status_id: AssetStatusEnum.DEPLOYABLE,
-            previous_loc_id: data.prev_location?.id
+            previous_loc_id: data.prev_location?.id,
+            image: data.image
         })
     }
     return await prisma.asset_count_line.upsert({
@@ -111,7 +112,8 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             is_not_asset_loc: data.is_not_asset_loc,
             asset_check: data.asset_check,
             asset_count_line_status_id: await findStatusId(data),
-            previous_loc_id: data.prev_location?.id
+            previous_loc_id: data.prev_location?.id,
+            image: data.image
         },
         create: {
             asset_check: false,
@@ -125,7 +127,8 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             checked_on: dayjs().toDate(),
             asset_count_line_location_id: data.location_id,
             asset_count_line_status_id: await findStatusId(data),
-            previous_loc_id: data.prev_location?.id
+            previous_loc_id: data.prev_location?.id,
+            image: data.image
         }
     })
 }

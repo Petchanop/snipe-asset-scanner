@@ -330,7 +330,8 @@ export default function NewCountTable(props: {
               in_report: false,
               location_id: assetLocationId?.id as string,
               status: asset.status_label?.status_meta as string,
-              prev_location: allLocation.find((loc) => loc.id == asset.location) as TLocation
+              prev_location: allLocation.find((loc) => loc.id == asset.location) as TLocation,
+              image: asset.image as string
             }
             return await AddAssetCountLine(extendTypeAsset, report)
           }))
@@ -356,7 +357,8 @@ export default function NewCountTable(props: {
               notInLocation: asset.is_not_asset_loc ? asset.is_not_asset_loc : false,
               assignIncorrect: asset.is_assigned_incorrectly,
               status: asset.asset_count_line_status_id,
-              prev_location: prev_loc?.name
+              prev_location: prev_loc?.name,
+              image: asset.image
             } as unknown as TAssetRow
           }))
 
