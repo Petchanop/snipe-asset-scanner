@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ReactNode, Suspense } from "react";
 import { LoadingSkeleton } from "@/_components/loading";
-import TableLayout from "@/_components/tableLayout";
+import Card from "@mui/material/Card";
+import Providers from "@/provider";
+import { getSession } from "auth";
+import TopBar from "@/_components/topBar";
 
 export const metadata: Metadata = {
   title: "Snipe-it asset tracker",
@@ -15,7 +18,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-
+  const session = await getSession()
   return (
     <html lang="en">
       <head>
@@ -26,13 +29,22 @@ export default async function RootLayout({
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <main className="w-full h-svh flex justify-center overflow-auto">
             <Suspense fallback={<LoadingSkeleton />}>
-              <TableLayout>
-                {children}
-              </TableLayout>
+              <Card className='w-screen h-screen absolute'
+                sx={{
+                  borderRadius: {
+                    lg: 4
+                  }
+                }}
+              >
+                <Providers session={session}>
+                  <TopBar />
+                  {children}
+                </Providers>
+              </Card>
             </Suspense>
           </main>
         </AppRouterCacheProvider>
       </body>
-    </html>
+    </html >
   );
 }

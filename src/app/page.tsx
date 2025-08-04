@@ -1,6 +1,10 @@
 'use server'
+import { getSession } from "auth";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-  redirect(`/reports`);
+  const session = await getSession()
+  if (session)
+    redirect('/reports')
+  redirect(`/auth/login`);
 }

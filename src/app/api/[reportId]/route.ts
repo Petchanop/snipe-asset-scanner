@@ -6,11 +6,17 @@ import { AssetCountWithLineAndLocation } from "@/_types/interfaces";
 import path from "path";
 import { fetchLocations } from "@/api/snipe-it/snipe-it.api";
 import { GetAllUserPrisma } from "@/api/report.api";
+import { getSession } from "auth";
+import { redirect } from "next/navigation";
+import { AssetStatusEnum } from "@/_constants/constants";
 
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ reportId: string }> }
 ) {
+    const session = await getSession()
+    if (!session)
+        return redirect('/unauthorized') 
     try {
         const { reportId } = await params
         if (!reportId) throw new Error('Report id required')
@@ -19,7 +25,6 @@ export async function GET(
         const newWorkBook = new Excel.Workbook();
         await newWorkBook.xlsx.readFile(filePath)
         const sheet = newWorkBook.getWorksheet(1)
-        // console.log(sheet)
         if (!sheet)
             return
         await CreateAssetCountReportFile(assetCountReport, sheet)
@@ -72,13 +77,14 @@ async function CreateAssetCountReportFile(
             const getUser = users.find((user) => user.id == countLine.assigned_to)
             const countCheck = countLine.asset_check ? "Yes" : "No"
             const assingedInCorrect = countLine.is_assigned_incorrectly ? "Yes" : "No"
+            const useAble = countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "Yes" : "No"
             dataSheet.getCell(`A${assetCodeCol}`).value = i + 1
             dataSheet.getCell(`B${assetCodeCol}`).value = countLine.asset_code
             dataSheet.getCell(`C${assetCodeCol}`).value = countLine.asset_name
             dataSheet.getCell(`D${assetCodeCol}`).value = `${getUser?.first_name}  ${getUser?.last_name}`
             dataSheet.getCell(`E${assetCodeCol}`).value = countCheck
             dataSheet.getCell(`F${assetCodeCol}`).value = assingedInCorrect
-            dataSheet.getCell(`G${assetCodeCol}`).value = countLine.asset_count_line_status_id
+            dataSheet.getCell(`G${assetCodeCol}`).value = useAble
             dataSheet.getCell(`H${assetCodeCol}`).value = getLocation!.name
             createBorder(dataSheet, assetCodeCol)
             assetCodeCol += 1
@@ -87,7 +93,6 @@ async function CreateAssetCountReportFile(
     }
     dataSheet.getCell(`B8`).value = locationData
     dataSheet.getCell(`B9`).value = assetQuantity
-    // dataSheet['!cols'] = [ { wch: 15}, { wch: 25}, { wch: 50}, { wch: 25}, { wch: 12}, { wch: 12}, { wch: 12}, { wch: 25}] 
     return dataSheet
 }
 

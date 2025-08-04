@@ -35,6 +35,10 @@ import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Button from "@mui/material/Button"
 import Tooltip from "@mui/material/Tooltip"
+import Dialog from "@mui/material/Dialog"
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import Image from "next/image"
 
 
 export function CreateAssetTableCell(
@@ -46,10 +50,11 @@ export function CreateAssetTableCell(
     isCheckTable: boolean
   }) {
   const { data, assetTab, actionLabel, action, isCheckTable } = props
-  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, prev_location } = data;
+  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, prev_location, image } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
+  const [open, setOpen] = useState(false)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
   useEffect(() => {
@@ -105,7 +110,34 @@ export function CreateAssetTableCell(
               {assetCode}
             </TableCell>
             <TableCell>
-              {assetName}
+              {/* <Link href={image ? image as string : ""}
+                target="_blank" rel="noopener noreferrer"
+                className="hover:underline hover:text-blue-400"
+              >{assetName}</Link> */}
+              <Button variant="text" onClick={() => setOpen((prev) => !prev)}>
+                {assetName}
+              </Button>
+              <Dialog
+                open={open}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                onClick={() => setOpen((prev) => !prev)}
+              >
+                <DialogTitle id="alert-dialog-title">
+                  {assetName}
+                </DialogTitle>
+                <DialogContent>
+                  {
+                    image ?
+                      <Image
+                        src={image as string}
+                        alt={assetName}
+                        width={400}
+                        height={400}
+                      /> : "No image display"
+                  }
+                </DialogContent>
+              </Dialog>
             </TableCell>
             <TableCell>
               {assignedTo.first_name} {assignedTo.last_name}
@@ -150,7 +182,7 @@ export function CreateAssetTableCell(
               tabType == OUTLOCATION ?
                 <TableCell align="center">
                   <Tooltip title={prev_location}
-                  placement="top-start"
+                    placement="top-start"
                   >
                     <Button variant="text">{prev_location}</Button>
                   </Tooltip>

@@ -258,15 +258,18 @@ export default function CreatePlanComponent(props: {
   parentLocation: TLocation[],
   childrenLocation: TLocation[],
   parentProp: TLocation | null,
-  childProp: TLocation | null
+  childProp: TLocation | null,
+  user: any
 }) {
-  const { parentLocation, childrenLocation, parentProp, childProp } = props
+  const { parentLocation, childrenLocation, parentProp, childProp, user } = props
   const [reportForm, setReportForm] = useState<TReportForm>({
     document_date: null,
     document_name: "",
     state: ReportState.NEW,
+    created_by: user.id,
     asset_count_location: []
   })
+  const [reportList, setReportList] = useState<TReportForm[]>([])
   const [activeStep, setActiveStep] = useState(0);
   const [disableButton, setDisableButton] = useState(false)
   const { push } = useRouter()
@@ -275,7 +278,7 @@ export default function CreatePlanComponent(props: {
     if (activeStep < steps.length) {
       setActiveStep((prev) => prev + 1)
       if (!ValidReportForm(reportForm))
-        setDisableButton(true) 
+        setDisableButton(true)
       if (activeStep === CreateDocumentStep.CONFIRM) {
         setDisableButton(false)
         if (reportForm !== null && typeof reportForm !== 'undefined') {
@@ -291,6 +294,7 @@ export default function CreatePlanComponent(props: {
             state: assetCountReport.state as ReportState,
             asset_count_location: (reportForm as unknown as TReportForm).asset_count_location
           }))
+          setReportList((prev) => [...prev, reportForm])
         }
       }
     }
@@ -315,6 +319,7 @@ export default function CreatePlanComponent(props: {
       document_date: null,
       document_name: "",
       state: ReportState.NEW,
+      created_by: user.id,
       asset_count_location: []
     })
   }
@@ -326,13 +331,6 @@ export default function CreatePlanComponent(props: {
     }))
   }, [])
 
-  useEffect(() => {
-    const CreateReport = async () => {
-      
-    }
-
-    CreateReport()
-  }, [activeStep])
   return (
     <div className="flex flex-col w-full py-2 pl-2 lg:pl-10 place-items-center space-y-2">
       <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", mt: 4 }}>
@@ -344,22 +342,34 @@ export default function CreatePlanComponent(props: {
           ))}
         </Stepper>
 
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ mt: 4, mx: 2 }}>
           {activeStep === steps.length ? (
-            <>
-              <Typography sx={{ mb: 2 }}>🎉 เสร็จสิ้นขั้นตอนทั้งหมด</Typography>
+            <div className="space-x-4">
+              <Typography sx={{ mb: 2 }}>เสร็จสิ้นขั้นตอนทั้งหมด</Typography>
               <Button onClick={handleReset} variant="outlined">แก้ไขรายงาน</Button>
               <Button variant="outlined" onClick={handleNewRequest}>สร้างรายงานใหม่</Button>
-              <Button variant="outlined"
-                onClick={() =>
-                  push(`/reports/count-assets/${reportForm.document_number}`)}
-              >เริ่มทำการตรวจนับ</Button>
-              <div>รายชื่อรายการที่ได้ทำการสร้าง</div>
-            </>
+
+              <div className="flex flex-col mt-4 space-y-2">
+                <Typography>รายชื่อรายการที่ได้ทำการสร้าง</Typography>
+                <Typography className="text-md text-red-400">* คลิปที่รายงานเพื่อทำการเริ่มตรวจนับ</Typography>
+                {
+                  reportList.length > 0 ?
+                    reportList.map((report) => {
+                      return (
+                        <Button variant="text" key={report.document_name}
+                          onClick={() =>
+                            push(`/reports/count-assets/${report.document_number}`)}
+                        >{report.document_name}</Button>
+                      )
+                    })
+                    : <></>
+                }
+              </div>
+            </div>
           ) : (
             <>
               <Typography sx={{ mb: 2 }}>
-                👉 ขั้นตอนที่ {activeStep + 1}: {steps[activeStep]}
+                ขั้นตอนที่ {activeStep + 1}: {steps[activeStep]}
               </Typography>
               <div className="flex flex-row items-center">
                 <CreateReportContext value={

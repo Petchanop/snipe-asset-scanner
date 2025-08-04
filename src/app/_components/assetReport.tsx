@@ -14,6 +14,8 @@ import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Image from 'next/image';
+import DownloadIcon from '@mui/icons-material/Download';
+import { blue } from '@mui/material/colors';
 
 export default function AssetReport(
   props: {
@@ -23,7 +25,7 @@ export default function AssetReport(
     user: User,
     listOfUser: User[]
   }) {
-  const { assetCountReport, locations, user, assetCountLine, listOfUser } = props
+  const { assetCountReport, locations, assetCountLine, listOfUser } = props
   const { document_number, document_date } = assetCountReport
   let reportLocation = ""
   for (const location of locations) {
@@ -43,7 +45,7 @@ export default function AssetReport(
   }
 
   return (
-    <div className="p-4 shadow-md ">
+    <div className="p-4 space-y-2">
       <div className="flex flex-row justify-between">
         <Image
           src={cititexLogo}
@@ -51,9 +53,10 @@ export default function AssetReport(
           width={300}
           height={100}
         ></Image>
-        <Button href={`/api/${document_number}`} variant="contained" sx={{
+        <Button href={`/api/${document_number}`} sx={{
           maxHeight: '3rem'
-        }}>Download</Button>
+        }}><DownloadIcon sx={{ color: blue[400] }}/></Button>
+        
       </div>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
         CITITEX Group
@@ -65,7 +68,7 @@ export default function AssetReport(
       <Box sx={{ mt: 2 }}>
         <Typography><strong>Document No:</strong> {document_number} </Typography>
         <Typography><strong>Date Count:</strong> {document_date.toLocaleDateString('th-BK')} </Typography>
-        <Typography><strong>Asset Check Name:</strong> {user.first_name} {user.last_name} </Typography>
+        <Typography><strong>Asset Check Name:</strong> {getUser(assetCountReport.created_by!)} </Typography>
         <Typography><strong>Location:</strong> {reportLocation} </Typography>
         <Typography><strong>Asset Count:</strong> {assetCountLine.length} </Typography>
       </Box>

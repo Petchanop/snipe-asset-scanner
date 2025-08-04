@@ -102,7 +102,7 @@ export async function getAssetCountReportList(
 export async function getAssetCountReport(
     documentNumber: number, location?: boolean, assetCountLine?: boolean)
     : Promise<AssetCount | null> {
-    return await prisma.asset_count.findFirst({
+    return await prisma.asset_count.findUnique({
         where: {
             document_number: documentNumber
         },
@@ -127,6 +127,7 @@ type FCreateAssetCountLine = {
     asset_count_line_location_id: string;
     asset_count_line_status_id: number;
     previous_loc_id?: number;
+    image?: string;
 }
 
 export async function createAssetCountLine(payload: FCreateAssetCountLine)
@@ -143,6 +144,7 @@ type FUpdateAssetCountLine = {
     is_assigned_incorrectly?: boolean;
     asset_name_not_correct?: boolean;
     asset_count_line_status_id?: number;
+    image?: string;
 }
 
 export async function UpdateAssetCountLine(

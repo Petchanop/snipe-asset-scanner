@@ -88,13 +88,14 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             asset_name: data.name!,
             assigned_to: data.assigned_to?.id || null,
             asset_check: data.asset_check,
-            checked_by: null,
+            checked_by: data.checked_by,
             checked_on: dayjs().toDate(),
             is_not_asset_loc: data.is_not_asset_loc,
             asset_name_not_correct: false,
             asset_count_line_location_id: data.location_id,
             asset_count_line_status_id: AssetStatusEnum.DEPLOYABLE,
-            previous_loc_id: data.prev_location?.id
+            previous_loc_id: data.prev_location?.id,
+            image: data.image
         })
     }
     return await prisma.asset_count_line.upsert({
@@ -111,7 +112,8 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             is_not_asset_loc: data.is_not_asset_loc,
             asset_check: data.asset_check,
             asset_count_line_status_id: await findStatusId(data),
-            previous_loc_id: data.prev_location?.id
+            previous_loc_id: data.prev_location?.id,
+            image: data.image
         },
         create: {
             asset_check: false,
@@ -125,7 +127,8 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             checked_on: dayjs().toDate(),
             asset_count_line_location_id: data.location_id,
             asset_count_line_status_id: await findStatusId(data),
-            previous_loc_id: data.prev_location?.id
+            previous_loc_id: data.prev_location?.id,
+            image: data.image
         }
     })
 }
@@ -152,7 +155,6 @@ export async function CreateAssetCountLocation(locationId: number, assetCountId:
             }
         })
     } catch (error) {
-        console.log(error)
         return error as Error
     }
 }
@@ -202,7 +204,6 @@ export async function DeleteAssetCountLocationByAssetCountId(assetCountLocationI
             }
         })
     } catch (error) {
-        console.log(error)
         return error
     }
 }

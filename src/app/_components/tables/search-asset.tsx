@@ -29,11 +29,13 @@ export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
   is_not_asset_loc: boolean;
   asset_check: boolean;
+  checked_by: number;
   location_id: string;
   in_report: boolean;
   status: string;
   is_assigned_incorrectly: boolean;
   prev_location: TLocation;
+  image?: string;
 }
 
 function CreateSearchAssetTableCell(props: {
@@ -182,9 +184,10 @@ export default function SearchAsset(
     assetInReport: AssetCountLine[]
     locationId: AssetCountLocation
     users: User[]
+    user: any
   }
 ) {
-  const { assetCountReport, assetInReport, locationId, users } = props
+  const { assetCountReport, assetInReport, locationId, users, user } = props
   const [searchInput, setSearchInput] = useState<string>("")
   const [scanData, setScanData] = useState<IDetectedBarcode[]>([])
   const [fetchData, setFetchData] = useState<boolean>(false)
@@ -198,7 +201,7 @@ export default function SearchAsset(
       if (error) {
         toast.error(`${searchInput} not found.`)
       } else {
-        const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId)
+        const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
         toast.success(`${searchInput} was found.`)
         setSearchResult([asset, ...searchResult])
         toast.success(`${searchInput} has been checked.`)
@@ -220,7 +223,7 @@ export default function SearchAsset(
         if (error) {
           toast.error(`${result.rawValue} not found.`)
         } else {
-          const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId)
+          const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
           toast.success(`${result.rawValue} was found.`)
           setSearchResult([asset, ...searchResult])
           toast.success(`${result.rawValue} has been checked.`)

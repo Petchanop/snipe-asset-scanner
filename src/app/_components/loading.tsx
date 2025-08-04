@@ -1,3 +1,4 @@
+'use client'
 import Skeleton from "@mui/material/Skeleton";
 
 export function LoadingSkeleton() {
@@ -18,9 +19,39 @@ import {
   Paper,
 } from '@mui/material';
 import { blue } from "@mui/material/colors";
+import { useEffect, useState } from "react";
+
+export function useWindowSize() {
+  const [windowSize, setWindowSize] = useState<{width : number | undefined, height: number | undefined}>({
+    width :  undefined,
+    height: undefined,
+  });
+
+  useEffect(() => {
+    // Only run on client
+    if (typeof window !== 'undefined') {
+      const handleResize = () => {
+        setWindowSize({
+          width: window.innerWidth as number,
+          height: window.innerHeight as number,
+        });
+      };
+
+      window.addEventListener('resize', handleResize);
+      handleResize(); // Set initial size
+
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  return windowSize;
+}
 
 export const LoadingTableSkeleton = () => {
+  const media = useWindowSize()
   const rows = Array.from({ length: 5 }); // 5 loading rows
+  const columns = Array.from({ length: media.width as number < 500 ? 1 : 5})
+  console.log(media)
 
   return (
     <TableContainer component={Paper}>
@@ -38,21 +69,13 @@ export const LoadingTableSkeleton = () => {
         >
           {rows.map((_, index) => (
             <TableRow key={index}>
-              <TableCell>
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell>
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell>
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell>
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell>
-                <Skeleton variant="text" />
-              </TableCell>
+              {
+                columns.map((_, index) => (
+                  <TableCell key={index}>
+                    <Skeleton variant="text" />
+                  </TableCell>
+                ))
+              }
             </TableRow>
           ))}
         </TableBody>

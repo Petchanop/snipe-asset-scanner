@@ -84,6 +84,8 @@ function CreateLocationTableCell(props: {
           } else if (reportState.value == "edit") {
             context.selected.current = ""
             push(`/setup/${documentNumber}`)
+          } else if (reportState.value == "view") {
+            push(`/reports/${documentNumber}`)
           }
         }}>
           <Typography sx={{ color: MapActionColor[reportState.label]![500] }}>
@@ -119,7 +121,7 @@ export function ChildrenSelectComponent(props: {
   const childrenLocationChange = useMemo(() => {
     return locationByParent.filter((loc) =>
       //@ts-expect-error some use parent_id some parent.id
-      loc.parent_id === parent.id || loc.parent?.id == parent.id
+      loc.parent_id === parent?.id || loc.parent?.id == parent?.id
     )
   }, [parent, locationByParent])
 
@@ -147,11 +149,11 @@ export function ChildrenSelectComponent(props: {
   return (
     <>
       {
-        childrenLocation.length ?
+        childrenLocation.length && parent ?
           <TextField
             select
             label="sub location"
-            name={parent.name}
+            name={parent?.name}
             value={childLocation.current}
             className="mt-3 p-4 lg:w-3/5 w-full"
             onChange={(event) => handleOnClick(event.target)}
@@ -182,7 +184,7 @@ export function ParentSelectComponent(props: {
     <TextField
       select
       label="location"
-      value={parentProp.name}
+      value={parentProp? parentProp.name : parentLocation[0]!.name! as string}
       className="mt-3 p-4 lg:w-3/5 w-full"
       disabled={isCheckTable}
       onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

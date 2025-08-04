@@ -10,17 +10,21 @@ export async function CreatAssetCountLine(
     data: AssetResponse,
     assetCountReport: AssetCount,
     assetInReport: AssetCountLine[],
-    locationId: AssetCountLocation): Promise<TAssetRow> {
+    locationId: AssetCountLocation,
+    user: any
+): Promise<TAssetRow> {
     const extendTypeAsset: ExtendAssetResponse = {
         ...data,
         asset_name_not_correct: false,
         is_not_asset_loc: data.location?.id != locationId.location_id,
         asset_check: true,
+        checked_by: parseInt(user.id) as number,
         in_report: assetInReport.find((report) => report.asset_code === data.asset_tag) ? true : false,
         location_id: locationId.id,
         is_assigned_incorrectly: false,
         status: assetStatusOptions.find((status) => status.value.toLowerCase() == data.status_label?.status_meta as string)?.value as string,
-        prev_location: data.location as unknown as TLocation
+        prev_location: data.location as unknown as TLocation,
+        image: data.image as string
     }
     const assetCountLine = await AddAssetCountLine(extendTypeAsset, assetCountReport)
     const asset = {
@@ -36,7 +40,8 @@ export async function CreatAssetCountLine(
         assignIncorrect: assetCountLine.is_assigned_incorrectly,
         notInLocation: assetCountLine.is_not_asset_loc ? assetCountLine.is_not_asset_loc : false,
         status: assetCountLine.asset_count_line_status_id,
-        prev_location: data.location
+        prev_location: data.location,
+        image: assetCountLine.image
     } as unknown as TAssetRow
     return asset
 }
@@ -46,11 +51,13 @@ export async function UpdateAssetCountLineForSearchAssetPage(
     data : AssetResponse,
     assetCountReport : AssetCount,
     users: User[],
-    locationId : AssetCountLocation) {
+    locationId : AssetCountLocation,
+    user: any
+) {
     const IsInLocation = assetInReport.find((result) => result.asset_code == data.asset_tag)
     let asset: TAssetRow
     if (!IsInLocation) {
-        asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId)
+        asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId, user)
         await UpdateAssetCountLine(asset.id as string, { asset_check: true })
     } else {
         const result = await UpdateAssetCountLine(IsInLocation.id, { asset_check: true })
@@ -63,7 +70,8 @@ export async function UpdateAssetCountLineForSearchAssetPage(
             assignIncorrect: result?.is_assigned_incorrectly as boolean,
             notInLocation: result?.is_not_asset_loc as boolean,
             status: result?.asset_count_line_status_id as number,
-            prev_location: data.location?.name as string
+            prev_location: data.location?.name as string,
+            image: result?.image as string
         }
     }
     return asset

@@ -3,11 +3,13 @@ import { fetchLocations } from "@/api/snipe-it/snipe-it.api"
 import ReportComponent from "@/_components/reportComponent";
 import { getChildrenLocation, getOtherLocation, getParentFromChildId, getParentLocation } from '@/_libs/location.utils';
 import { TLocation } from "@/_types/snipe-it.type";
+import { getSession } from "auth";
 
 export default async function ReportTablePage({ searchParams }: {
     searchParams: Promise<{ location?: number }>
 }) {
     const { location } = await searchParams
+    const session = await getSession()
     const locationId = location ? parseInt(location!.toString()) : null
     const locations = await fetchLocations();
     let parentLocation = getParentLocation(locations.data!.rows)
@@ -31,6 +33,7 @@ export default async function ReportTablePage({ searchParams }: {
             childrenLocation={childrenLocation}
             parentProp={parentProp!}
             childProp={childProp!}
+            user={session.user}
         />
     )
 }

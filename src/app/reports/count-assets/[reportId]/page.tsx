@@ -8,6 +8,7 @@ import { findAssetCount, getAssetCountReport, updateAssetCountReport } from "@/_
 import { ReportState } from "@/_constants/constants";
 import { notFound } from "next/navigation";
 import { hasOwnProperty, Location } from "@/_types/types"
+import { getSession } from "auth";
 
 export default async function AssetsTablePage({ params }: {
     params: Promise<{ reportId: string }>
@@ -19,6 +20,7 @@ export default async function AssetsTablePage({ params }: {
     //fetch data here
     //use mock data before implement api call
     //fetch location from snipe api
+    const session = await getSession()
     const assetCountReport = await getAssetCountReport(parseInt(reportId))
     if (!assetCountReport)
         notFound()
@@ -74,6 +76,7 @@ export default async function AssetsTablePage({ params }: {
             parentProp={parent}
             users={users}
             report={report}
+            user={session?.user}
         />
     )
 }

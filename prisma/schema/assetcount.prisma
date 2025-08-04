@@ -1,7 +1,7 @@
 generator client {
   provider               = "prisma-client-js"
   output                 = "../generated/prisma"
-  previewFeatures        = ["driverAdapters", "multiSchema", "relationJoins"]
+  previewFeatures        = ["driverAdapters", "relationJoins"]
   generatedFileExtension = "ts"
   importFileExtension    = "ts"
 }
@@ -9,6 +9,14 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model asset_count_user {
+  id       Int    @id
+  user     users  @relation(fields: [user_id], references: [id])
+  user_id  Int    @db.UnsignedInt
+  username String
+  password String
 }
 
 model asset_count {
@@ -32,7 +40,7 @@ model asset_count_line {
   asset_id                     Int
   asset_code                   String
   asset_name                   String
-  assigned_to                  Int?                 
+  assigned_to                  Int?
   asset_check                  Boolean
   checked_by                   Int?
   checked_on                   DateTime              @db.Timestamp(0)
@@ -44,6 +52,7 @@ model asset_count_line {
   asset_count_line_status_id   Int                   @default(0)
   status_id                    asset_status          @relation(fields: [asset_count_line_status_id], references: [id])
   previous_loc_id              Int?
+  image                        String?
 
   @@index([asset_count_id], map: "asset_count_line_asset_count_id_index")
   @@index([asset_count_line_status_id], map: "asset_count_line_status_id_index")
@@ -62,7 +71,7 @@ model asset_count_location {
   id              String             @id @default(uuid()) @db.Char(36)
   asset_count_id  String             @db.Char(36)
   rtd_location_id Int?
-  location_id     Int
+  location_id     Int                @db.UnsignedInt
   location        locations          @relation(fields: [location_id], references: [id])
   count_id        asset_count        @relation(fields: [asset_count_id], references: [id])
   AssetCountLine  asset_count_line[]

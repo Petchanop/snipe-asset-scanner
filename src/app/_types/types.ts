@@ -40,6 +40,7 @@ export type TAssetRow = {
     notInLocation: boolean;
     status: number;
     prev_location?: string;
+    image?: string;
 };
 
 export type TReportForm = {
@@ -47,6 +48,7 @@ export type TReportForm = {
     document_number?: number,
     document_name: string,
     document_date: Date | null,
+    created_by: number,
     state: ReportState,
     asset_count_location: number[]
 }

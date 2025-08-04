@@ -30,8 +30,9 @@ export default function ReportComponent(props: {
   childrenLocation: TLocation[],
   parentProp: TLocation | null,
   childProp: TLocation | null,
+  user: any
 }) {
-  const { locations, parentLocation, childrenLocation, parentProp, childProp } = props
+  const { locations, parentLocation, childrenLocation, parentProp, childProp, user } = props
   const [show, setShow] = useState(true)
   const [reports, setReports] = useState<AssetCount[]>([])
   const [dateValue, setDateValue] = useState<Dayjs | null>(null)
@@ -82,6 +83,7 @@ export default function ReportComponent(props: {
                   childrenLocation={childrenLocation}
                   parentProp={parentProp!}
                   childProp={childProp!}
+                  user={user}
                 />
               </DateValueContext>
           }
