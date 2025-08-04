@@ -8,7 +8,6 @@ import Button from "@mui/material/Button";
 
 export default function TopBar() {
   const session = useSession()
-  console.log(session.data)
   return (
     <>
       <CardHeader

@@ -295,6 +295,7 @@ export default function NewCountTable(props: {
   const [documentNumber, setDocumentNumber] = useState<number>()
   const [update, setUpdate] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const { push } = useRouter()
 
   useEffect(() => {
     if (!dateValue) {
@@ -400,6 +401,11 @@ export default function NewCountTable(props: {
   function handleSelectValue(event: SyntheticEvent, newValue: string) {
     setAssetTab(newValue as TAssetTab)
   }
+
+  useEffect(() => {
+    if (!user)
+      push(`/auth/login`)
+  }, [user])
   return (
     <>
       <DateValueContext

@@ -76,7 +76,7 @@ export default async function AssetsTablePage({ params }: {
             parentProp={parent}
             users={users}
             report={report}
-            user={session.user}
+            user={session?.user}
         />
     )
 }

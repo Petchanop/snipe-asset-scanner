@@ -107,6 +107,7 @@ export default function SetupPlanComponent(
                 return loc?.id! as number
             })
         }))
+        push(`/reports`)
     }
 
     const handleCancel = () => {
