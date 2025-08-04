@@ -12,10 +12,10 @@ export default async function ReportPage({ params }: { params: Promise<{ reportI
     const session = await getSession()
     if (!session)
         return redirect('/auth/unauthorized')
-    if (!reportId)
-        return notFound()
     const reportIdNumber = Number(reportId)
     const assetCountReport = await getAssetCountReport(reportIdNumber, true) as AssetCountWithLineAndLocation
+    if (!reportId || !assetCountReport)
+        return notFound()
     const allAssetCountLine: AssetCountLine[] = []
     const locations = await fetchLocations();
     const locationsProp = []
