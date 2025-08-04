@@ -1,7 +1,5 @@
 'use client'
 import TableLayout from "@/_components/tableLayout";
-import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
 export default function ReportLayout({
@@ -9,12 +7,9 @@ export default function ReportLayout({
 }: Readonly<{
     children: ReactNode;
 }>) {
-    const { data: session } = useSession()
-    if (!session)
-        redirect('/auth/login')
     return (
-            <TableLayout>
-                {children}
-            </TableLayout>
+        <TableLayout>
+            {children}
+        </TableLayout>
     );
 }

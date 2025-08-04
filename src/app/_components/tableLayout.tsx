@@ -5,7 +5,8 @@ import Paper from "@mui/material/Paper";
 import Tab from "@mui/material/Tab";
 import TableContainer from "@mui/material/TableContainer";
 import Tabs from "@mui/material/Tabs";
-import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { redirect, useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   createContext, Dispatch, ReactNode,
   RefObject, SetStateAction,
@@ -36,11 +37,14 @@ export default function TableLayout({
 }: {
   children: ReactNode
 }) {
+  const { data: session } = useSession()
+  if (!session)
+    redirect('/auth/login')
   const pathname = usePathname()
   const params = useSearchParams()
   const location = params.get('location')
   const reportId = useParams()
-  const reportNumber = reportId.reportId ? reportId.reportId : "" 
+  const reportNumber = reportId.reportId ? reportId.reportId : ""
   const [locationId, setLocationId] = useState(parseInt(location?.toString()!))
   const selected = useRef(pathname)
   const router = useRouter();
@@ -60,39 +64,39 @@ export default function TableLayout({
   }, [locationId])
 
   return <>
-      <CardContent className="space-y-4">
-        <Tabs
-          value={pathname}
-          className="pl-2"
-          onChange={handleOnChange}
-        >
-          <Tab value={
-            `/reports`
-          }
-            label="Document list" />
-          <Tab value={`/setup/${reportNumber}`}
+    <CardContent className="space-y-4">
+      <Tabs
+        value={pathname}
+        className="pl-2"
+        onChange={handleOnChange}
+      >
+        <Tab value={
+          `/reports`
+        }
+          label="Document list" />
+        <Tab value={`/setup/${reportNumber}`}
           disabled
           label="Setup"
-          />
-            <Tab value={
-             `/reports/count-assets/${reportNumber}`
-          }
-            disabled
-            label="new count" />
-        </Tabs>
-        <Paper elevation={10}>
-          <TableContainer className="w-full max-h-[75vh]">
-            <LocationUrlContext
-              value={{
-                locationId: locationId,
-                setLocationId: setLocationId,
-                selected: selected,
-              }}>
-              {children}
-            </LocationUrlContext>
-          </TableContainer>
-        </Paper>
-      </CardContent>
+        />
+        <Tab value={
+          `/reports/count-assets/${reportNumber}`
+        }
+          disabled
+          label="new count" />
+      </Tabs>
+      <Paper elevation={10}>
+        <TableContainer className="w-full max-h-[75vh]">
+          <LocationUrlContext
+            value={{
+              locationId: locationId,
+              setLocationId: setLocationId,
+              selected: selected,
+            }}>
+            {children}
+          </LocationUrlContext>
+        </TableContainer>
+      </Paper>
+    </CardContent>
     {/* </Card > */}
   </>
 }

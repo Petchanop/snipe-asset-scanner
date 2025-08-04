@@ -3,7 +3,6 @@ import { JWT } from "next-auth/jwt";
 import { getServerSession } from "next-auth";
 import { GetAssetCountUser } from "@/api/auth.api";
 import * as bcrypt from 'bcrypt'
-import { User } from "next-auth";
 
 export const authOptions = {
   providers: [
@@ -16,7 +15,6 @@ export const authOptions = {
         },
         password: { label: "Password", type: "password" }
       },
-
 
       async authorize(credentials, req) {
         const user = await GetAssetCountUser(credentials)

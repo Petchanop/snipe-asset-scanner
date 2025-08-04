@@ -27,7 +27,6 @@ import { CreateAssetCountLocation } from "@/api/report.api";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
 import { TReportForm } from "@/_types/types";
-import { userAgent } from "next/server";
 
 type TCreateReportContext = {
   report: TReportForm,
@@ -270,6 +269,7 @@ export default function CreatePlanComponent(props: {
     created_by: user.id,
     asset_count_location: []
   })
+  const [ reportList, setReportList ] = useState<TReportForm[]>([])
   const [activeStep, setActiveStep] = useState(0);
   const [disableButton, setDisableButton] = useState(false)
   const { push } = useRouter()
@@ -278,7 +278,7 @@ export default function CreatePlanComponent(props: {
     if (activeStep < steps.length) {
       setActiveStep((prev) => prev + 1)
       if (!ValidReportForm(reportForm))
-        setDisableButton(true) 
+        setDisableButton(true)
       if (activeStep === CreateDocumentStep.CONFIRM) {
         setDisableButton(false)
         if (reportForm !== null && typeof reportForm !== 'undefined') {
@@ -294,6 +294,7 @@ export default function CreatePlanComponent(props: {
             state: assetCountReport.state as ReportState,
             asset_count_location: (reportForm as unknown as TReportForm).asset_count_location
           }))
+          setReportList((prev) => [...prev, reportForm])
         }
       }
     }
@@ -330,13 +331,6 @@ export default function CreatePlanComponent(props: {
     }))
   }, [])
 
-  useEffect(() => {
-    const CreateReport = async () => {
-      
-    }
-
-    CreateReport()
-  }, [activeStep])
   return (
     <div className="flex flex-col w-full py-2 pl-2 lg:pl-10 place-items-center space-y-2">
       <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", mt: 4 }}>
@@ -348,10 +342,10 @@ export default function CreatePlanComponent(props: {
           ))}
         </Stepper>
 
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ mt: 4 , mx: 2}}>
           {activeStep === steps.length ? (
-            <>
-              <Typography sx={{ mb: 2 }}>🎉 เสร็จสิ้นขั้นตอนทั้งหมด</Typography>
+            <div className="space-x-4">
+              <Typography sx={{ mb: 2 }}>เสร็จสิ้นขั้นตอนทั้งหมด</Typography>
               <Button onClick={handleReset} variant="outlined">แก้ไขรายงาน</Button>
               <Button variant="outlined" onClick={handleNewRequest}>สร้างรายงานใหม่</Button>
               <Button variant="outlined"
@@ -359,11 +353,20 @@ export default function CreatePlanComponent(props: {
                   push(`/reports/count-assets/${reportForm.document_number}`)}
               >เริ่มทำการตรวจนับ</Button>
               <div>รายชื่อรายการที่ได้ทำการสร้าง</div>
-            </>
+              {
+                reportList.length > 0 ?
+                reportList.map((report) => {
+                  return (
+                    <Typography>{report.document_name}</Typography>
+                  )
+                })
+                : <></>
+              }
+            </div>
           ) : (
             <>
               <Typography sx={{ mb: 2 }}>
-                👉 ขั้นตอนที่ {activeStep + 1}: {steps[activeStep]}
+                ขั้นตอนที่ {activeStep + 1}: {steps[activeStep]}
               </Typography>
               <div className="flex flex-row items-center">
                 <CreateReportContext value={

@@ -37,7 +37,7 @@ export default async function RootLayout({
                 }}
               >
                 <Providers session={session}>
-                  {session ? <TopBar session={session} /> : <TopBar />}
+                  <TopBar />
                   {children}
                 </Providers>
               </Card>

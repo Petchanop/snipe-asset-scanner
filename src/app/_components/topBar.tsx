@@ -3,11 +3,12 @@
 import CardHeader from "@mui/material/CardHeader";
 import Image from 'next/image'
 import CititexLogo from "@/public/cititexlogo.png"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import Button from "@mui/material/Button";
 
-export default function TopBar(props: { session?: any }) {
-  const { session } = props
+export default function TopBar() {
+  const session = useSession()
+  console.log(session.data)
   return (
     <>
       <CardHeader
@@ -22,19 +23,19 @@ export default function TopBar(props: { session?: any }) {
         }
         slotProps={{
           title: {
-            className: 'max-md:text-xl text-lg lg:text-2xl max-md:hidden max-lg:mx-6'
+            className: 'max-md:text-xl text-lg lg:text-2xl max-sm:hidden mx-6'
           }
         }}
         title="Asset Count"
       >
       </CardHeader>
-       {
-        session ? 
-          <Button 
-            className="absolute end-5 max-lg:top-5.5 lg:top-10 text-white text-lg" 
+      {
+        session.data ?
+          <Button
+            className="absolute end-5 top-6.5  text-white text-md"
             onClick={() => signOut()}
           >Sign out
-          </Button>: <></>
+          </Button> : <></>
       }
     </>
   )

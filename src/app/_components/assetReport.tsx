@@ -25,7 +25,7 @@ export default function AssetReport(
     user: User,
     listOfUser: User[]
   }) {
-  const { assetCountReport, locations, user, assetCountLine, listOfUser } = props
+  const { assetCountReport, locations, assetCountLine, listOfUser } = props
   const { document_number, document_date } = assetCountReport
   let reportLocation = ""
   for (const location of locations) {

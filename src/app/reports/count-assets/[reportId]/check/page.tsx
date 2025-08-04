@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography"
 import { GetAllUserPrisma } from "@/api/report.api"
 import { notFound } from "next/navigation"
 import { AssetCountWithAssetLocation } from "@/_types/interfaces"
+import { getSession } from "auth"
 
 export default async function CheckAssetPage(
     { params, searchParams }: { params :  Promise<{ reportId: string}>, searchParams: Promise<{ location?: number }> }, 
@@ -13,6 +14,7 @@ export default async function CheckAssetPage(
     const { location } = await searchParams
     const resolveLocationId = await location
     const documentNumber = await reportId
+    const session = await getSession()
     //fetch data here
     //use mock data before implement api cal
     //fetch location from snipe api
@@ -40,6 +42,7 @@ export default async function CheckAssetPage(
                     assetInReport={assetInReport}
                     locationId={locationId}
                     users={users}
+                    user={session.user}
                 />
             )}
         </div>

@@ -55,7 +55,8 @@ export default function SetupPlanComponent(
         state: state as ReportState,
         asset_count_location: assetCountLocation.map((loc) => {
             return loc.location_id
-        })
+        }),
+        created_by: assetCountReport.created_by as number
     })
 
     const { push } = useRouter()
