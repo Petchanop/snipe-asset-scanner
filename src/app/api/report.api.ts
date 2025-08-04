@@ -88,7 +88,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             asset_name: data.name!,
             assigned_to: data.assigned_to?.id || null,
             asset_check: data.asset_check,
-            checked_by: null,
+            checked_by: data.checked_by,
             checked_on: dayjs().toDate(),
             is_not_asset_loc: data.is_not_asset_loc,
             asset_name_not_correct: false,

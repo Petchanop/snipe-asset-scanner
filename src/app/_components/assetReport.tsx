@@ -68,7 +68,7 @@ export default function AssetReport(
       <Box sx={{ mt: 2 }}>
         <Typography><strong>Document No:</strong> {document_number} </Typography>
         <Typography><strong>Date Count:</strong> {document_date.toLocaleDateString('th-BK')} </Typography>
-        <Typography><strong>Asset Check Name:</strong> {user.first_name} {user.last_name} </Typography>
+        <Typography><strong>Asset Check Name:</strong> {getUser(assetCountReport.created_by!)} </Typography>
         <Typography><strong>Location:</strong> {reportLocation} </Typography>
         <Typography><strong>Asset Count:</strong> {assetCountLine.length} </Typography>
       </Box>

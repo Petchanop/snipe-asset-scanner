@@ -16,7 +16,7 @@ export async function CreateAssetCountUser(userInput: any) {
         data: {
             id: user.id,
             user_id : user.id,
-            username : userInput.FirstName + userInput.LastName[0] as string,
+            username : userInput.FirstName + '.' + userInput.LastName[0] as string,
             password: hashPassword 
         }
     })

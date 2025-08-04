@@ -29,6 +29,7 @@ export type ExtendAssetResponse = AssetResponse & {
   asset_name_not_correct: boolean;
   is_not_asset_loc: boolean;
   asset_check: boolean;
+  checked_by: number;
   location_id: string;
   in_report: boolean;
   status: string;

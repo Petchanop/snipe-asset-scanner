@@ -205,10 +205,9 @@ export function NewCountInput(props: {
   const [parent, setParent] = useState(parentProp)
   const [childId, setChildId] = useState<number | null>(defaultLocation!.id as unknown as number)
   const documentContext = useReportContext()
-
   useEffect(() => {
     setLocation(locations?.find((loc) => childId ? loc.id == childId : loc.id == parent.id)!);
-  }, [childId, locations, setLocation, parent.id])
+  }, [childId, locations, setLocation, parent?.id])
   return (
     <div className="flex md:flex-row flex-col w-full py-2 pl-2 lg:pl-10 content-center">
       <div className="flex flex-col md:basis-lg space-y-2">
@@ -274,6 +273,7 @@ export default function NewCountTable(props: {
   parentProp: TLocation;
   users: User[];
   report: AssetCount | null;
+  user: any;
 }) {
   const {
     allLocation,
@@ -284,6 +284,7 @@ export default function NewCountTable(props: {
     locationId,
     parentProp,
     users,
+    user,
     report } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
@@ -327,6 +328,7 @@ export default function NewCountTable(props: {
               is_not_asset_loc: asset.location?.id != location.id,
               is_assigned_incorrectly: false,
               asset_check: false,
+              checked_by: parseInt(user.id),
               in_report: false,
               location_id: assetLocationId?.id as string,
               status: asset.status_label?.status_meta as string,

@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   //   authInterrupts: true,
   // },
   images: {
-    remotePatterns: [new URL('http://localhost:8000/uploads/**')],
+    remotePatterns: [new URL('http://localhost:8000/uploads/**'), new URL('https://dev-snipe-it.cititex.co.th/uploads/**')],
   },
   allowedDevOrigins: ['127.0.0.1'],
 };

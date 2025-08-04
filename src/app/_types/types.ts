@@ -48,6 +48,7 @@ export type TReportForm = {
     document_number?: number,
     document_name: string,
     document_date: Date | null,
+    created_by: number,
     state: ReportState,
     asset_count_location: number[]
 }

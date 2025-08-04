@@ -10,7 +10,6 @@ import { notFound, redirect } from 'next/navigation'
 export default async function ReportPage({ params }: { params: Promise<{ reportId: string }> }) {
     const { reportId } = await params
     const session = await getSession()
-    console.log(session)
     if (!session)
         return redirect('/auth/unauthorized')
     if (!reportId)

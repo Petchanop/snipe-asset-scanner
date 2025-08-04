@@ -56,7 +56,7 @@ export default function RegisterComponent(props: { handleRegister: (data: any) =
                             <Typography className="text-red-400 mb-2">* {errors.Position?.message as string} </Typography>
                             : <></>
                     }
-                    <TextField
+                    {/* <TextField
                         error={errors.Position?.message ? true : false}
                         {...register("Position", {
                             required: "Position is required"
@@ -70,7 +70,7 @@ export default function RegisterComponent(props: { handleRegister: (data: any) =
                         errors.Email?.message ?
                             <Typography className="text-red-400 mb-2">* {errors.Email.message as string}</Typography>
                             : <></>
-                    }
+                    } */}
                     <TextField
                         error={errors.Email?.message ? true : false}
                         {...register("Email", {

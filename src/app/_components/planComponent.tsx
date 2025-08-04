@@ -27,6 +27,7 @@ import { CreateAssetCountLocation } from "@/api/report.api";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
 import { TReportForm } from "@/_types/types";
+import { userAgent } from "next/server";
 
 type TCreateReportContext = {
   report: TReportForm,
@@ -258,13 +259,15 @@ export default function CreatePlanComponent(props: {
   parentLocation: TLocation[],
   childrenLocation: TLocation[],
   parentProp: TLocation | null,
-  childProp: TLocation | null
+  childProp: TLocation | null,
+  user: any
 }) {
-  const { parentLocation, childrenLocation, parentProp, childProp } = props
+  const { parentLocation, childrenLocation, parentProp, childProp, user } = props
   const [reportForm, setReportForm] = useState<TReportForm>({
     document_date: null,
     document_name: "",
     state: ReportState.NEW,
+    created_by: user.id,
     asset_count_location: []
   })
   const [activeStep, setActiveStep] = useState(0);
@@ -315,6 +318,7 @@ export default function CreatePlanComponent(props: {
       document_date: null,
       document_name: "",
       state: ReportState.NEW,
+      created_by: user.id,
       asset_count_location: []
     })
   }

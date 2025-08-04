@@ -38,10 +38,7 @@ import Tooltip from "@mui/material/Tooltip"
 import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText"
-import Link from "next/link";
 import Image from "next/image"
-import { Typography } from "@mui/material";
 
 
 export function CreateAssetTableCell(
@@ -60,7 +57,6 @@ export function CreateAssetTableCell(
   const [open, setOpen] = useState(false)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
-  console.log(image)
   useEffect(() => {
     const updateData = async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -128,6 +124,7 @@ export function CreateAssetTableCell(
                 onClick={() => setOpen((prev) => !prev)}
               >
                 <DialogTitle id="alert-dialog-title">
+                  {assetName}
                 </DialogTitle>
                 <DialogContent>
                   {
