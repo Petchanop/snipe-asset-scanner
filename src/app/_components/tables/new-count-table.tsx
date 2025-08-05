@@ -406,7 +406,7 @@ export default function NewCountTable(props: {
   useEffect(() => {
     if (!user)
       push(`/auth/login`)
-  }, [user])
+  }, [user, push])
   return (
     <>
       <DateValueContext

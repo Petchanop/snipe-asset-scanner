@@ -26,7 +26,7 @@ export async function createDocumentNumber(locationId: number, date: string): Pr
 
 export type FCreateAssetCountReport = {
     id?: string;
-    created_by?: number;
+    created_by?: number | null;
     document_name?: string | null;
     document_date?: Date | null;
     state?: string;
