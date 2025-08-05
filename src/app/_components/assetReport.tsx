@@ -36,7 +36,7 @@ export default function AssetReport(
 
   function getUser(userId: number): string {
     const user = listOfUser.find((user) => user.id == userId)
-    return user?.first_name + ' ' + user?.last_name
+    return user ? user?.first_name + ' ' + user?.last_name : ""
   }
 
   function getLocation(locationId: string, LocationList: TLocation[]): string {

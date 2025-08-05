@@ -56,7 +56,7 @@ async function CreateAssetCountReportFile(
     dataSheet.getCell(`B9`).alignment = { horizontal: 'left', vertical: 'middle' }
     dataSheet.getCell(`B5`).value = assetCountReport.document_number
     dataSheet.getCell(`B6`).value = assetCountReport.document_date.toLocaleDateString('th-BK')
-    dataSheet.getCell(`B7`).value =  user?.first_name + " " + user?.last_name
+    dataSheet.getCell(`B7`).value = user ?  user?.first_name + " " + user?.last_name : ""
     dataSheet.getColumn(1).width = 15
     dataSheet.getColumn(2).width = 30
     dataSheet.getColumn(3).width = 55
@@ -83,7 +83,7 @@ async function CreateAssetCountReportFile(
             dataSheet.getCell(`A${assetCodeCol}`).value = i + 1
             dataSheet.getCell(`B${assetCodeCol}`).value = countLine.asset_code
             dataSheet.getCell(`C${assetCodeCol}`).value = countLine.asset_name
-            dataSheet.getCell(`D${assetCodeCol}`).value = `${getUser?.first_name}  ${getUser?.last_name}`
+            dataSheet.getCell(`D${assetCodeCol}`).value = getUser ? `${getUser?.first_name}  ${getUser?.last_name}` : ""
             dataSheet.getCell(`E${assetCodeCol}`).value = countCheck
             dataSheet.getCell(`F${assetCodeCol}`).value = assingedInCorrect
             dataSheet.getCell(`G${assetCodeCol}`).value = useAble
