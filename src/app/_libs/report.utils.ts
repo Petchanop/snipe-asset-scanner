@@ -26,6 +26,7 @@ export async function createDocumentNumber(locationId: number, date: string): Pr
 
 export type FCreateAssetCountReport = {
     id?: string;
+    created_by?: number;
     document_name?: string | null;
     document_date?: Date | null;
     state?: string;
@@ -59,8 +60,8 @@ export async function createAssetCountReport(
         })
     } else {
         return await prisma.asset_count.create({
-
             data: {
+                created_by: payload.created_by,
                 document_name: payload.document_name,
                 document_date: await changeDateToIsoString(payload.document_date!),
                 state: payload.state as string
