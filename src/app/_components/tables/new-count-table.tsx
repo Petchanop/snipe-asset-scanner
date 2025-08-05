@@ -29,6 +29,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { LoadingTableSkeleton } from "@/_components/loading";
 import { ReportState } from "@/_constants/constants";
+import { ConvertImageUrl } from "@/_libs/convert_url.utils";
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
@@ -361,7 +362,7 @@ export default function NewCountTable(props: {
               assignIncorrect: asset.is_assigned_incorrectly,
               status: asset.asset_count_line_status_id,
               prev_location: prev_loc?.name,
-              image: asset.image
+              image: await ConvertImageUrl(asset.image as string)
             } as unknown as TAssetRow
           }))
 
