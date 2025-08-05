@@ -201,9 +201,11 @@ export default function SearchAsset(
       if (error) {
         toast.error(`${searchInput} not found.`)
       } else {
-        const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
-        toast.success(`${searchInput} was found.`)
-        setSearchResult([asset, ...searchResult])
+        if (!searchResult.find((res) => res.assetCode == data.asset_tag)) {
+          const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
+          toast.success(`${searchInput} was found.`)
+          setSearchResult([asset, ...searchResult])
+        }
         toast.success(`${searchInput} has been checked.`)
       }
       setSearchInput("")
@@ -223,9 +225,11 @@ export default function SearchAsset(
         if (error) {
           toast.error(`${result.rawValue} not found.`)
         } else {
-          const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
-          toast.success(`${result.rawValue} was found.`)
-          setSearchResult([asset, ...searchResult])
+          if (!searchResult.find((res) => res.assetCode == data.asset_tag)) {
+            const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
+            toast.success(`${result.rawValue} was found.`)
+            setSearchResult([asset, ...searchResult])
+          }
           toast.success(`${result.rawValue} has been checked.`)
         }
         setScanData([])
