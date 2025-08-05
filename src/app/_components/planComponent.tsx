@@ -266,7 +266,7 @@ export default function CreatePlanComponent(props: {
     document_date: null,
     document_name: "",
     state: ReportState.NEW,
-    created_by: user.id,
+    created_by: Number(user.id),
     asset_count_location: []
   })
   const [reportList, setReportList] = useState<TReportForm[]>([])
@@ -324,7 +324,7 @@ export default function CreatePlanComponent(props: {
       document_date: null,
       document_name: "",
       state: ReportState.NEW,
-      created_by: user.id,
+      created_by: Number(user.id),
       asset_count_location: []
     })
   }
