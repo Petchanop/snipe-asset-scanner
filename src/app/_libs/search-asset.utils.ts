@@ -61,11 +61,12 @@ export async function UpdateAssetCountLineForSearchAssetPage(
         await UpdateAssetCountLine(asset.id as string, { asset_check: true })
     } else {
         const result = await UpdateAssetCountLine(IsInLocation.id, { asset_check: true })
+        const assigned_to = users.find((data: User) => data.id == result?.assigned_to as number)
         asset = {
             id: result?.id,
             assetCode: result?.asset_code as string,
             assetName: result?.asset_name as string,
-            assignedTo: users.find((data: User) => data.id = result?.assigned_to as number) as assetUser,
+            assignedTo: { id: assigned_to?.id, first_name: assigned_to?.first_name, last_name: assigned_to?.last_name} as assetUser,
             countCheck: result?.asset_check as boolean,
             assignIncorrect: result?.is_assigned_incorrectly as boolean,
             notInLocation: result?.is_not_asset_loc as boolean,
