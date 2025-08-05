@@ -101,6 +101,7 @@ export function CreateAssetTableCell(
     }
     updateAssetStatus()
   }, [assetStatus, data])
+
   return (
     <>
       {
@@ -130,7 +131,7 @@ export function CreateAssetTableCell(
                   {
                     image ?
                       <Image
-                        src={image as string}
+                        src={image}
                         alt={assetName}
                         width={400}
                         height={400}
