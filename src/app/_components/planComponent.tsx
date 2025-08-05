@@ -286,15 +286,20 @@ export default function CreatePlanComponent(props: {
           for (const location of (reportForm as unknown as TReportForm).asset_count_location) {
             await CreateAssetCountLocation(location, assetCountReport.id)
           }
-          setReportForm((prev) => ({
-            ...prev,
+          const newReport : TReportForm = {
             id: assetCountReport.id,
+            document_name: assetCountReport.document_name as string,
             document_number: assetCountReport.document_number,
             document_date: assetCountReport.document_date,
+            created_by: assetCountReport.created_by as number,
             state: assetCountReport.state as ReportState,
             asset_count_location: (reportForm as unknown as TReportForm).asset_count_location
+          }
+          setReportForm((prev) => ({
+            ...prev,
+            newReport
           }))
-          setReportList((prev) => [...prev, reportForm])
+          setReportList((prev) => [...prev, newReport])
         }
       }
     }

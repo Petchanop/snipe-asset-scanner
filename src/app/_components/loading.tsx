@@ -51,7 +51,6 @@ export const LoadingTableSkeleton = () => {
   const media = useWindowSize()
   const rows = Array.from({ length: 5 }); // 5 loading rows
   const columns = Array.from({ length: media.width as number < 500 ? 1 : 5})
-  console.log(media)
 
   return (
     <TableContainer component={Paper}>
