@@ -49,10 +49,14 @@ export async function GET(
 async function CreateAssetCountReportFile(
     assetCountReport: AssetCountWithLineAndLocation, dataSheet: Excel.Worksheet): Promise<Excel.Worksheet> {
 
+    const users = await GetAllUserPrisma()
+    const locations = await fetchLocations();
+    const user = users.find((user) => user.id == assetCountReport.created_by)
     dataSheet.getCell(`B5`).alignment = { horizontal: 'left', vertical: 'middle' }
     dataSheet.getCell(`B9`).alignment = { horizontal: 'left', vertical: 'middle' }
     dataSheet.getCell(`B5`).value = assetCountReport.document_number
     dataSheet.getCell(`B6`).value = assetCountReport.document_date.toLocaleDateString('th-BK')
+    dataSheet.getCell(`B7`).value =  user?.first_name + " " + user?.last_name
     dataSheet.getColumn(1).width = 15
     dataSheet.getColumn(2).width = 30
     dataSheet.getColumn(3).width = 55
@@ -61,8 +65,6 @@ async function CreateAssetCountReportFile(
     let assetQuantity = 0
     let assetCodeCol = 12
     let i = 0
-    const users = await GetAllUserPrisma()
-    const locations = await fetchLocations();
     let locationData = ""
 
     for (let j = 0; j < assetCountReport.AssetCountLocation.length; j++) {
