@@ -11,7 +11,7 @@ import {
   useEffect,
   useMemo,
   useState,
-  MouseEvent
+  MouseEvent,
 } from "react";
 import {
   dataPerPage,
@@ -39,7 +39,8 @@ import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import Image from "next/image"
-
+import TextField from "@mui/material/TextField";
+import { useReportContext } from "../tableLayout";
 
 export function CreateAssetTableCell(
   props: {
@@ -50,13 +51,15 @@ export function CreateAssetTableCell(
     isCheckTable: boolean
   }) {
   const { data, assetTab, actionLabel, action, isCheckTable } = props
-  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, prev_location, image } = data;
+  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, prev_location, image, remarks } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [open, setOpen] = useState(false)
+  const [ remarkAsset, setRemarkAsset ] = useState(remarks)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
+  const reportContext = useReportContext()
   useEffect(() => {
     const updateData = async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -102,6 +105,14 @@ export function CreateAssetTableCell(
     updateAssetStatus()
   }, [assetStatus, data])
 
+  useEffect(() => {
+    const updateRemark = async () => {
+      if (reportContext.update) {
+      await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset})
+    }}
+    updateRemark()
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportContext.update, data.id])
   return (
     <>
       {
@@ -185,7 +196,12 @@ export function CreateAssetTableCell(
                   <Tooltip title={prev_location}
                     placement="top-start"
                   >
-                    <Button variant="text">{prev_location}</Button>
+                    <TextField
+                      id="remark"
+                      label={prev_location}
+                      onChange={(event) => setRemarkAsset(event.target.value)}
+                      value={remarkAsset}
+                    />
                   </Tooltip>
                 </TableCell>
                 : <></>
@@ -315,7 +331,7 @@ export function AssetTable(props: {
               showFirstButton
               showLastButton
               rowsPerPageOptions={
-                [5, 10, 25, { label: 'All', value: -1 }]
+                [5, 10, 25, { label: 'All', value: data.length}]
               }
               colSpan={5}
               count={data.length}

@@ -41,6 +41,7 @@ export type TAssetRow = {
     status: number;
     prev_location?: string;
     image?: string;
+    remarks?: string;
 };
 
 export type TReportForm = {

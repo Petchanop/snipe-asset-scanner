@@ -20,12 +20,19 @@ type LocationStateContext = {
   setLocationId: Dispatch<SetStateAction<number>>;
 }
 
-type ReportStateContext = {
+export type TRemarkAssetCountLine = {
+  id: string;
+  remark: string;
+}
+
+export type ReportStateContext = {
   DocumentNumber: number | undefined;
   update: boolean;
+  remark?: TRemarkAssetCountLine[];
   setDocumentNumber: Dispatch<SetStateAction<number | undefined>>;
   setRefetchReport: Dispatch<SetStateAction<boolean>>;
-  setUpdate: Dispatch<SetStateAction<boolean>>
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setRemark?: Dispatch<SetStateAction<TRemarkAssetCountLine[]>>;
 }
 
 //31 line of console.log

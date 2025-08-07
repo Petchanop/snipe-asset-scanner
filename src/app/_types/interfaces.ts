@@ -11,7 +11,8 @@ export interface HeadersAssetTable {
     label: string,
     isSelectBox: boolean,
     fontColor: string[],
-    value: keyof TAssetRow
+    value: keyof TAssetRow,
+    mobile?: boolean
 }
 
 export interface AssignedTo {

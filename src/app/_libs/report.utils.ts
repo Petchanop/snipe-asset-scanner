@@ -146,6 +146,7 @@ type FUpdateAssetCountLine = {
     asset_name_not_correct?: boolean;
     asset_count_line_status_id?: number;
     image?: string;
+    remarks?: string;
 }
 
 export async function UpdateAssetCountLine(
@@ -181,7 +182,7 @@ export async function getAssetCountLineByAssetCount(
         where: {
             asset_count_id: assetCountId,
             asset_count_line_location_id: location_id
-        },
+        }
     })
     return result
 }

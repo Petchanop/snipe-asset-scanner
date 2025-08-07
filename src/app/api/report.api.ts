@@ -76,6 +76,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
         where: {
             asset_count_id: assetCountReport.id!,
             asset_code: data.asset_tag,
+            asset_name: data.name,
             asset_count_line_location_id: data.location_id
         },
         orderBy: {}

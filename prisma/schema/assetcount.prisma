@@ -53,6 +53,7 @@ model asset_count_line {
   status_id                    asset_status          @relation(fields: [asset_count_line_status_id], references: [id])
   previous_loc_id              Int?
   image                        String?
+  remarks                      String                @default("")
 
   @@index([asset_count_id], map: "asset_count_line_asset_count_id_index")
   @@index([asset_count_line_status_id], map: "asset_count_line_status_id_index")

@@ -296,7 +296,7 @@ export default function LocationTable(props: {
             <TablePagination
               showFirstButton
               showLastButton
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: tableData.length }]}
               colSpan={8}
               count={reports.length}
               rowsPerPage={rowsPerPage}
