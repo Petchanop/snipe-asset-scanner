@@ -194,6 +194,7 @@ export function CreateAssetTableCell(
                     id="remark"
                     onChange={(event) => setRemarkAsset(event.target.value)}
                     value={remarkAsset}
+                    className="w-full"
                   />
                 </TableCell>
                 : <></>

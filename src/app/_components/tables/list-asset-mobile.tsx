@@ -84,60 +84,60 @@ function RenderCellValueByAssetKey(props: {
 
     case "countCheck":
       return (
-        <div className="flex flex-row items-center justify-between pr-4 h-[1rem]">
+        <div className="flex flex-row items-center justify-between h-[1.25rem]">
           {header}
           <Checkbox checked={count}
             disabled={!isCheckTable}
             onChange={() => setCount(pre => !pre)}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           />
         </div>
       )
 
     case "assignIncorrect":
       return (
-        <div className="flex flex-row items-center justify-between pr-4 h-[1rem]">
+        <div className="flex flex-row items-center justify-between h-[1.25rem]">
           {header}
           <Checkbox
             checked={incorrect}
             disabled={!isCheckTable}
             onChange={() => setIncorrect(pre => !pre)}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           />
         </div>
       )
     case "notInLocation":
       return (
-        <div className="flex flex-row items-center justify-between pr-4 h-[1rem]">
+        <div className="flex flex-row items-center justify-between h-[1.25rem]">
           {header}
           <Checkbox
             checked={wrongLocation}
             disabled={!isCheckTable}
             onChange={() => setWrongLocation(pre => !pre)}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           />
         </div>
       )
 
     case "status":
       return (
-        <div className="flex flex-row items-center justify-between pr-4 h-[1rem]">
+        <div className="flex flex-row items-center justify-between h-[1.25rem]">
           {header}
           <Checkbox
             checked={assetStatus}
             onChange={() => setAssetStatus(pre => !pre)}
             disabled={!isCheckTable}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           />
         </div>
       )
 
     case "prev_location":
       return (
-        <div className="flex flex-row items-center justify-between pr-4 h-[1rem]">
+        <div className="flex flex-row items-center justify-between h-[1.25rem]">
           {header}
           <IconButton onClick={() => setOpenModal((prev) => !prev)}
-            sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+            sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           >
             <EditNoteTwoToneIcon />
           </IconButton>
@@ -314,7 +314,7 @@ function AssetCard(props: {
     setOpenModal: setOpenModal
   }
   return (
-    <Table stickyHeader size="small" sx={{
+    <Table stickyHeader sx={{
     }}
       className={tabValue == assetTab ? "p-8" : "hidden"}
     >
