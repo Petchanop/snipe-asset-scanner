@@ -1,7 +1,12 @@
 'use client'
 
 import {
-  createContext, Dispatch, SetStateAction, SyntheticEvent, useContext, useEffect, useState
+  createContext,
+  Dispatch,
+  SetStateAction,
+  SyntheticEvent,
+  useContext,
+  useEffect, useState
 } from "react";
 import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -9,8 +14,12 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Button from "@mui/material/Button";
 import { AssetTable } from "@/_components/tables/list-asset";
-import { AssetCount, INLOCATION, OUTLOCATION, TAssetRow, TAssetTab, User } from "@/_types/types";
-import { AddAssetCountLine, GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
+import {
+  AssetCount, AssetCountLocation,
+  INLOCATION, OUTLOCATION,
+  TAssetRow, TAssetTab, User
+} from "@/_types/types";
+import { BulkCreateAssetCountLine, GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
 import dayjs, { Dayjs } from "dayjs";
 import { ReportContext, useReportContext } from "@/_components/tableLayout";
 import { usePathname, useRouter, useParams } from "next/navigation";
@@ -20,16 +29,16 @@ import {
   getAssetCountLineByAssetCount,
   updateAssetCountReport,
 } from "@/_libs/report.utils";
-import { AssetResponse, getAssetById } from "@/api/snipe-it/snipe-it.api";
+import { getAssetById } from "@/api/snipe-it/snipe-it.api";
 import toast from "react-hot-toast";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
-import { ExtendAssetResponse } from "@/_components/tables/search-asset";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { LoadingTableSkeleton } from "@/_components/loading";
+import { LoadingTableSkeleton, useWindowSize } from "@/_components/loading";
 import { ReportState } from "@/_constants/constants";
-import { ConvertImageUrl } from "@/_libs/convert_url.utils";
+import ListAssetMobile from "@/_components/tables/list-asset-mobile";
+import { mapAssetData, parseDataForCreateAssetCountLine } from "@/_components/tables/utility";
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
@@ -81,7 +90,7 @@ function CheckAssetButton(props: {
       </div>
       <div className="flex flex-col">
         <Button className={
-          `hover:bg-blue-200 max-md:w-1/3 
+          `hover:bg-blue-200 max-md:w-2/3 
         max-md:text-sm max-md:font-medium`
         }
           onClick={handleFinishButton}
@@ -141,8 +150,6 @@ function SelectCountButton(props: {
 
   async function handleClickStart() {
     setIsCheckTable((pre) => !pre)
-
-
     documentContext.setDocumentNumber(documentNumber)
     replace(`${window.location.href}`)
   }
@@ -275,6 +282,7 @@ export default function NewCountTable(props: {
   users: User[];
   report: AssetCount | null;
   user: any;
+  baseUrl: string;
 }) {
   const {
     allLocation,
@@ -286,6 +294,7 @@ export default function NewCountTable(props: {
     parentProp,
     users,
     user,
+    baseUrl,
     report } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
@@ -296,6 +305,7 @@ export default function NewCountTable(props: {
   const [documentNumber, setDocumentNumber] = useState<number>()
   const [update, setUpdate] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const media = useWindowSize()
   const { push } = useRouter()
 
   useEffect(() => {
@@ -320,27 +330,18 @@ export default function NewCountTable(props: {
         let assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
         if (assetCountLineReport.length == 0) {
           const { data, error } = await getAssetByLocationId(location.id)
-          if (error || data) {
+          if (error || !data) {
             toast.error(`${report.document_number} asset data not found.`)
           }
-          assetCountLineReport = await Promise.all(data!.map(async (asset: AssetResponse) => {
-            const extendTypeAsset: ExtendAssetResponse = {
-              ...asset,
-              asset_name_not_correct: false,
-              is_not_asset_loc: asset.location?.id != location.id,
-              is_assigned_incorrectly: false,
-              asset_check: false,
-              checked_by: parseInt(user.id),
-              in_report: false,
-              location_id: assetLocationId?.id as string,
-              status: asset.status_label?.status_meta as string,
-              prev_location: allLocation.find((loc) => loc.id == asset.location) as TLocation,
-              image: asset.image as string
-            }
-            return await AddAssetCountLine(extendTypeAsset, report)
-          }))
+          const assetCountLineList = data?.map((asset) => {
+            return parseDataForCreateAssetCountLine(
+              asset, location, user, assetLocationId as AssetCountLocation, allLocation, report
+            )
+          }) 
+          await BulkCreateAssetCountLine(assetCountLineList!)
+          assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
         }
-        const mapAssetData = await Promise.all(
+        const AssetData = await Promise.all(
           assetCountLineReport.map(async (asset) => {
             const data = users.find((user) => user.id as number == asset.assigned_to)
             let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
@@ -348,37 +349,16 @@ export default function NewCountTable(props: {
               const assetData = await getAssetById(asset.asset_id)
               prev_loc = assetData.data?.location as unknown as TLocation
             }
-            return {
-              id: asset.id,
-              assetCode: asset.asset_code,
-              assetName: asset.asset_name,
-              assignedTo: {
-                id: asset.assigned_to,
-                first_name: data ? data!.first_name : null,
-                last_name: data ? data!.last_name : null
-              },
-              countCheck: asset.asset_check ? asset.asset_check : false,
-              notInLocation: asset.is_not_asset_loc ? asset.is_not_asset_loc : false,
-              assignIncorrect: asset.is_assigned_incorrectly,
-              status: asset.asset_count_line_status_id,
-              prev_location: prev_loc?.name,
-              image: await ConvertImageUrl(asset.image as string)
-            } as unknown as TAssetRow
+            return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
           }))
-
         if (await CheckAllDataCount(report.id) == true) {
           await updateAssetCountReport(report.document_number, {
             ...report,
             state: ReportState.COMPLETED
           })
-        } else {
-          await updateAssetCountReport(report.document_number, {
-            ...report,
-            state: ReportState.INPROGRESS
-          })
         }
-
-        setData(mapAssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck)))
+        const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+        setData(sortMapData)
         setRefetchReport(false)
         setLoading(false)
       }
@@ -388,14 +368,12 @@ export default function NewCountTable(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchReport])
 
-
   useEffect(() => {
     const updateAssetCountLine = () => {
       if (update) {
         setRefetchReport(true)
       }
     }
-
     updateAssetCountLine()
   }, [update])
 
@@ -419,7 +397,7 @@ export default function NewCountTable(props: {
           update: update,
           setDocumentNumber: setDocumentNumber,
           setRefetchReport: setRefetchReport,
-          setUpdate: setUpdate
+          setUpdate: setUpdate,
         }}
         >
           <NewCountInput
@@ -446,24 +424,40 @@ export default function NewCountTable(props: {
             loading ?
               <LoadingTableSkeleton />
               :
-              <>
-                <AssetTable
-                  data={data.filter((loc) => loc.notInLocation == false) as TAssetRow[]}
-                  isCheckTable={isCheckTable}
-                  assetTab={assetTab}
-                  setAssetTab={setAssetTab}
-                  tabValue={INLOCATION}
-                />
-                <AssetTable
-                  data={data.filter((loc) => loc.notInLocation == true) as TAssetRow[]}
-                  isCheckTable={isCheckTable}
-                  assetTab={assetTab}
-                  setAssetTab={setAssetTab}
-                  tabValue={OUTLOCATION}
-                />
-              </>
+              media.width as number < 500 ?
+                <>
+                  <ListAssetMobile
+                    data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    tabValue={INLOCATION}
+                  />
+                  <ListAssetMobile
+                    data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    tabValue={OUTLOCATION}
+                  />
+                </> :
+                <>
+                  <AssetTable
+                    data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    tabValue={INLOCATION}
+                  />
+                  <AssetTable
+                    data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    tabValue={OUTLOCATION}
+                  />
+                </>
           }
-
         </ReportContext>
       </DateValueContext>
     </>

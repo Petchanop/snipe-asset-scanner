@@ -1,8 +1,10 @@
 import { ReportState } from "@/_constants/constants";
 import { asset_count, asset_count_line, asset_count_location, assets, locations, users } from "@/prisma/generated/prisma";
+import { TLocation } from "./snipe-it.type";
+import { AssetResponse } from "@/api/snipe-it/snipe-it.api";
 //eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export function hasOwnProperty<X extends {}, Y extends PropertyKey>
- (obj: X, prop: Y): obj is X & Record<Y, unknown> {
+    (obj: X, prop: Y): obj is X & Record<Y, unknown> {
     if (obj == null)
         return false
     return obj.hasOwnProperty(prop)
@@ -32,16 +34,34 @@ export type assetUser = {
 
 export type TAssetRow = {
     id?: string;
-    assetCode: string;
-    assetName: string;
+    assetCode?: string;
+    assetName?: string;
     assignedTo: assetUser;
-    countCheck: boolean;
-    assignIncorrect: boolean;
-    notInLocation: boolean;
-    status: number;
+    countCheck?: boolean;
+    assignIncorrect?: boolean;
+    notInLocation?: boolean;
+    status?: number;
     prev_location?: string;
     image?: string;
+    remarks?: string;
 };
+
+export type ExtendAssetResponse = AssetResponse & {
+    // id: number;
+    // asset_tag: string;
+    // name: string;
+    // assigned_to: any;
+    asset_name_not_correct: boolean;
+    is_not_asset_loc: boolean;
+    asset_check: boolean;
+    checked_by: number;
+    location_id: string;
+    in_report: boolean;
+    status: string;
+    is_assigned_incorrectly: boolean;
+    prev_location: TLocation;
+    image?: string;
+}
 
 export type TReportForm = {
     id?: string,

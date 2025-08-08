@@ -1,9 +1,8 @@
 "use server"
-import { AssetCount, AssetCountLine, AssetCountLocation, User } from "@/_types/types";
+import { AssetCount, AssetCountLine, AssetCountLocation, ExtendAssetResponse, User } from "@/_types/types";
 import { prisma } from "@/_libs/prisma"
 import { TResponse } from "@/api/next.api";
 import dayjs from "dayjs";
-import { ExtendAssetResponse } from "@/_components/tables/search-asset";
 import { AssetStatusEnum, assetStatusOptions } from "@/_constants/constants";
 import { createAssetCountLine } from "@/_libs/report.utils";
 
@@ -71,11 +70,16 @@ export async function findStatusId(data: ExtendAssetResponse): Promise<number> {
     return assetStatusOptions.find((status) => status.value == data.status)?.id || 2;
 }
 
+export async function BulkCreateAssetCountLine(data: any[]) {
+    await prisma.asset_count_line.createMany({ data : data })
+}
+
 export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountReport: AssetCount): Promise<AssetCountLine> {
     const findLatest = await prisma.asset_count_line.findFirst({
         where: {
             asset_count_id: assetCountReport.id!,
             asset_code: data.asset_tag,
+            asset_name: data.name,
             asset_count_line_location_id: data.location_id
         },
         orderBy: {}

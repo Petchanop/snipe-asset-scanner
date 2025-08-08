@@ -33,6 +33,7 @@ import { AssetCount, Location } from "@/_types/types";
 import { useLocationUrlContext } from "@/_components/tableLayout";
 import { useRouter } from "next/navigation";
 import { TableSortLabel } from "@mui/material";
+import { decode } from 'html-entities';
 
 function CreateLocationTableCell(props: {
   data: locationTableData
@@ -162,7 +163,7 @@ export function ChildrenSelectComponent(props: {
             {
               childrenLocation.map((loc) =>
                 <MenuItem value={loc.name as unknown as string} key={loc.id}>
-                  <div dangerouslySetInnerHTML={{ __html: loc.name! }} data-key={loc.id} data-name={loc.name}></div>
+                  {decode(loc.name)}
                 </MenuItem>
               )
             }
@@ -194,7 +195,7 @@ export function ParentSelectComponent(props: {
       {
         parentLocation ?
           parentLocation.map((loc) =>
-            <MenuItem value={loc.name} key={loc.id}>{loc.name}</MenuItem>
+            <MenuItem value={loc.name} key={loc.id}>{decode(loc.name)}</MenuItem>
           )
           : <></>
       }
@@ -296,7 +297,7 @@ export default function LocationTable(props: {
             <TablePagination
               showFirstButton
               showLastButton
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+              rowsPerPageOptions={[5, 10, 25]}
               colSpan={8}
               count={reports.length}
               rowsPerPage={rowsPerPage}

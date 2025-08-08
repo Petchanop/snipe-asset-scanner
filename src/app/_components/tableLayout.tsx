@@ -20,12 +20,19 @@ type LocationStateContext = {
   setLocationId: Dispatch<SetStateAction<number>>;
 }
 
-type ReportStateContext = {
+export type TRemarkAssetCountLine = {
+  id: string;
+  remark: string;
+}
+
+export type ReportStateContext = {
   DocumentNumber: number | undefined;
   update: boolean;
+  remark?: TRemarkAssetCountLine[];
   setDocumentNumber: Dispatch<SetStateAction<number | undefined>>;
   setRefetchReport: Dispatch<SetStateAction<boolean>>;
-  setUpdate: Dispatch<SetStateAction<boolean>>
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+  setRemark?: Dispatch<SetStateAction<TRemarkAssetCountLine[]>>;
 }
 
 //31 line of console.log
@@ -85,7 +92,7 @@ export default function TableLayout({
           label="new count" />
       </Tabs>
       <Paper elevation={10}>
-        <TableContainer className="w-full max-h-[75vh]">
+        <TableContainer className="w-full max-md:w-full max-h-[75vh]">
           <LocationUrlContext
             value={{
               locationId: locationId,

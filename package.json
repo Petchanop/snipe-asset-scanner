@@ -30,6 +30,7 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "exceljs": "^4.4.0",
+    "html-entities": "^2.6.0",
     "ldap-authentication": "^3.3.4",
     "ldapts": "^8.0.9",
     "next": "15.3.3",

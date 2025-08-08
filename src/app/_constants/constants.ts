@@ -43,43 +43,50 @@ export const tableHeaders: HeadersAssetTable[] = [
         label: "Asset code",
         isSelectBox: false,
         fontColor: ["black"],
-        value: "assetCode"
+        value: "assetCode",
+        mobile: true
     },
     {
         label: "Asset Name",
         isSelectBox: false,
         fontColor: ["black"],
-        value: "assetName"
+        value: "assetName",
+        mobile: false
     },
     {
         label: "Assigned to",
         isSelectBox: false,
         fontColor: ["black"],
-        value: "assignedTo"
+        value: "assignedTo",
+        mobile: true
     },
     {
         label: "Count Check",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "countCheck"
+        value: "countCheck",
+        mobile: true
     },
     {
         label: "Assign Incorrect",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "assignIncorrect"
+        value: "assignIncorrect",
+        mobile: true
     },
     {
         label: "Not in Location",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "notInLocation"
+        value: "notInLocation",
+        mobile: true
     },
     {
         label: "ชำรุด",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "status"
+        value: "status",
+        mobile: true
     }
 ]
 
@@ -102,49 +109,57 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         label: "Asset code",
         isSelectBox: false,
         fontColor: ["black"],
-        value: "assetCode"
+        value: "assetCode",
+        mobile: true
     },
     {
         label: "Asset Name",
         isSelectBox: false,
         fontColor: ["black"],
-        value: "assetName"
+        value: "assetName",
+        mobile: false
     },
     {
         label: "Assigned to",
         isSelectBox: false,
         fontColor: ["black"],
-        value: "assignedTo"
+        value: "assignedTo",
+        mobile: true
     },
     {
         label: "Count Check",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "countCheck"
+        value: "countCheck",
+        mobile: true
     },
     {
         label: "Assign Incorrect",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "assignIncorrect"
+        value: "assignIncorrect",
+        mobile: true
     },
     {
         label: "Not in Location",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "notInLocation"
+        value: "notInLocation",
+        mobile: true
     },
     {
         label: "ชำรุด",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "status"
+        value: "status",
+        mobile: true
     },
     {
         label: "remarks",
         isSelectBox: true,
         fontColor: ["black"],
-        value: "prev_location"
+        value: "prev_location",
+        mobile: true
     }
 ]
 

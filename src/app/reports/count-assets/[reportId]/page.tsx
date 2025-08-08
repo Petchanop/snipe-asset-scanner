@@ -27,8 +27,6 @@ export default async function AssetsTablePage({ params }: {
     const locationId = await GetAssetCountLocationByAssetCountReport(assetCountReport.id)
     const locations = await fetchLocations();
     const parentLocation = getParentLocation(locations.data!.rows)
-    // const childrenLocation = getChildrenLocation(locations.data!.rows) as TLocation[]
-    // const otherLocation = getOtherLocation(locations.data!.rows)
     const locationData: Location[] = []
     const listOfParent: Location[] = []
     for (const loc of locationId) {
@@ -64,7 +62,7 @@ export default async function AssetsTablePage({ params }: {
         loc.children as unknown as { id: number, name: string }[])
         .find((child: { id: number, name: string }) => locationId.find((loc) => child.id == loc.location_id))
     ) as TLocation
-
+    const baseUrl = process.env.SNIPE_URL
     return (
         <NewCountTable
             allLocation={locations.data!.rows}
@@ -77,6 +75,7 @@ export default async function AssetsTablePage({ params }: {
             users={users}
             report={report}
             user={session?.user}
+            baseUrl={baseUrl as string}
         />
     )
 }
