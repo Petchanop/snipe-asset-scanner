@@ -34,13 +34,13 @@ import TableRow from "@mui/material/TableRow"
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Button from "@mui/material/Button"
-import Tooltip from "@mui/material/Tooltip"
 import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import Image from "next/image"
-import TextField from "@mui/material/TextField";
-import { useReportContext } from "../tableLayout";
+import { useReportContext } from "@/_components/tableLayout";
+import ImageComponent from "@/_components/ImageComponent";
+import { decode } from 'html-entities'
+import { TextareaAutosize } from "@mui/material";
 
 export function CreateAssetTableCell(
   props: {
@@ -51,12 +51,12 @@ export function CreateAssetTableCell(
     isCheckTable: boolean
   }) {
   const { data, assetTab, actionLabel, action, isCheckTable } = props
-  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, prev_location, image, remarks } = data;
+  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, image, remarks } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [open, setOpen] = useState(false)
-  const [ remarkAsset, setRemarkAsset ] = useState(remarks)
+  const [remarkAsset, setRemarkAsset] = useState(remarks)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
   const reportContext = useReportContext()
@@ -108,8 +108,9 @@ export function CreateAssetTableCell(
   useEffect(() => {
     const updateRemark = async () => {
       if (reportContext.update) {
-      await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset})
-    }}
+        await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset })
+      }
+    }
     updateRemark()
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportContext.update, data.id])
@@ -122,12 +123,8 @@ export function CreateAssetTableCell(
               {assetCode}
             </TableCell>
             <TableCell>
-              {/* <Link href={image ? image as string : ""}
-                target="_blank" rel="noopener noreferrer"
-                className="hover:underline hover:text-blue-400"
-              >{assetName}</Link> */}
               <Button variant="text" onClick={() => setOpen((prev) => !prev)}>
-                {assetName}
+                {decode(assetName)}
               </Button>
               <Dialog
                 open={open}
@@ -136,14 +133,14 @@ export function CreateAssetTableCell(
                 onClick={() => setOpen((prev) => !prev)}
               >
                 <DialogTitle id="alert-dialog-title">
-                  {assetName}
+                  {decode(assetName)}
                 </DialogTitle>
                 <DialogContent>
                   {
                     image ?
-                      <Image
+                      <ImageComponent
                         src={image}
-                        alt={assetName}
+                        alt={assetName as string}
                         width={400}
                         height={400}
                       /> : "No image display"
@@ -193,20 +190,14 @@ export function CreateAssetTableCell(
             {
               tabType == OUTLOCATION ?
                 <TableCell align="center">
-                  <Tooltip title={prev_location}
-                    placement="top-start"
-                  >
-                    <TextField
-                      id="remark"
-                      label={prev_location}
-                      onChange={(event) => setRemarkAsset(event.target.value)}
-                      value={remarkAsset}
-                    />
-                  </Tooltip>
+                  <TextareaAutosize
+                    id="remark"
+                    onChange={(event) => setRemarkAsset(event.target.value)}
+                    value={remarkAsset}
+                  />
                 </TableCell>
                 : <></>
             }
-
           </>
           : <></>
       }
@@ -331,7 +322,7 @@ export function AssetTable(props: {
               showFirstButton
               showLastButton
               rowsPerPageOptions={
-                [5, 10, 25, { label: 'All', value: data.length}]
+                [5, 10, 25]
               }
               colSpan={5}
               count={data.length}

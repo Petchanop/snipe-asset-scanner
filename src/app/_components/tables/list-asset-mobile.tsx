@@ -1,8 +1,9 @@
-import { AssetStatusEnum, 
-    assetStatusOptions, 
-    INLOCATION, 
-    tableHeaders, 
-    tableHeadersAdditional 
+import {
+  AssetStatusEnum,
+  assetStatusOptions,
+  INLOCATION,
+  tableHeaders,
+  tableHeadersAdditional
 } from "@/_constants/constants"
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { TAssetRow, TAssetTab } from "@/_types/types"
@@ -19,7 +20,6 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import Image from 'next/image'
 import Pagination from "@mui/material/Pagination";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -28,14 +28,16 @@ import Typography from "@mui/material/Typography";
 import EditNoteTwoToneIcon from '@mui/icons-material/EditNoteTwoTone'
 import IconButton from "@mui/material/IconButton";
 import { DialogActions } from "@mui/material";
+import ImageComponent from "@/_components/ImageComponent";
+import { decode } from 'html-entities'
 
 type TRenderCellProps = {
-  count: boolean,
-  setCount: Dispatch<SetStateAction<boolean>>,
-  incorrect: boolean,
-  setIncorrect: Dispatch<SetStateAction<boolean>>,
-  wrongLocation: boolean,
-  setWrongLocation: Dispatch<SetStateAction<boolean>>,
+  count: boolean | undefined,
+  setCount: Dispatch<SetStateAction<boolean | undefined>>,
+  incorrect: boolean | undefined,
+  setIncorrect: Dispatch<SetStateAction<boolean | undefined>>,
+  wrongLocation: boolean | undefined, 
+  setWrongLocation: Dispatch<SetStateAction<boolean | undefined>>,
   assetStatus: boolean,
   setAssetStatus: Dispatch<SetStateAction<boolean>>,
   remarkAsset: string,
@@ -157,11 +159,8 @@ function RenderCellValueByAssetKey(props: {
                 color='warning'
               >ยกเลิก</Button>
               <Button onClick={() => {
-                // context.setUpdate((prev) => !prev)
                 const updateRemark = async () => {
-                  // if (reportContext.update) {
                   await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset })
-                  // }
                 }
                 updateRemark()
                 setOpenModal((prev) => !prev)
@@ -182,9 +181,9 @@ function RenderCellValueByAssetKey(props: {
           <Button onClick={() => setOpen((prev) => !prev)}>
             {
               image ?
-                <Image
+                <ImageComponent
                   src={image}
-                  alt={assetName}
+                  alt={assetName as string}
                   width={400}
                   height={400}
                 /> : "No image display"
@@ -197,14 +196,14 @@ function RenderCellValueByAssetKey(props: {
             onClick={() => setOpen((prev) => !prev)}
           >
             <DialogTitle id="alert-dialog-title">
-              {assetName}
+              {decode(assetName)}
             </DialogTitle>
             <DialogContent>
               {
                 image ?
-                  <Image
+                  <ImageComponent
                     src={image}
-                    alt={assetName}
+                    alt={assetName as string}
                     width={400}
                     height={400}
                   /> : "No image display"
@@ -212,7 +211,7 @@ function RenderCellValueByAssetKey(props: {
             </DialogContent>
           </Dialog>
           <div className="text-black text-lg" key={assetCode}>
-            {assetName}
+            {decode(assetName)}
           </div>
         </div>
       )
@@ -278,8 +277,8 @@ function AssetCard(props: {
     const updateAssetStatus = async () => {
       data.status = assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
       await UpdateAssetCountLine(data.id as string, {
-        asset_count_line_status_id: assetStatus ? 
-          AssetStatusEnum.MALFUNCTIONING 
+        asset_count_line_status_id: assetStatus ?
+          AssetStatusEnum.MALFUNCTIONING
           : AssetStatusEnum.DEPLOYABLE
       })
     }
@@ -368,12 +367,12 @@ export default function ListAssetMobile(props: {
   const { data, isCheckTable, assetTab, tabValue } = props
   const [itemPerPage, setItemPerPage] = useState(5)
   const [page, setPage] = useState<number>(1);
-  const rowPerPageOptions = [5, 10, 20]
+  const rowPerPageOptions = [5, 10, 25]
 
   function dataPerPage(data: any, page: number, rowsPerPage: number): any[] {
-    return data.length ? 
+    return data.length ?
       data
-        .slice((page - 1) * rowsPerPage, ((page - 1) * rowsPerPage) + rowsPerPage) 
+        .slice((page - 1) * rowsPerPage, ((page - 1) * rowsPerPage) + rowsPerPage)
       : []
   }
   return (
@@ -391,8 +390,8 @@ export default function ListAssetMobile(props: {
                 <Paper key={asset.assetCode} elevation={5}
                   sx={{
                     borderRadius: '2%',
-                    maxWidth: 600,
-                    minWidth: 400
+                    maxWidth: 350,
+                    minWidth: 350
                   }}
                 >
                   <AssetCard
@@ -409,7 +408,6 @@ export default function ListAssetMobile(props: {
               page={page}
               onChange={(_, page) => {
                 setPage(page)
-                console.log("page", page)
               }}
               siblingCount={0}
               showFirstButton showLastButton />

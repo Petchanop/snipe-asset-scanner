@@ -16,6 +16,7 @@ import Button from '@mui/material/Button';
 import Image from 'next/image';
 import DownloadIcon from '@mui/icons-material/Download';
 import { blue } from '@mui/material/colors';
+import { decode } from 'html-entities'
 
 export default function AssetReport(
   props: {
@@ -29,7 +30,7 @@ export default function AssetReport(
   const { document_number, document_date } = assetCountReport
   let reportLocation = ""
   for (const location of locations) {
-    reportLocation += location.name
+    reportLocation += decode(location.name)
     if (location != locations[locations.length - 1])
       reportLocation += '/'
   }

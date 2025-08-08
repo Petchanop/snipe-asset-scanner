@@ -27,6 +27,7 @@ import { CreateAssetCountLocation } from "@/api/report.api";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
 import { TReportForm } from "@/_types/types";
+import { decode } from 'html-entities'
 
 type TCreateReportContext = {
   report: TReportForm,
@@ -70,7 +71,7 @@ export function ObjectList(props: {
               }
             >
               <ListItemText
-                primary={item.name}
+                primary={decode(item.name)}
               />
             </ListItem>
             <Divider />
@@ -232,7 +233,7 @@ function StepComponent(props: {
                   <div key={item.id}>
                     <ListItem>
                       <ListItemText
-                        primary={item.name}
+                        primary={decode(item.name)}
                       />
                     </ListItem>
                     <Divider />

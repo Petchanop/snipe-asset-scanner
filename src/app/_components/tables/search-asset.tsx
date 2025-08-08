@@ -10,7 +10,7 @@ import TextField from "@mui/material/TextField";
 import Table from "@mui/material/Table";
 import { blue } from "@mui/material/colors";
 import Button from "@mui/material/Button";
-import { AssetResponse, fetchSearchAsset } from "@/api/snipe-it/snipe-it.api";
+import { fetchSearchAsset } from "@/api/snipe-it/snipe-it.api";
 import { toast, ToastBar, Toaster } from 'react-hot-toast';
 import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
@@ -22,21 +22,7 @@ import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_compo
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { useRouter } from "next/navigation";
 import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/search-asset.utils";
-import { TLocation } from "@/_types/snipe-it.type";
 import Tooltip from "@mui/material/Tooltip";
-
-export type ExtendAssetResponse = AssetResponse & {
-  asset_name_not_correct: boolean;
-  is_not_asset_loc: boolean;
-  asset_check: boolean;
-  checked_by: number;
-  location_id: string;
-  in_report: boolean;
-  status: string;
-  is_assigned_incorrectly: boolean;
-  prev_location: TLocation;
-  image?: string;
-}
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
