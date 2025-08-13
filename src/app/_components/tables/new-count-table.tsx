@@ -73,8 +73,8 @@ function CheckAssetButton(props: {
   const actions = [
     {
       icon: <SearchIcon />, name: 'ค้นหา', onClick: () => {
-        // push(`${pathname}/check?location=${childId}`)ue
-        reportContext.setSearch(true)
+        push(`${pathname}/check?location=${childId}`)
+        // reportContext.setSearch(true)
       }
     },
     { icon: <CancelIcon />, name: 'ยกเลิก', onClick: () => setIsCheckTable((pre) => !pre) },
@@ -478,29 +478,30 @@ export default function NewCountTable(props: {
           {
             loading ?
               <LoadingTableSkeleton />
-              :
-              IsSearch ?
-                <div className="p-4
-                  bg-white 
-                  rounded-2xl 
-                  shadow-lg 
-                  transition 
-                  duration-300 
-                  transform 
-                  hover:-translate-y-1 
-                  hover:shadow-2xl
-                  ">
-                  <Typography>Check asset</Typography>
-                  {locationId && (
-                    <SearchAsset
-                      assetCountReport={report!}
-                      assetInReport={assetCountLine}
-                      locationId={locationProp!}
-                      users={users}
-                      user={user}
-                    />
-                  )}
-                </div> :
+              // :
+              // IsSearch ?
+              //   <div className="p-4
+              //     bg-white 
+              //     rounded-2xl 
+              //     shadow-lg 
+              //     transition 
+              //     duration-300 
+              //     transform 
+              //     hover:-translate-y-1 
+              //     hover:shadow-2xl
+              //     ">
+              //     <Typography>Check asset</Typography>
+              //     {locationId && (
+              //       <SearchAsset
+              //         assetCountReport={report!}
+              //         assetInReport={assetCountLine}
+              //         locationId={locationProp!}
+              //         users={users}
+              //         user={user}
+              //       />
+              //     )}
+              //   </div> 
+                :
                 media.width as number < 500 ?
                   <>
                     <ListAssetMobile
