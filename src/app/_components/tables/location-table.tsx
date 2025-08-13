@@ -44,7 +44,6 @@ import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import { maxWindowSize } from "@/_constants/mockData";
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 
@@ -125,7 +124,6 @@ function CreateLocationTableCell(props: {
   const windowSize = useWindowSize()
   const [hidden, setHidden] = useState<boolean>(true);
 
-  const hiddenContext = useHiddenCellContext()
   const context = useLocationUrlContext()
   //change location to document name
   return (
