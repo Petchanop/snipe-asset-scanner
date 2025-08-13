@@ -14,8 +14,8 @@ export default function FilterReportComponent() {
         onClick={() => setOpen(!open)}
         // className="fixed top-4 left-4
         className="
-        z-50 flex items-center gap-2 bg-blue-600 text-white 
-        px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+        z-50 flex items-center gap-2 bg-blue-300 text-white 
+        px-4 py-2 rounded shadow hover:bg-blue-500 transition"
       >
         <FilterListIcon />
         <span>Filters</span>
