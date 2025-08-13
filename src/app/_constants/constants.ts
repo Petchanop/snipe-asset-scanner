@@ -32,10 +32,10 @@ export enum ReportState {
 }
 
 export const MapActionColor: Record<string, { [key: number]: string }> = {
-    "เริ่ม": blue,
-    "ตรวจนับ": brown,
-    "แก้ไข": red,
-    "เรียกดู": grey,
+    "เริ่ม": blue[300],
+    "ตรวจนับ": brown[400],
+    "แก้ไข": red[300],
+    "เรียกดู": grey[500],
 }
 
 export const tableHeaders: HeadersAssetTable[] = [

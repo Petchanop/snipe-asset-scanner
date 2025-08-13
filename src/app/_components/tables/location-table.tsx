@@ -83,7 +83,7 @@ function HiddenMenuDialog(props: {
           <Typography>Name: {name}</Typography>
           <Typography>Date: {date}</Typography>
           <Typography
-           sx={{color: MapColor[state]![700]}}
+           sx={{color: MapColor[state]![300]}}
           >State: {state}</Typography>
         </DialogContent>
         <DialogActions>
@@ -98,7 +98,7 @@ function HiddenMenuDialog(props: {
               push(`/reports/${documentNumber}`)
             }
           }}> <Typography sx={{ 
-              color: MapActionColor[reportState.label]![300],
+              color: MapActionColor[reportState.label]!,
               fontWeight: 700
             }}>
               [{reportState.label}]
