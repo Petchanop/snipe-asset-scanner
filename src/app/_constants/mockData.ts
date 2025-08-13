@@ -77,35 +77,45 @@ export const mockLocation = [
   'IT dpt', 'HR office', 'Finance', 'Marketing', 'Legal'
 ]
 
+export const maxWindowSize = 500
+
 export const tableHeaders: HeadersLocationTable[] = [
   {
     label: "Document No.",
     isSelectBox: false,
     fontColor: ["black"],
-    value: "document_number" as never
+    value: "document_number" as never,
+    //eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    isHidden: (value?: number) => false,
+    isSticky: true
   },
   {
-    label: "ชื่อแผน",
+    label: "Name",
     isSelectBox: false,
     fontColor: ["black"],
-    value: "document_name" as never
+    value: "document_name" as never,
+    //eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    isHidden: (value?: number) => false
   },
     {
-    label: "วันที่ตรวจนับ",
+    label: "Date",
     isSelectBox: false,
     fontColor: ["black"],
-    value: "document_date" as never
+    value: "document_date" as never,
+    isHidden: (value?: number) => value! < maxWindowSize
   },
   {
     label: "Status",
     isSelectBox: true,
     fontColor: ["blue", "yellow", "green", "red"],
-    value: "state" as never
+    value: "state" as never,
+    isHidden: (value?: number) => value! < maxWindowSize
   },
   {
     label: "Actions",
     isSelectBox: true,
     fontColor: ["black"],
-    value: "action" as never
+    value: "action" as never,
+    isHidden: (value?: number) => value! < maxWindowSize
   }
 ]

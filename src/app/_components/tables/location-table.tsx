@@ -5,7 +5,11 @@ import {
   useEffect,
   useMemo,
   useRef,
-  MouseEvent
+  MouseEvent,
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useContext
 } from "react";
 import {
   dataPerPage,
@@ -34,6 +38,82 @@ import { useLocationUrlContext } from "@/_components/tableLayout";
 import { useRouter } from "next/navigation";
 import { TableSortLabel } from "@mui/material";
 import { decode } from 'html-entities';
+import { useWindowSize } from "../loading";
+import IconButton from "@mui/material/IconButton";
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import { maxWindowSize } from "@/_constants/mockData";
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import FilterReportComponent from "../filterReportComponent";
+
+function processAction(state: string): { label: string, value: string } {
+  switch (state) {
+    case ReportState.NEW:
+      return { label: "แก้ไข", value: "edit" }
+    case ReportState.INPROGRESS:
+      return { label: "ตรวจนับ", value: "count" }
+    case ReportState.COMPLETED:
+      return { label: "เรียกดู", value: "view" }
+    case ReportState.CANCEL:
+      return { label: "เรียกดู", value: "view" }
+  }
+  return { label: "", value: "" }
+}
+
+function HiddenMenuDialog(props: {
+  data: locationTableData,
+  isHidden: boolean,
+  setIsHidden: Dispatch<SetStateAction<boolean>>,
+  reportState: { label: string, value: string }
+}) {
+  const { push } = useRouter()
+  const { data, isHidden, setIsHidden, reportState } = props
+  const { date, documentNumber, state, name } = data;
+  const context = useLocationUrlContext()
+  return (
+    <>
+      <Dialog open={isHidden}
+        onClick={() => setIsHidden((prev) => !prev)}
+        maxWidth="xl"
+        fullWidth={true}
+      >
+        <DialogContent>
+          <Typography>Document no: {documentNumber}</Typography>
+          <Typography>Name: {name}</Typography>
+          <Typography>Date: {date}</Typography>
+          <Typography
+           sx={{color: MapColor[state]![300]}}
+          >State: {state}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={() => {
+            if (reportState.value == "count") {
+              context.selected.current = `/reports/count-assets/${documentNumber}`
+              push(`/reports/count-assets/${documentNumber}`)
+            } else if (reportState.value == "edit") {
+              context.selected.current = ""
+              push(`/setup/${documentNumber}`)
+            } else if (reportState.value == "view") {
+              push(`/reports/${documentNumber}`)
+            }
+          }}> <Typography sx={{ 
+              color: MapActionColor[reportState.label]!,
+              fontWeight: 700
+            }}>
+              [{reportState.label}]
+            </Typography>
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  )
+}
+
+function isCellHiddnen(value: number): boolean {
+  return value < maxWindowSize;
+}
 
 function CreateLocationTableCell(props: {
   data: locationTableData
@@ -42,20 +122,9 @@ function CreateLocationTableCell(props: {
   const { date, documentNumber, state, name } = data;
   const { push } = useRouter()
   const reportState = processAction(state);
+  const windowSize = useWindowSize()
+  const [hidden, setHidden] = useState<boolean>(true);
 
-  function processAction(state: string): { label: string, value: string } {
-    switch (state) {
-      case ReportState.NEW:
-        return { label: "แก้ไข", value: "edit" }
-      case ReportState.INPROGRESS:
-        return { label: "ตรวจนับ", value: "count" }
-      case ReportState.COMPLETED:
-        return { label: "เรียกดู", value: "view" }
-      case ReportState.CANCEL:
-        return { label: "เรียกดู", value: "view" }
-    }
-    return { label: "", value: "" }
-  }
   const context = useLocationUrlContext()
   //change location to document name
   return (
@@ -66,10 +135,10 @@ function CreateLocationTableCell(props: {
       <TableCell>
         {name}
       </TableCell>
-      <TableCell>
+      <TableCell hidden={isCellHiddnen(windowSize.width!)}>
         {date}
       </TableCell>
-      <TableCell>
+      <TableCell hidden={isCellHiddnen(windowSize.width!)}>
         <Typography sx={{
           color: MapColor[state]![700],
           fontWeight: 700, bgcolor: MapColor[state]![300],
@@ -77,7 +146,7 @@ function CreateLocationTableCell(props: {
           {state}
         </Typography>
       </TableCell>
-      <TableCell>
+      <TableCell hidden={isCellHiddnen(windowSize.width!)}>
         <Button variant="text" onClick={() => {
           if (reportState.value == "count") {
             context.selected.current = `/reports/count-assets/${documentNumber}`
@@ -89,11 +158,24 @@ function CreateLocationTableCell(props: {
             push(`/reports/${documentNumber}`)
           }
         }}>
-          <Typography sx={{ color: MapActionColor[reportState.label]![500] }}>
+          <Typography sx={{ color: MapActionColor[reportState.label] }}>
             [{reportState.label}]
           </Typography>
         </Button>
       </TableCell>
+      {
+        isCellHiddnen(windowSize.width!) && (
+          <TableCell className="justify-items-center">
+            <IconButton onClick={() => setHidden((prev) => !prev)}>
+              <VisibilityRoundedIcon />
+            </IconButton>
+          </TableCell>
+        )
+      }
+      <HiddenMenuDialog data={data}
+        isHidden={!hidden}
+        setIsHidden={setHidden}
+        reportState={reportState} />
     </>
   )
 }
@@ -185,7 +267,7 @@ export function ParentSelectComponent(props: {
     <TextField
       select
       label="location"
-      value={parentProp? parentProp.name : parentLocation[0]!.name! as string}
+      value={parentProp ? parentProp.name : parentLocation[0]!.name! as string}
       className="mt-3 p-4 lg:w-3/5 w-full"
       disabled={isCheckTable}
       onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -203,6 +285,21 @@ export function ParentSelectComponent(props: {
   )
 }
 
+type hiddenCellContextType = {
+  isHidden: boolean;
+  setIsHidden: Dispatch<SetStateAction<boolean>>;
+}
+
+const HiddenCellContext = createContext<hiddenCellContextType | null>(null)
+
+export function useHiddenCellContext() {
+  const context = useContext(HiddenCellContext);
+  if (!context) {
+    throw new Error("useHiddenCellContext must be used within a HiddenCellProvider");
+  }
+  return context;
+}
+
 export default function LocationTable(props: {
   reports: AssetCount[]
 }) {
@@ -211,7 +308,8 @@ export default function LocationTable(props: {
   const [orderBy, setOrderBy] = useState<keyof AssetCount>('document_number')
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-
+  const [isHidden, setIsHidden] = useState<boolean>(false);
+  const windowSize = useWindowSize()
   const handleRequestSort = (
     event: MouseEvent<unknown>,
     property: keyof AssetCount
@@ -233,83 +331,97 @@ export default function LocationTable(props: {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - reports.length) : 0
   return (
     <>
-      <Table stickyHeader size="small">
-        <TableHead>
-          <TableRow>
-            {
-              tableHeaders.map((header) => (
-                <TableCell key={header.label}
-                  className="bg-blue-300 font-medium"
-                >
-                  <TableSortLabel
-                    active={orderBy === header.value}
-                    direction={orderBy === header.value ? order : 'asc'}
-                    onClick={createSortHandler(header.value)}>
-                    {header.label}
-                  </TableSortLabel>
-                </TableCell>
-              ))
-            }
-          </TableRow>
-        </TableHead>
-        <TableBody sx={{ overflow: 'hidden' }}>
-          {
-            tableData.length ?
-              dataPerPage(tableData, page, rowsPerPage).map((mockData: AssetCount) => {
-                const mapData: locationTableData = {
-                  date: mockData.document_date.toLocaleDateString('th-BK'),
-                  name: mockData.document_name as string,
-                  documentNumber: mockData.document_number,
-                  state: mockData.state,
-                  action: ""
-                }
-                return (
-                  <TableRow key={mapData.documentNumber} >
-                    <CreateLocationTableCell data={mapData} />
-                  </TableRow>
-                )
-              })
-              :
-              <TableRow sx={{
-                height: '9rem',
-                maxHeight: '9rem'
-              }}>
-                <TableCell colSpan={2} />
-                <TableCell colSpan={1}>
-                  No asset report
-                </TableCell>
-                <TableCell colSpan={2} />
-              </TableRow>
-          }
-          {
-            emptyRows > 0 && (
-              <TableRow
-                style={{
-                  height: 33 * emptyRows
-                }} >
-                <TableCell colSpan={6} />
-              </TableRow>
-            )
-          }
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              showFirstButton
-              showLastButton
-              rowsPerPageOptions={[5, 10, 25]}
-              colSpan={8}
-              count={reports.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={(event, page) => handleChangePage(event, page, setPage, reports.length, rowsPerPage)}
-              onRowsPerPageChange={(event) =>
-                handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
+      <HiddenCellContext
+        value={{
+          isHidden,
+          setIsHidden
+        }}
+      >
+        {/* <FilterReportComponent /> */}
+        <Table stickyHeader size="small">
+          <TableHead>
+            <TableRow>
+              {
+                tableHeaders.map((header, index) => (
+                  <TableCell key={header.label}
+                    hidden={index < 2 ? isHidden : isCellHiddnen!(windowSize.width!) ? !isHidden : false}
+                    sx={{ position: header.isSticky ? 'sticky' : 'static' }}
+                    className="bg-blue-300 font-medium justify-items-center"
+                  >
+                    <TableSortLabel
+                      active={orderBy === header.value}
+                      direction={orderBy === header.value ? order : 'asc'}
+                      onClick={createSortHandler(header.value)}>
+                      {header.label}
+                    </TableSortLabel>
+                  </TableCell>
+                ))
               }
-            />
-          </TableRow>
-        </TableFooter>
-      </Table >
+              <TableCell hidden={!isCellHiddnen(windowSize.width!)}
+                className="items-center bg-blue-300 justify-items-center">
+                <ChevronRightRoundedIcon />
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody sx={{ overflow: 'hidden' }}>
+            {
+              tableData.length ?
+                dataPerPage(tableData, page, rowsPerPage).map((mockData: AssetCount) => {
+                  const mapData: locationTableData = {
+                    date: mockData.document_date.toLocaleDateString('th-BK'),
+                    name: mockData.document_name as string,
+                    documentNumber: mockData.document_number,
+                    state: mockData.state,
+                    action: ""
+                  }
+                  return (
+                    <TableRow key={mapData.documentNumber} >
+                      <CreateLocationTableCell data={mapData} />
+                    </TableRow>
+                  )
+                })
+                :
+                <TableRow sx={{
+                  height: '9rem',
+                  maxHeight: '9rem'
+                }}>
+                  <TableCell colSpan={2} />
+                  <TableCell colSpan={1}>
+                    No asset report
+                  </TableCell>
+                  <TableCell colSpan={2} />
+                </TableRow>
+            }
+            {
+              emptyRows > 0 && (
+                <TableRow
+                  style={{
+                    height: 33 * emptyRows
+                  }} >
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )
+            }
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                showFirstButton
+                showLastButton
+                rowsPerPageOptions={[5, 10, 25]}
+                colSpan={8}
+                count={reports.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={(event, page) => handleChangePage(event, page, setPage, reports.length, rowsPerPage)}
+                onRowsPerPageChange={(event) =>
+                  handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
+                }
+              />
+            </TableRow>
+          </TableFooter>
+        </Table >
+      </HiddenCellContext>
     </>
   )
 }

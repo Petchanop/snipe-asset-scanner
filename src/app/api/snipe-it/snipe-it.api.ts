@@ -2,6 +2,7 @@
 
 import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } from "@/api/next.api";
 import { TAsset, TLocation, TUser, TUserList } from "@/_types/snipe-it.type";
+import { ConvertImageUrl } from "@/_libs/convert_url.utils";
 
 const client = await createGateway();
 export type AssetResponse = Exclude<TAsset, TStatusResponse>
@@ -34,6 +35,8 @@ export async function fetchSearchAsset(searchInput: string) : Promise<TResponse<
     if (checkIfIsTStatusResponse(data)) {
         return { data: null , error: data as TStatusResponse}
     }
+    if (data)
+        data.image = ConvertImageUrl(process.env.SNIPE_URL as string, data?.image as string)
     return { data: data as AssetResponse, error: null }
 }
 

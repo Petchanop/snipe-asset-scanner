@@ -41,7 +41,7 @@ export default async function AssetsTablePage({ params }: {
                 listOfParent.push(filterParent as unknown as Location)
                 locationData.push(data as unknown as Location)
             }
-            else if (filterParent != null ){
+            else if (filterParent != null) {
                 locationData.push(data as unknown as Location)
             } else {
                 listOfParent.push(data as unknown as Location)
@@ -64,18 +64,21 @@ export default async function AssetsTablePage({ params }: {
     ) as TLocation
     const baseUrl = process.env.SNIPE_URL
     return (
-        <NewCountTable
-            allLocation={locations.data!.rows}
-            parentLocation={listOfParent as unknown as TLocation[]}
-            childrenLocation={locationData as unknown as TLocation[]}
-            locations={locationData as PNewCountTableProps[]}
-            defaultLocation={locationData[0] as unknown as TLocation}
-            locationId={locationData[0]?.id as number}
-            parentProp={parent}
-            users={users}
-            report={report}
-            user={session?.user}
-            baseUrl={baseUrl as string}
-        />
+        <>
+            <NewCountTable
+                allLocation={locations.data!.rows}
+                parentLocation={listOfParent as unknown as TLocation[]}
+                childrenLocation={locationData as unknown as TLocation[]}
+                locations={locationData as PNewCountTableProps[]}
+                defaultLocation={locationData[0] as unknown as TLocation}
+                locationId={locationData[0]?.id as number}
+                parentProp={parent}
+                users={users}
+                report={report}
+                user={session?.user}
+                baseUrl={baseUrl as string}
+            />
+          
+        </>
     )
 }
