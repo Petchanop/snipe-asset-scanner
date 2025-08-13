@@ -46,7 +46,8 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import FilterReportComponent from "../filterReportComponent";
+import FilterReportComponent from "@/_components/filterReportComponent";
+import SortReportComponent from "@/_components/sortReportComponent";
 
 function processAction(state: string): { label: string, value: string } {
   switch (state) {
@@ -84,7 +85,7 @@ function HiddenMenuDialog(props: {
           <Typography>Name: {name}</Typography>
           <Typography>Date: {date}</Typography>
           <Typography
-           sx={{color: MapColor[state]![300]}}
+            sx={{ color: MapColor[state]![300] }}
           >State: {state}</Typography>
         </DialogContent>
         <DialogActions>
@@ -98,10 +99,10 @@ function HiddenMenuDialog(props: {
             } else if (reportState.value == "view") {
               push(`/reports/${documentNumber}`)
             }
-          }}> <Typography sx={{ 
-              color: MapActionColor[reportState.label]!,
-              fontWeight: 700
-            }}>
+          }}> <Typography sx={{
+            color: MapActionColor[reportState.label]!,
+            fontWeight: 700
+          }}>
               [{reportState.label}]
             </Typography>
           </Button>
@@ -318,7 +319,6 @@ export default function LocationTable(props: {
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
   }
-
   const tableData = useMemo(() => reports
     .sort(getComparator<AssetCount, keyof AssetCount>(order, orderBy)),
     [order, orderBy, reports]
@@ -337,7 +337,10 @@ export default function LocationTable(props: {
           setIsHidden
         }}
       >
-        {/* <FilterReportComponent /> */}
+        <div className="flex flex-row justify-end">
+          <FilterReportComponent />
+          <SortReportComponent />
+        </div>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
@@ -345,7 +348,7 @@ export default function LocationTable(props: {
                 tableHeaders.map((header, index) => (
                   <TableCell key={header.label}
                     hidden={index < 2 ? isHidden : isCellHiddnen!(windowSize.width!) ? !isHidden : false}
-                    sx={{ position: header.isSticky ? 'sticky' : 'static' }}
+                    // sx={{ position: header.isSticky ? 'sticky' : 'static' }}
                     className="bg-blue-300 font-medium justify-items-center"
                   >
                     <TableSortLabel
@@ -406,6 +409,9 @@ export default function LocationTable(props: {
           <TableFooter>
             <TableRow>
               <TablePagination
+                labelRowsPerPage={
+                  <Typography className="items-center">{windowSize.width! < 500 ? "": "row per page"}</Typography>
+                }
                 showFirstButton
                 showLastButton
                 rowsPerPageOptions={[5, 10, 25]}

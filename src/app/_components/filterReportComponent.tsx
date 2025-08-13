@@ -1,25 +1,38 @@
 import { useState } from 'react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import { ReportState } from '@/_constants/constants';
+import Typography from '@mui/material/Typography';
+import ListItemButton from '@mui/material/ListItemButton';
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import { Collapse } from '@mui/material';
 
 export default function FilterReportComponent() {
-  const filters = ['All', 'Active', 'Pending', 'Archived'];
+  const filters = Object.keys(ReportState);
+  filters.push("ALL")
   const [open, setOpen] = useState(false);
+  const [openStatus, setOpenStatus] = useState(false);
   const [selected, setSelected] = useState('All');
 
   return (
-    <div className="relative">
+    <div className="relative m-2">
       {/* Toggle Button */}
-      <button
+      <Button
         onClick={() => setOpen(!open)}
         // className="fixed top-4 left-4
-        className="
-        z-50 flex items-center gap-2 bg-blue-300 text-white 
-        px-4 py-2 rounded shadow hover:bg-blue-500 transition"
+        variant='text'
+        className="font-blue-300"
+      // className="
+      // flex items-center gap-2 bg-blue-300 text-white 
+      // px-4 py-2 rounded shadow hover:bg-blue-500 transition"
       >
         <FilterListIcon />
         <span>Filters</span>
-      </button>
+      </Button>
 
       {/* Sidebar */}
       <div
@@ -35,21 +48,27 @@ export default function FilterReportComponent() {
           </button>
         </div>
 
-        <ul className="p-4 space-y-2">
-          {filters.map((filter) => (
-            <li key={filter}>
-              <button
-                onClick={() => setSelected(filter)}
-                className={`w-full text-left px-4 py-2 rounded ${selected === filter
-                  ? 'bg-blue-100 text-blue-700 font-semibold'
-                  : 'hover:bg-gray-100'
-                  }`}
-              >
-                {filter}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <List className="p-2 space-y-2">
+          <ListItemButton onClick={() => setOpenStatus((prev) => !prev)}>
+            <Typography>Status</Typography>
+            {openStatus ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <Collapse in={openStatus} timeout="auto" unmountOnExit>
+            {filters.map((filter) => (
+              <ListItem key={filter}>
+                <ListItemButton
+                  onClick={() => setSelected(filter)}
+                  className={`w-full text-left px-4 py-2 rounded ${selected === filter
+                    ? 'bg-blue-100 text-blue-700 font-semibold'
+                    : 'hover:bg-gray-100'
+                    }`}
+                >
+                  {filter}
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </Collapse>
+        </List>
       </div>
     </div>
   );
