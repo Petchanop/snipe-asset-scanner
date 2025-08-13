@@ -1,10 +1,13 @@
 import { AssetCount, AssetCountLine, AssetCountLocation, TAssetRow } from "@/_types/types";
 
+
 export interface HeadersLocationTable {
     label: string;
     isSelectBox: boolean;
     fontColor: string[];
     value: keyof AssetCount & "action" & string; 
+    isHidden?: (value?: number) => boolean;
+    isSticky?: boolean;
 }
 
 export interface HeadersAssetTable {

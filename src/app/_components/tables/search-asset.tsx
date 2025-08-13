@@ -20,9 +20,11 @@ import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
-import { useRouter } from "next/navigation";
 import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/search-asset.utils";
 import Tooltip from "@mui/material/Tooltip";
+import ListAssetMobile from "./list-asset-mobile";
+import { useWindowSize } from "../loading";
+import { useReportContext } from "../tableLayout";
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
@@ -120,6 +122,7 @@ function SearchAssetTable(props: {
   const headers = tableHeadersAdditional
   return (
     <>
+
       <TableHead>
         <TableRow className="place-content-center">
           {headers.map((header) => (
@@ -179,8 +182,7 @@ export default function SearchAsset(
   const [fetchData, setFetchData] = useState<boolean>(false)
   const [searchResult, setSearchResult] = useState<TAssetRow[]>([])
   const [show, setShow] = useState(true)
-  const { back } = useRouter()
-
+  const reportContext = useReportContext()
   async function callFetchAssetSearch() {
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
@@ -225,6 +227,8 @@ export default function SearchAsset(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanData])
 
+
+  const media = useWindowSize()
   return (
     <>
       <Toaster
@@ -276,7 +280,7 @@ export default function SearchAsset(
           <Button onClick={() => setFetchData(true)}>Search</Button>
           <Typography className="content-center">OR</Typography>
           <Button onClick={() => setShow((pre) => !pre)}>Scan</Button>
-          <Button onClick={() => back()}>Back</Button>
+          <Button onClick={() => reportContext.setSearch(false)}>Back</Button>
 
         </div>
         {
@@ -287,26 +291,32 @@ export default function SearchAsset(
             />
             : <></>
         }
-
-
-        <Table stickyHeader size="small" sx={{
-          minWidth: 650,
-          border: 'solid',
-          borderLeft: 'none',
-          borderRight: 'none',
-          borderBottom: 'none',
-          borderWidth: 1,
-          borderColor: blue[400]
-        }}>
-          <SearchAssetTable
-            data={searchResult}
-            isCheckTable={true}
-            assetTab={false}
-            assetCountReport={assetCountReport}
-            assetInReport={assetInReport}
-          />
-        </Table>
+        {
+          media.width as number < 500 ?
+            <ListAssetMobile
+              data={searchResult}
+              isCheckTable={true}
+            /> :
+            <Table stickyHeader size="small" sx={{
+              minWidth: 650,
+              border: 'solid',
+              borderLeft: 'none',
+              borderRight: 'none',
+              borderBottom: 'none',
+              borderWidth: 1,
+              borderColor: blue[400]
+            }}>
+              <SearchAssetTable
+                data={searchResult}
+                isCheckTable={true}
+                assetTab={false}
+                assetCountReport={assetCountReport}
+                assetInReport={assetInReport}
+              />
+            </Table>
+        }
       </div>
+
     </>
   )
 }
