@@ -85,6 +85,7 @@ export const tableHeaders: HeadersLocationTable[] = [
     isSelectBox: false,
     fontColor: ["black"],
     value: "document_number" as never,
+    //eslint-disable-next-line  @typescript-eslint/no-unused-vars
     isHidden: (value?: number) => false,
     isSticky: true
   },
@@ -93,6 +94,7 @@ export const tableHeaders: HeadersLocationTable[] = [
     isSelectBox: false,
     fontColor: ["black"],
     value: "document_name" as never,
+    //eslint-disable-next-line  @typescript-eslint/no-unused-vars
     isHidden: (value?: number) => false
   },
     {

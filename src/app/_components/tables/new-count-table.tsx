@@ -6,13 +6,12 @@ import {
   SetStateAction,
   SyntheticEvent,
   useContext,
-  useEffect, useRef, useState
+  useEffect, useState
 } from "react";
 import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import Button from "@mui/material/Button";
 import { AssetTable } from "@/_components/tables/list-asset";
 import {
   AssetCount, AssetCountLine, AssetCountLocation,
@@ -48,7 +47,6 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import SummarizeIcon from '@mui/icons-material/Summarize';
-import SearchAsset from "./search-asset";
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
@@ -161,7 +159,7 @@ function SelectCountButton(props: {
     setLocation,
     setIsCheckTable
   } = props
-  const { replace } = useRouter()
+  // const { replace } = useRouter()
   const params = useParams<{ reportId: string }>()
   const documentNumber = params.reportId ? parseInt(params.reportId) : 0
   const documentContext = useReportContext()
@@ -331,7 +329,9 @@ export default function NewCountTable(props: {
     report } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [assetCountLine, setAssetCountLine] = useState<AssetCountLine[]>([])
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [locationProp, setLocationProp] = useState<AssetCountLocation>(defaultLocation as unknown as AssetCountLocation)
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
@@ -340,6 +340,7 @@ export default function NewCountTable(props: {
   const [documentNumber, setDocumentNumber] = useState<number>()
   const [update, setUpdate] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [IsSearch, setIsSearch] = useState<boolean>(false)
   const media = useWindowSize()
   const { push } = useRouter()

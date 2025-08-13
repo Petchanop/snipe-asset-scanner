@@ -404,7 +404,7 @@ export default function ListAssetMobile(props: {
               )
             })
             }
-            <Pagination count={Math.floor(data.length / itemPerPage)}
+            <Pagination count={Math.ceil(data.length / itemPerPage)}
               page={page}
               onChange={(_, page) => {
                 setPage(page)
