@@ -330,7 +330,7 @@ export default function NewCountTable(props: {
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  const [assetCountLine, setAssetCountLine] = useState<AssetCountLine[]>([])
+  // const [assetCountLine, setAssetCountLine] = useState<AssetCountLine[]>([])
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [locationProp, setLocationProp] = useState<AssetCountLocation>(defaultLocation as unknown as AssetCountLocation)
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
@@ -359,7 +359,7 @@ export default function NewCountTable(props: {
     setChangeLocationProp()
   }, [locationId])
 
-   useEffect(() => {
+  useEffect(() => {
     setData([])
     const setChangeLocationProp = async () => {
       const locationIds = await GetAssetCountLocationByAssetCountReport(report!.id)
@@ -394,7 +394,7 @@ export default function NewCountTable(props: {
           await BulkCreateAssetCountLine(assetCountLineList!)
           assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
         }
-        setAssetCountLine(assetCountLineReport)
+        // setAssetCountLine(assetCountLineReport)
         const AssetData = await Promise.all(
           assetCountLineReport.map(async (asset) => {
             const data = users.find((user) => user.id as number == asset.assigned_to)
@@ -423,9 +423,24 @@ export default function NewCountTable(props: {
   }, [refetchReport])
 
   useEffect(() => {
-    const updateAssetCountLine = () => {
-      if (update) {
-        setRefetchReport(true)
+    const updateAssetCountLine = async () => {
+      if (update && report) {
+        const locationIds = await GetAssetCountLocationByAssetCountReport(report.id)
+        const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
+        const assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
+        const AssetData = await Promise.all(
+          assetCountLineReport.map(async (asset) => {
+            const data = users.find((user) => user.id as number == asset.assigned_to)
+            let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
+            if (!asset.previous_loc_id && asset.is_not_asset_loc) {
+              const assetData = await getAssetById(asset.asset_id)
+              prev_loc = assetData.data?.location as unknown as TLocation
+            }
+            return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
+          }))
+        const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+        setData(sortMapData)
+        setUpdate(false)
       }
     }
     updateAssetCountLine()
@@ -502,40 +517,40 @@ export default function NewCountTable(props: {
               //       />
               //     )}
               //   </div> 
-                :
-                media.width as number < 500 ?
-                  <>
-                    <ListAssetMobile
-                      data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
-                      isCheckTable={isCheckTable}
-                      assetTab={assetTab}
-                      setAssetTab={setAssetTab}
-                      tabValue={INLOCATION}
-                    />
-                    <ListAssetMobile
-                      data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
-                      isCheckTable={isCheckTable}
-                      assetTab={assetTab}
-                      setAssetTab={setAssetTab}
-                      tabValue={OUTLOCATION}
-                    />
-                  </> :
-                  <>
-                    <AssetTable
-                      data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
-                      isCheckTable={isCheckTable}
-                      assetTab={assetTab}
-                      setAssetTab={setAssetTab}
-                      tabValue={INLOCATION}
-                    />
-                    <AssetTable
-                      data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
-                      isCheckTable={isCheckTable}
-                      assetTab={assetTab}
-                      setAssetTab={setAssetTab}
-                      tabValue={OUTLOCATION}
-                    />
-                  </>
+              :
+              media.width as number < 500 ?
+                <>
+                  <ListAssetMobile
+                    data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    tabValue={INLOCATION}
+                  />
+                  <ListAssetMobile
+                    data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    tabValue={OUTLOCATION}
+                  />
+                </> :
+                <>
+                  <AssetTable
+                    data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    tabValue={INLOCATION}
+                  />
+                  <AssetTable
+                    data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
+                    isCheckTable={isCheckTable}
+                    assetTab={assetTab}
+                    setAssetTab={setAssetTab}
+                    tabValue={OUTLOCATION}
+                  />
+                </>
           }
         </ReportContext>
       </DateValueContext>

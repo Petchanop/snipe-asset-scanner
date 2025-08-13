@@ -46,6 +46,7 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import FilterReportComponent from "../filterReportComponent";
 
 function processAction(state: string): { label: string, value: string } {
   switch (state) {
@@ -157,7 +158,7 @@ function CreateLocationTableCell(props: {
             push(`/reports/${documentNumber}`)
           }
         }}>
-          <Typography sx={{ color: MapActionColor[reportState.label]![500] }}>
+          <Typography sx={{ color: MapActionColor[reportState.label] }}>
             [{reportState.label}]
           </Typography>
         </Button>
@@ -336,6 +337,7 @@ export default function LocationTable(props: {
           setIsHidden
         }}
       >
+        {/* <FilterReportComponent /> */}
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
