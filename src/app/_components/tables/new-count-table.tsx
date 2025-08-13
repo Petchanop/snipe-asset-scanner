@@ -12,10 +12,9 @@ import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import Button from "@mui/material/Button";
 import { AssetTable } from "@/_components/tables/list-asset";
 import {
-  AssetCount, AssetCountLocation,
+  AssetCount, AssetCountLine, AssetCountLocation,
   INLOCATION, OUTLOCATION,
   TAssetRow, TAssetTab, User
 } from "@/_types/types";
@@ -39,6 +38,15 @@ import { LoadingTableSkeleton, useWindowSize } from "@/_components/loading";
 import { ReportState } from "@/_constants/constants";
 import ListAssetMobile from "@/_components/tables/list-asset-mobile";
 import { mapAssetData, parseDataForCreateAssetCountLine } from "@/_components/tables/utility";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
+import SearchIcon from '@mui/icons-material/Search';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
+import DoneIcon from '@mui/icons-material/Done';
+import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
@@ -59,44 +67,53 @@ function CheckAssetButton(props: {
       state: ReportState.COMPLETED
     })
   }
+
+  const actions = [
+    {
+      icon: <SearchIcon />, name: 'ค้นหา', onClick: () => {
+        push(`${pathname}/check?location=${childId}`)
+        // reportContext.setSearch(true)
+      }
+    },
+    { icon: <CancelIcon />, name: 'ยกเลิก', onClick: () => setIsCheckTable((pre) => !pre) },
+    { icon: <SaveIcon />, name: 'บันทึก', onClick: handleSavebutton },
+    { icon: <DoneIcon />, name: 'จบการตรวจนับ', onClick: handleFinishButton },
+  ];
+
+  const windowSize = useWindowSize()
+  const dialPosition = windowSize.width as number < 500 ? 16 : 50
   return (
-    <div className="flex flex-row w-full lg:pl-4 lg:space-x-4 justify-start content-center items-center">
-      <div className="flex flex-col">
-        <Button className={
-          `hover:bg-blue-200 max-md:w-1/3
-        max-md:text-sm max-md:font-medium`
-        }
-          variant="text"
-          onClick={() => {
-            push(`${pathname}/check?location=${childId}`)
+    <SpeedDial
+      ariaLabel="Floating Action Button"
+      sx={{ position: 'absolute', bottom: dialPosition, right: dialPosition }}
+      icon={<SpeedDialIcon />}
+    >
+      {actions.map((action) => (
+        <SpeedDialAction
+          key={action.name}
+          icon={action.icon}
+          onClick={action.onClick}
+          sx={{
+            "& .MuiSpeedDialAction-staticTooltipLabel": {
+              display: 'inline-block',
+              cursor: 'pointer',
+              backgroundColor: '#e0f7fa',
+              borderRadius: '4px',
+              width: "7.5rem",
+              height: "2rem",
+              textAlign: "center",
+              fontSize: "0.8rem"
+            },
           }}
-        >ค้นหา</Button>
-      </div>
-      <div className="flex flex-col">
-        <Button className={
-          `hover:bg-blue-200 max-md:w-1/3 
-        max-md:text-sm max-md:font-medium`
-        }
-          onClick={handleSavebutton}
-        >บันทึก</Button>
-      </div>
-      <div className="flex flex-col">
-        <Button className={
-          `hover:bg-blue-200 max-md:w-1/3 
-        max-md:text-sm max-md:font-medium`
-        }
-          onClick={() => setIsCheckTable((pre) => !pre)}
-        >ยกเลิก</Button>
-      </div>
-      <div className="flex flex-col">
-        <Button className={
-          `hover:bg-blue-200 max-md:w-2/3 
-        max-md:text-sm max-md:font-medium`
-        }
-          onClick={handleFinishButton}
-        >จบการตรวจนับ</Button>
-      </div>
-    </div>
+          slotProps={{
+            tooltip: {
+              open: true,
+              title: action.name
+            },
+          }}
+        />
+      ))}
+    </SpeedDial>
   )
 }
 
@@ -113,7 +130,6 @@ function SelectCountInput(props: {
       dateContext.setDateValue(value)
     }
   }
-
   return (
     <>
       <div className="flex md:flex-row flex-col md:items-center">
@@ -143,7 +159,7 @@ function SelectCountButton(props: {
     setLocation,
     setIsCheckTable
   } = props
-  const { replace } = useRouter()
+  // const { replace } = useRouter()
   const params = useParams<{ reportId: string }>()
   const documentNumber = params.reportId ? parseInt(params.reportId) : 0
   const documentContext = useReportContext()
@@ -151,7 +167,7 @@ function SelectCountButton(props: {
   async function handleClickStart() {
     setIsCheckTable((pre) => !pre)
     documentContext.setDocumentNumber(documentNumber)
-    replace(`${window.location.href}`)
+    // replace(`${window.location.href}`)
   }
 
   async function handleGetData() {
@@ -160,29 +176,44 @@ function SelectCountButton(props: {
     documentContext.setRefetchReport(true)
   }
 
+  const actions = [
+    { icon: <SummarizeIcon />, name: 'เรียกดูข้อมูล', onClick: handleGetData },
+    { icon: <PlayCircleFilledIcon />, name: 'เริ่มตรวจนับ', onClick: handleClickStart },
+  ];
+  const windowSize = useWindowSize()
+  const dialPosition = windowSize.width as number < 500 ? 16 : 50
   return (
-    <div className="flex flex-row md:flex-col pt-2 max-md:w-4/5 md:justify-center md:space-y-2 max-md:space-x-2 max-md:pl-4">
-      <div className="flex flex-row">
-        <Button className={
-          `hover:bg-blue-200 max-md:w-full
-          max-md:text-sm max-md:font-medium`
-        }
-          onClick={handleGetData}
-        >
-          เรียกดูข้อมูล
-        </Button>
-      </div>
-      <div className="flex flex-row">
-        <Button className={
-          `hover:bg-blue-200 max-md:w-full
-          max-md:text-sm max-md:font-medium
-          `}
-          onClick={handleClickStart}
-        >
-          เริ่มตรวจนับ
-        </Button>
-      </div>
-    </div>
+    <SpeedDial
+      ariaLabel="Floating Action Button"
+      sx={{ position: 'fixed', bottom: dialPosition, right: dialPosition }}
+      icon={<SpeedDialIcon />}
+    >
+      {actions.map((action) => (
+        <SpeedDialAction
+          key={action.name}
+          icon={action.icon}
+          onClick={action.onClick}
+          sx={{
+            "& .MuiSpeedDialAction-staticTooltipLabel": {
+              display: 'inline-block',
+              cursor: 'pointer',
+              backgroundColor: '#e0f7fa',
+              borderRadius: '4px',
+              width: "7.5rem",
+              height: "2rem",
+              textAlign: "center",
+              fontSize: "0.8rem"
+            },
+          }}
+          slotProps={{
+            tooltip: {
+              open: true,
+              title: action.name
+            },
+          }}
+        />
+      ))}
+    </SpeedDial>
   )
 }
 
@@ -298,6 +329,10 @@ export default function NewCountTable(props: {
     report } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  const [assetCountLine, setAssetCountLine] = useState<AssetCountLine[]>([])
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  const [locationProp, setLocationProp] = useState<AssetCountLocation>(defaultLocation as unknown as AssetCountLocation)
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
   const [data, setData] = useState<TAssetRow[]>([])
@@ -305,9 +340,10 @@ export default function NewCountTable(props: {
   const [documentNumber, setDocumentNumber] = useState<number>()
   const [update, setUpdate] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  const [IsSearch, setIsSearch] = useState<boolean>(false)
   const media = useWindowSize()
   const { push } = useRouter()
-
   useEffect(() => {
     if (!dateValue) {
       setDateValue(dayjs(report?.document_date))
@@ -315,7 +351,23 @@ export default function NewCountTable(props: {
   }, [dateValue, report])
   useEffect(() => {
     setData([])
+    const setChangeLocationProp = async () => {
+      const locationIds = await GetAssetCountLocationByAssetCountReport(report!.id)
+      const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
+      setLocationProp(assetLocationId!)
+    }
+    setChangeLocationProp()
   }, [locationId])
+
+   useEffect(() => {
+    setData([])
+    const setChangeLocationProp = async () => {
+      const locationIds = await GetAssetCountLocationByAssetCountReport(report!.id)
+      const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
+      setLocationProp(assetLocationId!)
+    }
+    setChangeLocationProp()
+  }, [location])
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -327,6 +379,7 @@ export default function NewCountTable(props: {
         setDocumentNumber(report.document_number)
         const locationIds = await GetAssetCountLocationByAssetCountReport(report.id)
         const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
+        setLocationProp(assetLocationId!)
         let assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
         if (assetCountLineReport.length == 0) {
           const { data, error } = await getAssetByLocationId(location.id)
@@ -337,10 +390,11 @@ export default function NewCountTable(props: {
             return parseDataForCreateAssetCountLine(
               asset, location, user, assetLocationId as AssetCountLocation, allLocation, report
             )
-          }) 
+          })
           await BulkCreateAssetCountLine(assetCountLineList!)
           assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
         }
+        setAssetCountLine(assetCountLineReport)
         const AssetData = await Promise.all(
           assetCountLineReport.map(async (asset) => {
             const data = users.find((user) => user.id as number == asset.assigned_to)
@@ -398,8 +452,10 @@ export default function NewCountTable(props: {
           setDocumentNumber: setDocumentNumber,
           setRefetchReport: setRefetchReport,
           setUpdate: setUpdate,
+          setSearch: setIsSearch
         }}
         >
+
           <NewCountInput
             parentLocation={parentLocation}
             childrenLocation={childrenLocation}
@@ -423,43 +479,67 @@ export default function NewCountTable(props: {
           {
             loading ?
               <LoadingTableSkeleton />
-              :
-              media.width as number < 500 ?
-                <>
-                  <ListAssetMobile
-                    data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
-                    isCheckTable={isCheckTable}
-                    assetTab={assetTab}
-                    setAssetTab={setAssetTab}
-                    tabValue={INLOCATION}
-                  />
-                  <ListAssetMobile
-                    data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
-                    isCheckTable={isCheckTable}
-                    assetTab={assetTab}
-                    setAssetTab={setAssetTab}
-                    tabValue={OUTLOCATION}
-                  />
-                </> :
-                <>
-                  <AssetTable
-                    data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
-                    isCheckTable={isCheckTable}
-                    assetTab={assetTab}
-                    setAssetTab={setAssetTab}
-                    tabValue={INLOCATION}
-                  />
-                  <AssetTable
-                    data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
-                    isCheckTable={isCheckTable}
-                    assetTab={assetTab}
-                    setAssetTab={setAssetTab}
-                    tabValue={OUTLOCATION}
-                  />
-                </>
+              // :
+              // IsSearch ?
+              //   <div className="p-4
+              //     bg-white 
+              //     rounded-2xl 
+              //     shadow-lg 
+              //     transition 
+              //     duration-300 
+              //     transform 
+              //     hover:-translate-y-1 
+              //     hover:shadow-2xl
+              //     ">
+              //     <Typography>Check asset</Typography>
+              //     {locationId && (
+              //       <SearchAsset
+              //         assetCountReport={report!}
+              //         assetInReport={assetCountLine}
+              //         locationId={locationProp!}
+              //         users={users}
+              //         user={user}
+              //       />
+              //     )}
+              //   </div> 
+                :
+                media.width as number < 500 ?
+                  <>
+                    <ListAssetMobile
+                      data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
+                      isCheckTable={isCheckTable}
+                      assetTab={assetTab}
+                      setAssetTab={setAssetTab}
+                      tabValue={INLOCATION}
+                    />
+                    <ListAssetMobile
+                      data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
+                      isCheckTable={isCheckTable}
+                      assetTab={assetTab}
+                      setAssetTab={setAssetTab}
+                      tabValue={OUTLOCATION}
+                    />
+                  </> :
+                  <>
+                    <AssetTable
+                      data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
+                      isCheckTable={isCheckTable}
+                      assetTab={assetTab}
+                      setAssetTab={setAssetTab}
+                      tabValue={INLOCATION}
+                    />
+                    <AssetTable
+                      data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
+                      isCheckTable={isCheckTable}
+                      assetTab={assetTab}
+                      setAssetTab={setAssetTab}
+                      tabValue={OUTLOCATION}
+                    />
+                  </>
           }
         </ReportContext>
       </DateValueContext>
+
     </>
   )
 }

@@ -33,6 +33,7 @@ export type ReportStateContext = {
   setRefetchReport: Dispatch<SetStateAction<boolean>>;
   setUpdate: Dispatch<SetStateAction<boolean>>;
   setRemark?: Dispatch<SetStateAction<TRemarkAssetCountLine[]>>;
+  setSearch:  Dispatch<SetStateAction<boolean>>;
 }
 
 //31 line of console.log

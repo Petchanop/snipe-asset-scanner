@@ -20,9 +20,13 @@ import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { UpdateAssetCountLine } from "@/_libs/report.utils";
-import { useRouter } from "next/navigation";
 import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/search-asset.utils";
 import Tooltip from "@mui/material/Tooltip";
+import ListAssetMobile from "./list-asset-mobile";
+import { useWindowSize } from "../loading";
+// import { useReportContext } from "../tableLayout";
+import { useRouter } from "next/navigation";
+import { ReportContext } from "../tableLayout";
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
@@ -120,6 +124,7 @@ function SearchAssetTable(props: {
   const headers = tableHeadersAdditional
   return (
     <>
+
       <TableHead>
         <TableRow className="place-content-center">
           {headers.map((header) => (
@@ -178,9 +183,18 @@ export default function SearchAsset(
   const [scanData, setScanData] = useState<IDetectedBarcode[]>([])
   const [fetchData, setFetchData] = useState<boolean>(false)
   const [searchResult, setSearchResult] = useState<TAssetRow[]>([])
+  const [documentNumber, setDocumentNumber] = useState<number | undefined>(
+    assetCountReport.document_number ? assetCountReport.document_number : 0)
+  const [update, setUpdate] = useState(false)
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  const [loading, setLoading] = useState<boolean>(false)
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  const [IsSearch, setIsSearch] = useState<boolean>(false)
+  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [show, setShow] = useState(true)
+  // const reportContext = useReportContext()
   const { back } = useRouter()
-
   async function callFetchAssetSearch() {
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
@@ -214,6 +228,7 @@ export default function SearchAsset(
           if (!searchResult.find((res) => res.assetCode == data.asset_tag)) {
             const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
             toast.success(`${result.rawValue} was found.`)
+            console.log(asset)
             setSearchResult([asset, ...searchResult])
           }
           toast.success(`${result.rawValue} has been checked.`)
@@ -225,6 +240,8 @@ export default function SearchAsset(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanData])
 
+
+  const media = useWindowSize()
   return (
     <>
       <Toaster
@@ -261,52 +278,68 @@ export default function SearchAsset(
           />
         )}
       </Toaster>
-      <div className="space-y-2">
-        <div className="flex flex-row w-full py-2 pl-2 lg:pl-10 space-x-2 content-center">
-          <TextField
-            id="search-asset"
-            label="Search asset"
-            variant="outlined"
-            size="small"
-            className="w-1/2"
-            onChange={(event) => setSearchInput(event.target.value)}
-            disabled={show}
-            value={searchInput}
-          />
-          <Button onClick={() => setFetchData(true)}>Search</Button>
-          <Typography className="content-center">OR</Typography>
-          <Button onClick={() => setShow((pre) => !pre)}>Scan</Button>
-          <Button onClick={() => back()}>Back</Button>
-
-        </div>
-        {
-          show ?
-            <ScannerComponent
-              scanData={scanData!}
-              setScanData={setScanData}
+      <ReportContext value={{
+        DocumentNumber: documentNumber,
+        update: update,
+        setDocumentNumber: setDocumentNumber,
+        setRefetchReport: setRefetchReport,
+        setUpdate: setUpdate,
+        setSearch: setIsSearch
+      }}>
+        <div className="space-y-2">
+          <div className="flex flex-row w-full py-2 pl-2 lg:pl-10 space-x-2 content-center">
+            <TextField
+              id="search-asset"
+              label="Search asset"
+              variant="outlined"
+              size="small"
+              className="w-1/2"
+              onChange={(event) => setSearchInput(event.target.value)}
+              disabled={show}
+              value={searchInput}
             />
-            : <></>
-        }
+            <Button onClick={() => setFetchData(true)}>Search</Button>
+            <Typography className="content-center">OR</Typography>
+            <Button onClick={() => setShow((pre) => !pre)}>Scan</Button>
+            {/* <Button onClick={() => reportContext.setSearch(false)}>Back</Button> */}
+            <Button onClick={() => back()}>Back</Button>
 
+          </div>
+          {
+            show ?
+              <ScannerComponent
+                scanData={scanData!}
+                setScanData={setScanData}
+              />
+              : <></>
+          }
+          {
+            media.width as number < 500 ?
+              <ListAssetMobile
+                data={searchResult}
+                isCheckTable={true}
+              /> :
+              <Table stickyHeader size="small" sx={{
+                minWidth: 650,
+                border: 'solid',
+                borderLeft: 'none',
+                borderRight: 'none',
+                borderBottom: 'none',
+                borderWidth: 1,
+                borderColor: blue[400]
+              }}>
+                <SearchAssetTable
+                  data={searchResult}
+                  isCheckTable={true}
+                  assetTab={false}
+                  assetCountReport={assetCountReport}
+                  assetInReport={assetInReport}
+                />
+              </Table>
+          }
+        </div>
+      </ReportContext>
 
-        <Table stickyHeader size="small" sx={{
-          minWidth: 650,
-          border: 'solid',
-          borderLeft: 'none',
-          borderRight: 'none',
-          borderBottom: 'none',
-          borderWidth: 1,
-          borderColor: blue[400]
-        }}>
-          <SearchAssetTable
-            data={searchResult}
-            isCheckTable={true}
-            assetTab={false}
-            assetCountReport={assetCountReport}
-            assetInReport={assetInReport}
-          />
-        </Table>
-      </div>
     </>
   )
 }

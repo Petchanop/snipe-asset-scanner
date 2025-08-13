@@ -220,7 +220,7 @@ function RenderCellValueByAssetKey(props: {
 
 function AssetCard(props: {
   data: TAssetRow,
-  assetTab: TAssetTab,
+  assetTab?: TAssetTab,
   tabValue?: TAssetTab,
   isCheckTable: boolean
 }) {
@@ -360,8 +360,8 @@ function AssetCard(props: {
 export default function ListAssetMobile(props: {
   data: TAssetRow[],
   isCheckTable: boolean,
-  assetTab: TAssetTab
-  setAssetTab: (value: SetStateAction<TAssetTab>) => void,
+  assetTab?: TAssetTab
+  setAssetTab?: (value: SetStateAction<TAssetTab>) => void,
   tabValue?: TAssetTab,
 }) {
   const { data, isCheckTable, assetTab, tabValue } = props
@@ -404,7 +404,7 @@ export default function ListAssetMobile(props: {
               )
             })
             }
-            <Pagination count={Math.floor(data.length / itemPerPage)}
+            <Pagination count={Math.ceil(data.length / itemPerPage)}
               page={page}
               onChange={(_, page) => {
                 setPage(page)
