@@ -43,6 +43,73 @@ import IconButton from "@mui/material/IconButton";
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import { maxWindowSize } from "@/_constants/mockData";
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+
+function processAction(state: string): { label: string, value: string } {
+  switch (state) {
+    case ReportState.NEW:
+      return { label: "แก้ไข", value: "edit" }
+    case ReportState.INPROGRESS:
+      return { label: "ตรวจนับ", value: "count" }
+    case ReportState.COMPLETED:
+      return { label: "เรียกดู", value: "view" }
+    case ReportState.CANCEL:
+      return { label: "เรียกดู", value: "view" }
+  }
+  return { label: "", value: "" }
+}
+
+function HiddenMenuDialog(props: {
+  data: locationTableData,
+  isHidden: boolean,
+  setIsHidden: Dispatch<SetStateAction<boolean>>,
+  reportState: { label: string, value: string }
+}) {
+  const { push } = useRouter()
+  const { data, isHidden, setIsHidden, reportState } = props
+  const { date, documentNumber, state, name } = data;
+  const context = useLocationUrlContext()
+  return (
+    <>
+      <Dialog open={isHidden}
+        onClick={() => setIsHidden((prev) => !prev)}
+        maxWidth="xl"
+        fullWidth={true}
+      >
+        <DialogContent>
+          <Typography>Document no: {documentNumber}</Typography>
+          <Typography>Name: {name}</Typography>
+          <Typography>Date: {date}</Typography>
+          <Typography
+           sx={{color: MapColor[state]![700]}}
+          >State: {state}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={() => {
+            if (reportState.value == "count") {
+              context.selected.current = `/reports/count-assets/${documentNumber}`
+              push(`/reports/count-assets/${documentNumber}`)
+            } else if (reportState.value == "edit") {
+              context.selected.current = ""
+              push(`/setup/${documentNumber}`)
+            } else if (reportState.value == "view") {
+              push(`/reports/${documentNumber}`)
+            }
+          }}> <Typography sx={{ 
+              color: MapActionColor[reportState.label]![300],
+              fontWeight: 700
+            }}>
+              [{reportState.label}]
+            </Typography>
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  )
+}
 
 function isCellHiddnen(value: number): boolean {
   return value < maxWindowSize;
@@ -56,78 +123,60 @@ function CreateLocationTableCell(props: {
   const { push } = useRouter()
   const reportState = processAction(state);
   const windowSize = useWindowSize()
+  const [hidden, setHidden] = useState<boolean>(true);
 
-  function processAction(state: string): { label: string, value: string } {
-    switch (state) {
-      case ReportState.NEW:
-        return { label: "แก้ไข", value: "edit" }
-      case ReportState.INPROGRESS:
-        return { label: "ตรวจนับ", value: "count" }
-      case ReportState.COMPLETED:
-        return { label: "เรียกดู", value: "view" }
-      case ReportState.CANCEL:
-        return { label: "เรียกดู", value: "view" }
-    }
-    return { label: "", value: "" }
-  }
-  const context = useLocationUrlContext()
   const hiddenContext = useHiddenCellContext()
+  const context = useLocationUrlContext()
   //change location to document name
   return (
     <>
-      <TableCell hidden={hiddenContext.isHidden}>
+      <TableCell>
         {documentNumber}
       </TableCell>
-      <TableCell hidden={hiddenContext.isHidden}>
+      <TableCell>
         {name}
       </TableCell>
-      {/* {
-        !isCellHiddnen(windowSize.width!) && ( */}
-          {/* <> */}
-            <TableCell hidden={
-              isCellHiddnen(windowSize.width!) ? 
-              !hiddenContext.isHidden : false}>
-              {date}
-            </TableCell>
-            <TableCell hidden={isCellHiddnen(windowSize.width!) ? 
-              !hiddenContext.isHidden : false}>
-              <Typography sx={{
-                color: MapColor[state]![700],
-                fontWeight: 700, bgcolor: MapColor[state]![300],
-              }}>
-                {state}
-              </Typography>
-            </TableCell>
-            <TableCell hidden={isCellHiddnen(windowSize.width!) ? 
-              !hiddenContext.isHidden : false}>
-              <Button variant="text" onClick={() => {
-                if (reportState.value == "count") {
-                  context.selected.current = `/reports/count-assets/${documentNumber}`
-                  push(`/reports/count-assets/${documentNumber}`)
-                } else if (reportState.value == "edit") {
-                  context.selected.current = ""
-                  push(`/setup/${documentNumber}`)
-                } else if (reportState.value == "view") {
-                  push(`/reports/${documentNumber}`)
-                }
-              }}>
-                <Typography sx={{ color: MapActionColor[reportState.label]![500] }}>
-                  [{reportState.label}]
-                </Typography>
-              </Button>
-            </TableCell>
-          {/* </>
-        )
-      } */}
+      <TableCell hidden={isCellHiddnen(windowSize.width!)}>
+        {date}
+      </TableCell>
+      <TableCell hidden={isCellHiddnen(windowSize.width!)}>
+        <Typography sx={{
+          color: MapColor[state]![700],
+          fontWeight: 700, bgcolor: MapColor[state]![300],
+        }}>
+          {state}
+        </Typography>
+      </TableCell>
+      <TableCell hidden={isCellHiddnen(windowSize.width!)}>
+        <Button variant="text" onClick={() => {
+          if (reportState.value == "count") {
+            context.selected.current = `/reports/count-assets/${documentNumber}`
+            push(`/reports/count-assets/${documentNumber}`)
+          } else if (reportState.value == "edit") {
+            context.selected.current = ""
+            push(`/setup/${documentNumber}`)
+          } else if (reportState.value == "view") {
+            push(`/reports/${documentNumber}`)
+          }
+        }}>
+          <Typography sx={{ color: MapActionColor[reportState.label]![500] }}>
+            [{reportState.label}]
+          </Typography>
+        </Button>
+      </TableCell>
       {
         isCellHiddnen(windowSize.width!) && (
           <TableCell className="justify-items-center">
-            <IconButton onClick={() => hiddenContext.setIsHidden((prev) => !prev)}>
+            <IconButton onClick={() => setHidden((prev) => !prev)}>
               <VisibilityRoundedIcon />
             </IconButton>
           </TableCell>
         )
       }
+      <HiddenMenuDialog data={data}
+        isHidden={!hidden}
+        setIsHidden={setHidden}
+        reportState={reportState} />
     </>
   )
 }
@@ -284,10 +333,10 @@ export default function LocationTable(props: {
   return (
     <>
       <HiddenCellContext
-      value={{
-        isHidden,
-        setIsHidden
-      }}
+        value={{
+          isHidden,
+          setIsHidden
+        }}
       >
         <Table stickyHeader size="small">
           <TableHead>
@@ -295,7 +344,7 @@ export default function LocationTable(props: {
               {
                 tableHeaders.map((header, index) => (
                   <TableCell key={header.label}
-                    hidden={index < 2 ? isHidden : header.isHidden!(windowSize.width!) ? !isHidden : false}
+                    hidden={index < 2 ? isHidden : isCellHiddnen!(windowSize.width!) ? !isHidden : false}
                     sx={{ position: header.isSticky ? 'sticky' : 'static' }}
                     className="bg-blue-300 font-medium justify-items-center"
                   >
