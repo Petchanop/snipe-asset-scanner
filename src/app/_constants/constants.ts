@@ -28,7 +28,8 @@ export enum ReportState {
     NEW = "NEW",
     INPROGRESS = "IN PROGRESS",
     COMPLETED = "COMPLETED",
-    CANCEL = "CANCEL"
+    CANCEL = "CANCEL",
+    ALL = "ALL"
 }
 
 export const MapActionColor: Record<string, { [key: number]: string }> = {
@@ -163,4 +164,6 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
     }
 ]
 
+export const startRowsPerPage = 10
+export const rowsPerPageOptions = [10, 20, 30]
 

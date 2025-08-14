@@ -29,7 +29,7 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { MapActionColor, MapColor, ReportState } from "@/_constants/constants";
+import { MapActionColor, MapColor, ReportState, rowsPerPageOptions, startRowsPerPage } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
 import { TLocation } from "@/_types/snipe-it.type";
@@ -48,6 +48,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import FilterReportComponent from "@/_components/filterReportComponent";
 import SortReportComponent from "@/_components/sortReportComponent";
+import { filterReportBytype } from "@/_libs/report.utils";
 
 function processAction(state: string): { label: string, value: string } {
   switch (state) {
@@ -193,7 +194,8 @@ export function ChildrenSelectComponent(props: {
   const childLocation = useRef("")
   const [childrenLocation, setChildrenLocation] = useState<TLocation[]>([])
   const context = useLocationUrlContext()
-  const handleOnClick = (target: EventTarget & (HTMLInputElement | HTMLTextAreaElement)) => {
+  const handleOnClick = (target: EventTarget
+    & (HTMLInputElement | HTMLTextAreaElement)) => {
     const locationByName = childrenLocation.filter((loc) => loc.name == target.value)[0] as unknown as Location
     setChildId(locationByName.id)
     // setChildLocation(target.value)
@@ -301,6 +303,11 @@ export function useHiddenCellContext() {
   return context;
 }
 
+type TFilter = {
+  type: string,
+  key: string
+}
+
 export default function LocationTable(props: {
   reports: AssetCount[]
 }) {
@@ -308,8 +315,10 @@ export default function LocationTable(props: {
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof AssetCount>('document_number')
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(startRowsPerPage);
+  const [filter, setFilter] = useState<TFilter[]>([])
   const [isHidden, setIsHidden] = useState<boolean>(false);
+  const [filterData, setFilterData] = useState<AssetCount[]>([])
   const windowSize = useWindowSize()
   const handleRequestSort = (
     event: MouseEvent<unknown>,
@@ -319,16 +328,30 @@ export default function LocationTable(props: {
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
   }
-  const tableData = useMemo(() => reports
-    .sort(getComparator<AssetCount, keyof AssetCount>(order, orderBy)),
-    [order, orderBy, reports]
-  )
+  // const tableData = useMemo(() => reports
+  //   .sort(getComparator<AssetCount, keyof AssetCount>(order, orderBy)
+  //   ), [order, orderBy, reports]
+  // )
 
   const createSortHandler = (property: keyof AssetCount) => (event: MouseEvent<unknown>) => {
     handleRequestSort(event, property)
   }
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - reports.length) : 0
+
+  useEffect(() => {
+    const filterReport = async () => {
+      const tableData = reports
+        .sort(getComparator<AssetCount, keyof AssetCount>(order, orderBy)
+        )
+      let result = tableData
+      for (const screen of filter) {
+        result = await filterReportBytype(result, screen)
+      }
+      setFilterData(result)
+    }
+    filterReport()
+  }, [filter,order,orderBy, reports])
   return (
     <>
       <HiddenCellContext
@@ -337,9 +360,13 @@ export default function LocationTable(props: {
           setIsHidden
         }}
       >
-        <div className="flex flex-row justify-end">
-          <FilterReportComponent />
-          <SortReportComponent />
+        <div className="flex flex-row justify-end md:pr-2">
+          {
+            windowSize.width as number < 500 && (
+              <SortReportComponent />
+            )
+          }
+          <FilterReportComponent setFilter={setFilter} />
         </div>
         <Table stickyHeader size="small">
           <TableHead>
@@ -348,7 +375,6 @@ export default function LocationTable(props: {
                 tableHeaders.map((header, index) => (
                   <TableCell key={header.label}
                     hidden={index < 2 ? isHidden : isCellHiddnen!(windowSize.width!) ? !isHidden : false}
-                    // sx={{ position: header.isSticky ? 'sticky' : 'static' }}
                     className="bg-blue-300 font-medium justify-items-center"
                   >
                     <TableSortLabel
@@ -368,8 +394,8 @@ export default function LocationTable(props: {
           </TableHead>
           <TableBody sx={{ overflow: 'hidden' }}>
             {
-              tableData.length ?
-                dataPerPage(tableData, page, rowsPerPage).map((mockData: AssetCount) => {
+              filterData.length ?
+                dataPerPage(filterData, page, rowsPerPage).map((mockData: AssetCount) => {
                   const mapData: locationTableData = {
                     date: mockData.document_date.toLocaleDateString('th-BK'),
                     name: mockData.document_name as string,
@@ -410,16 +436,20 @@ export default function LocationTable(props: {
             <TableRow>
               <TablePagination
                 labelRowsPerPage={
-                  <Typography className="items-center">{windowSize.width! < 500 ? "": "row per page"}</Typography>
+                  <span
+                    className="items-center">
+                    {windowSize.width! < 500 ? "" : "row per page"}
+                  </span>
                 }
                 showFirstButton
                 showLastButton
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={rowsPerPageOptions}
                 colSpan={8}
-                count={reports.length}
+                count={filterData.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                onPageChange={(event, page) => handleChangePage(event, page, setPage, reports.length, rowsPerPage)}
+                onPageChange={(event, page) =>
+                  handleChangePage(event, page, setPage, filterData.length, rowsPerPage)}
                 onRowsPerPageChange={(event) =>
                   handleChangeRowsPerPage(event as ChangeEvent<HTMLInputElement>, setRowsPerPage, setPage)
                 }

@@ -73,6 +73,18 @@ export type TReportForm = {
     asset_count_location: number[]
 }
 
+export type TFilter = {
+  type: string,
+  key: string
+}
+
+export enum CFiltertype {
+  NAME = "NAME",
+  ASSET = "ASSET",
+  DATE = "DATE",
+  STATUS = "STATUS"
+} 
+
 export type AssetCount = asset_count;
 export type AssetCountLine = asset_count_line;
 export type Asset = assets;

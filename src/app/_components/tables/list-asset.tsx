@@ -2,6 +2,8 @@ import {
   AssetStatusEnum,
   INLOCATION,
   assetStatusOptions,
+  rowsPerPageOptions,
+  startRowsPerPage,
   tableHeaders,
   tableHeadersAdditional
 } from "@/_constants/constants";
@@ -297,7 +299,7 @@ export function AssetTable(props: {
     tabValue
   } = props
   const [tablePage, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(startRowsPerPage);
   return (
     <>
       <Table stickyHeader size="small" sx={{
@@ -323,7 +325,7 @@ export function AssetTable(props: {
               showFirstButton
               showLastButton
               rowsPerPageOptions={
-                [5, 10, 25]
+                rowsPerPageOptions
               }
               colSpan={5}
               count={data.length}

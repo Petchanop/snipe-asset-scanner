@@ -4,7 +4,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow"
-import { AssetStatusEnum, assetStatusOptions, tableHeadersAdditional } from "@/_constants/constants";
+import { AssetStatusEnum, assetStatusOptions, rowsPerPageOptions, startRowsPerPage, tableHeadersAdditional } from "@/_constants/constants";
 import { ChangeEvent, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Table from "@mui/material/Table";
@@ -120,7 +120,7 @@ function SearchAssetTable(props: {
 }) {
   const { data } = props
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(startRowsPerPage);
   const headers = tableHeadersAdditional
   return (
     <>
@@ -153,7 +153,7 @@ function SearchAssetTable(props: {
           <TablePagination
             showFirstButton
             showLastButton
-            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+            rowsPerPageOptions={rowsPerPageOptions}
             colSpan={4}
             count={data.length}
             rowsPerPage={rowsPerPage}

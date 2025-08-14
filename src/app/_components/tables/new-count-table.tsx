@@ -14,7 +14,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { AssetTable } from "@/_components/tables/list-asset";
 import {
-  AssetCount, AssetCountLine, AssetCountLocation,
+  AssetCount, AssetCountLocation,
   INLOCATION, OUTLOCATION,
   TAssetRow, TAssetTab, User
 } from "@/_types/types";
@@ -47,6 +47,8 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import SummarizeIcon from '@mui/icons-material/Summarize';
+import EditIcon from '@mui/icons-material/Edit'
+import { green } from "@mui/material/colors";
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
@@ -86,7 +88,8 @@ function CheckAssetButton(props: {
     <SpeedDial
       ariaLabel="Floating Action Button"
       sx={{ position: 'absolute', bottom: dialPosition, right: dialPosition }}
-      icon={<SpeedDialIcon />}
+      FabProps={{ color: 'default' }}
+      icon={<EditIcon />}
     >
       {actions.map((action) => (
         <SpeedDialAction

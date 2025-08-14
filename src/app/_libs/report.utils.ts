@@ -1,9 +1,10 @@
 'use server'
-import { AssetCount, AssetCountLine } from '@/_types/types'
+import { AssetCount, AssetCountLine, CFiltertype, TFilter } from '@/_types/types'
 import { prisma } from '@/_libs/prisma';
 import dayjs from 'dayjs';
 import { AssetResponse } from '@/api/snipe-it/snipe-it.api';
 import { createGateway, TResponse } from '@/api/next.api';
+import { ReportState } from '@/_constants/constants';
 
 
 export async function changeDateToIsoString(date: Date): Promise<string> {
@@ -187,6 +188,20 @@ export async function getAssetCountLineByAssetCount(
     return result
 }
 
+export async function getAssetCountLineByCodeOrName(
+    keyword: string
+): Promise<AssetCountLine[] | null> {
+    const result = await prisma.asset_count_line.findMany({
+        where: {
+            OR: [
+                { asset_code: { contains: keyword } },
+                { asset_name: { contains: keyword } }
+            ]
+        }
+    })
+    return result
+}
+
 export async function getAssetByLocationId(
     locationId: number
 ): Promise<TResponse<AssetResponse[]>> {
@@ -208,5 +223,27 @@ export async function CheckAllDataCount(assetCountId: string): Promise<boolean> 
             asset_count_id: assetCountId
         }
     })
-    return assetInReport.every((asset) => asset.asset_check == true)
+    return assetInReport.every((asset: AssetCountLine) => asset.asset_check == true)
+}
+
+export async function filterReportBytype(data: AssetCount[], filter: TFilter) : Promise<AssetCount[]> {
+    switch (filter.type) {
+        case CFiltertype.STATUS:
+            if (filter.key == ReportState.ALL)
+                return data
+            return data.filter((items) => items.state == filter.key)
+        case CFiltertype.DATE:
+            const minMaxDate = filter.key.split(' ')
+            const minDate = dayjs(minMaxDate[0], 'MM-DD-YYYY').toDate()
+            const maxDate = dayjs(minMaxDate[1], 'MM-DD-YYYY').toDate()
+            return data.filter((items) => items.document_date >= minDate
+                && items.document_date <= maxDate)
+        case CFiltertype.NAME:
+            return data.filter((items) => items.document_name?.includes(filter.key))
+        case CFiltertype.ASSET:
+            return Promise.resolve(getAssetCountLineByCodeOrName(filter.key)).then((assets) => {
+                return data.filter((items) => assets?.filter((asset) => items.id == asset.asset_count_id)) as AssetCount[]
+            })
+    }
+    return data
 }
