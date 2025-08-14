@@ -1,13 +1,35 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState, MouseEvent, MouseEventHandler } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
 import ImportExportIcon from '@mui/icons-material/ImportExport'
+import { Order } from './tables/utility';
+import { AssetCount } from '@/_types/types';
 
-export default function SortReportComponent() {
+export default function SortReportComponent(
+  props: {
+    order: Order,
+    orderBy: keyof AssetCount,
+    setOrder: Dispatch<SetStateAction<Order>>,
+    setOrderBy: Dispatch<SetStateAction<keyof AssetCount>>,
+  }) {
+  const { order, orderBy, setOrder, setOrderBy} = props
   const [open, setOpen] = useState(false);
+
+  const handleRequestSort = (
+    event: MouseEvent<unknown>,
+    property: keyof AssetCount
+  ) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
+  const createSortHandler = (property: keyof AssetCount) => (event: MouseEvent<unknown>) => {
+    handleRequestSort(event, property)
+  }
 
   return (
     <div className="relative m-2">
@@ -17,9 +39,9 @@ export default function SortReportComponent() {
         // className="fixed top-4 left-4
         variant='text'
         className="font-blue-300"
-        // className="
-        // flex items-center gap-2 bg-blue-300 text-white 
-        // px-4 py-2 rounded shadow hover:bg-blue-500 transition"
+      // className="
+      // flex items-center gap-2 bg-blue-300 text-white 
+      // px-4 py-2 rounded shadow hover:bg-blue-500 transition"
       >
         <ImportExportIcon />
         <span>Sort</span>
@@ -40,11 +62,17 @@ export default function SortReportComponent() {
         </div>
 
         <List className="p-2 space-y-2">
-           <ListItemButton>
+          <ListItemButton onClick={createSortHandler("document_number")}>
             <Typography>Document no.</Typography>
           </ListItemButton>
-          <ListItemButton>
+          <ListItemButton onClick={createSortHandler("document_name")}>
             <Typography>Name</Typography>
+          </ListItemButton>
+          <ListItemButton onClick={createSortHandler("document_date")}>
+            <Typography>Date</Typography>
+          </ListItemButton>
+           <ListItemButton onClick={createSortHandler("state")}>
+            <Typography>Date</Typography>
           </ListItemButton>
         </List>
       </div>

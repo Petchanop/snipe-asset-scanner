@@ -351,7 +351,7 @@ export default function LocationTable(props: {
       setFilterData(result)
     }
     filterReport()
-  }, [filter,order,orderBy, reports])
+  }, [filter, order, orderBy, reports])
   return (
     <>
       <HiddenCellContext
@@ -363,7 +363,12 @@ export default function LocationTable(props: {
         <div className="flex flex-row justify-end md:pr-2">
           {
             windowSize.width as number < 500 && (
-              <SortReportComponent />
+              <SortReportComponent
+                order={order}
+                orderBy={orderBy}
+                setOrder={setOrder}
+                setOrderBy={setOrderBy}
+              />
             )
           }
           <FilterReportComponent setFilter={setFilter} />
