@@ -2,13 +2,13 @@
 
 import Button from "@mui/material/Button"
 import { TLocation } from "@/_types/snipe-it.type"
-import { ChangeEvent, createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Typography from "@mui/material/Typography";
-import { useDateContext } from "@/_components/reportComponent";
+import { useDateContext } from "@/_contexts/context";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -21,28 +21,17 @@ import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add"
-import { createAssetCountReport } from "@/_libs/report.utils";
+import { createAssetCountReport, getAssetByLocationId } from "@/_libs/report.utils";
 import { CreateDocumentStep, ReportState } from "@/_constants/constants";
-import { CreateAssetCountLocation } from "@/api/report.api";
+import { BulkCreateAssetCountLine, CreateAssetCountLocation } from "@/api/report.api";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
-import { TReportForm } from "@/_types/types";
+import { AssetCountLocation, TReportForm } from "@/_types/types";
 import { decode } from 'html-entities'
-
-type TCreateReportContext = {
-  report: TReportForm,
-  setReport: Dispatch<SetStateAction<TReportForm>>
-}
-
-const CreateReportContext = createContext<TCreateReportContext | null>(null);
-
-export function useCreateReportContext() {
-  const context = useContext(CreateReportContext)
-  if (!context) {
-    throw new Error("useCreateReportContext must be use within Context provider")
-  }
-  return context
-}
+import { toast } from "react-hot-toast";
+import { parseDataForCreateAssetCountLine } from "@/_components/tables/utility";
+import { PNewCountTableProps } from "@/_components/tables/new-count-table";
+import { CreateReportContext, useCreateReportContext } from "@/_contexts/context";
 
 const steps = ["เลือกวันที่", "ตั้งชื่อรายงานตรวจนับ", "เพิ่มสถานที่", "ยืนยัน"];
 
@@ -262,7 +251,7 @@ export default function CreatePlanComponent(props: {
   childProp: TLocation | null,
   user: any
 }) {
-  const { parentLocation, childrenLocation, parentProp, childProp, user } = props
+  const { location, parentLocation, childrenLocation, parentProp, childProp, user } = props
   const [reportForm, setReportForm] = useState<TReportForm>({
     document_date: null,
     document_name: "",
@@ -284,10 +273,22 @@ export default function CreatePlanComponent(props: {
         setDisableButton(false)
         if (reportForm !== null && typeof reportForm !== 'undefined') {
           const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
-          for (const location of (reportForm as unknown as TReportForm).asset_count_location) {
-            await CreateAssetCountLocation(location, assetCountReport.id)
+          for (const locationId of (reportForm as unknown as TReportForm).asset_count_location) {
+            const assetCountLocation = await CreateAssetCountLocation(locationId, assetCountReport.id)
+            const { data, error } = await getAssetByLocationId(locationId)
+            if (error || !data) {
+              toast.error(`${assetCountReport.document_name} cannot been created.`)
+            }
+            const assetLocation = location.find((loc) => loc.id == locationId) as TLocation
+            const assetCountLineList = data?.map((asset) => {
+              return parseDataForCreateAssetCountLine(
+                asset, assetLocation as unknown as PNewCountTableProps,
+                user, assetCountLocation as AssetCountLocation, location, assetCountReport
+              )
+            })
+            await BulkCreateAssetCountLine(assetCountLineList!)
           }
-          const newReport : TReportForm = {
+          const newReport: TReportForm = {
             id: assetCountReport.id,
             document_name: assetCountReport.document_name as string,
             document_number: assetCountReport.document_number,
@@ -357,7 +358,7 @@ export default function CreatePlanComponent(props: {
 
               <div className="flex flex-col mt-4 space-y-2">
                 <Typography>รายชื่อรายการที่ได้ทำการสร้าง</Typography>
-                <Typography className="text-md text-red-400">* คลิปที่รายงานเพื่อทำการเริ่มตรวจนับ</Typography>
+                <Typography className="text-md text-red-400">* คลิกที่รายงานเพื่อทำการเริ่มตรวจนับ</Typography>
                 {
                   reportList.length > 0 ?
                     reportList.map((report) => {

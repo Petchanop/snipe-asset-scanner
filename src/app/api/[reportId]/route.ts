@@ -2,7 +2,7 @@
 import { getAssetCountLineByAssetCount, getAssetCountReport } from "@/_libs/report.utils";
 import * as Excel from 'exceljs'
 import { NextRequest } from "next/server";
-import { AssetCountWithLineAndLocation } from "@/_types/interfaces";
+import { AssetCountWithLineAndLocation } from "../../_types/interfaces";
 import path from "path";
 import { fetchLocations } from "@/api/snipe-it/snipe-it.api";
 import { GetAllUserPrisma } from "@/api/report.api";

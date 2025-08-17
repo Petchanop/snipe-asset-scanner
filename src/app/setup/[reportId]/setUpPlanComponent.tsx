@@ -1,6 +1,6 @@
 'use client'
 import { ReportState } from "@/_constants/constants";
-import { AssetCount, AssetCountLocation, TReportForm } from "@/_types/types";
+import { AssetCount, AssetCountLocation, TReportForm } from "../../_types/types";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -13,8 +13,8 @@ import { useRouter } from "next/navigation";
 import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
 import AddIcon from "@mui/icons-material/Add"
 import IconButton from "@mui/material/IconButton";
-import { TLocation } from "@/_types/snipe-it.type";
-import { ObjectList } from "@/_components/planComponent";
+import { TLocation } from "../../_types/snipe-it.type";
+import { ObjectList } from "@/reports/planComponent";
 import { CreateAssetCountLocation, DeleteAssetCountLocationByAssetCountId } from "@/api/report.api";
 
 export default function SetupPlanComponent(

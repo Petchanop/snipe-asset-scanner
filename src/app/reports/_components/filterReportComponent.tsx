@@ -10,14 +10,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Collapse from '@mui/material/Collapse';
-import Box from '@mui/material/Box';
 import { CFiltertype, TFilter } from '@/_types/types';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle';
 
 export default function FilterReportComponent(props: {
   setFilter: Dispatch<SetStateAction<TFilter[]>>

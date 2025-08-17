@@ -22,7 +22,7 @@ import {
   handleChangeRowsPerPage,
   Order
 } from "@/_components/tables/utility";
-import { OUTLOCATION, TAssetRow, TAssetTab } from "@/_types/types";
+import { OUTLOCATION, TAssetRow, TAssetTab } from "../../_types/types";
 import { JSX } from "@emotion/react/jsx-runtime";
 import Checkbox from "@mui/material/Checkbox";
 import { blue } from "@mui/material/colors";
@@ -39,7 +39,7 @@ import Button from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import { useReportContext } from "@/_components/tableLayout";
+import { useReportContext } from "@/_contexts/context";
 import ImageComponent from "@/_components/ImageComponent";
 import { decode } from 'html-entities'
 import { TextareaAutosize } from "@mui/material";

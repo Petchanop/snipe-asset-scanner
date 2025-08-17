@@ -1,7 +1,7 @@
 'use server'
 
 import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } from "@/api/next.api";
-import { TAsset, TLocation, TUser, TUserList } from "@/_types/snipe-it.type";
+import { TAsset, TLocation, TUser, TUserList } from "../../_types/snipe-it.type";
 import { ConvertImageUrl } from "@/_libs/convert_url.utils";
 
 const client = await createGateway();

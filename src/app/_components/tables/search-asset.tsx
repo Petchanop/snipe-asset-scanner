@@ -23,10 +23,9 @@ import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/search-asset.utils";
 import Tooltip from "@mui/material/Tooltip";
 import ListAssetMobile from "./list-asset-mobile";
-import { useWindowSize } from "../loading";
-// import { useReportContext } from "../tableLayout";
+import { useWindowSize } from "@/_components/loading";
 import { useRouter } from "next/navigation";
-import { ReportContext } from "../tableLayout";
+import { ReportContext } from "@/_contexts/context";
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
@@ -228,7 +227,6 @@ export default function SearchAsset(
           if (!searchResult.find((res) => res.assetCode == data.asset_tag)) {
             const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
             toast.success(`${result.rawValue} was found.`)
-            console.log(asset)
             setSearchResult([asset, ...searchResult])
           }
           toast.success(`${result.rawValue} has been checked.`)

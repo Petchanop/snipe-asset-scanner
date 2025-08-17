@@ -1,5 +1,5 @@
 'use server'
-import { AssetCount, AssetCountLine, CFiltertype, TFilter } from '@/_types/types'
+import { AssetCount, AssetCountLine, CFiltertype, TFilter } from '../_types/types'
 import { prisma } from '@/_libs/prisma';
 import dayjs from 'dayjs';
 import { AssetResponse } from '@/api/snipe-it/snipe-it.api';

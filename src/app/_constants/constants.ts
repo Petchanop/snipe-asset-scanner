@@ -1,4 +1,4 @@
-import { HeadersAssetTable } from "@/_types/interfaces"
+import { HeadersAssetTable } from "../_types/interfaces"
 import { blue, green, grey, red, deepOrange, brown } from "@mui/material/colors"
 
 export const INLOCATION = "INLOCATION"

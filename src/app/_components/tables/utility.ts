@@ -1,6 +1,6 @@
 import { ConvertImageUrl } from "@/_libs/convert_url.utils";
-import { TLocation } from "@/_types/snipe-it.type";
-import { AssetCount, AssetCountLine, AssetCountLocation, TAssetRow, User } from "@/_types/types";
+import { TLocation } from "../../_types/snipe-it.type";
+import { AssetCount, AssetCountLine, AssetCountLocation, TAssetRow, User } from "../../_types/types";
 import { ChangeEvent, MouseEvent } from "react";
 import { AssetResponse } from "@/api/snipe-it/snipe-it.api";
 import { PNewCountTableProps } from "./new-count-table";

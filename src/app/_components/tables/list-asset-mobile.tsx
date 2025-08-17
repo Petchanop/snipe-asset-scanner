@@ -17,7 +17,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useReportContext } from "@/_components/tableLayout";
+import { useReportContext } from "@/_contexts/context";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";

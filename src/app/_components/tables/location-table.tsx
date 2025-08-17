@@ -8,8 +8,6 @@ import {
   MouseEvent,
   Dispatch,
   SetStateAction,
-  createContext,
-  useContext
 } from "react";
 import {
   dataPerPage,
@@ -30,11 +28,11 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { MapActionColor, MapColor, ReportState, rowsPerPageOptions, startRowsPerPage } from "@/_constants/constants";
-import { locationTableData } from "@/_types/types";
+import { locationTableData } from "../../_types/types";
 import { tableHeaders } from "@/_constants/mockData";
-import { TLocation } from "@/_types/snipe-it.type";
-import { AssetCount, Location } from "@/_types/types";
-import { useLocationUrlContext } from "@/_components/tableLayout";
+import { TLocation } from "../../_types/snipe-it.type";
+import { AssetCount, Location } from "../../_types/types";
+import { HiddenCellContext, useLocationUrlContext } from "@/_contexts/context";
 import { useRouter } from "next/navigation";
 import { TableSortLabel } from "@mui/material";
 import { decode } from 'html-entities';
@@ -46,8 +44,8 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import FilterReportComponent from "@/_components/filterReportComponent";
-import SortReportComponent from "@/_components/sortReportComponent";
+import FilterReportComponent from "@/reports/_components/filterReportComponent";
+import SortReportComponent from "@/reports/_components/sortReportComponent";
 import { filterReportBytype } from "@/_libs/report.utils";
 
 function processAction(state: string): { label: string, value: string } {
@@ -286,21 +284,6 @@ export function ParentSelectComponent(props: {
       }
     </TextField>
   )
-}
-
-type hiddenCellContextType = {
-  isHidden: boolean;
-  setIsHidden: Dispatch<SetStateAction<boolean>>;
-}
-
-const HiddenCellContext = createContext<hiddenCellContextType | null>(null)
-
-export function useHiddenCellContext() {
-  const context = useContext(HiddenCellContext);
-  if (!context) {
-    throw new Error("useHiddenCellContext must be used within a HiddenCellProvider");
-  }
-  return context;
 }
 
 type TFilter = {

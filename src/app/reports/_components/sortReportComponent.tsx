@@ -5,7 +5,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
 import ImportExportIcon from '@mui/icons-material/ImportExport'
-import { Order } from './tables/utility';
+import { Order } from '@/_components/tables/utility';
 import { AssetCount } from '@/_types/types';
 
 export default function SortReportComponent(
