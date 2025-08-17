@@ -2,6 +2,8 @@ import {
   AssetStatusEnum,
   assetStatusOptions,
   INLOCATION,
+  rowsPerPageOptions,
+  startRowsPerPage,
   tableHeaders,
   tableHeadersAdditional
 } from "@/_constants/constants"
@@ -15,7 +17,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useReportContext } from "@/_components/tableLayout";
+import { useReportContext } from "@/_contexts/context";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -365,9 +367,8 @@ export default function ListAssetMobile(props: {
   tabValue?: TAssetTab,
 }) {
   const { data, isCheckTable, assetTab, tabValue } = props
-  const [itemPerPage, setItemPerPage] = useState(5)
+  const [itemPerPage, setItemPerPage] = useState(startRowsPerPage)
   const [page, setPage] = useState<number>(1);
-  const rowPerPageOptions = [5, 10, 25]
 
   function dataPerPage(data: any, page: number, rowsPerPage: number): any[] {
     return data.length ?
@@ -427,7 +428,7 @@ export default function ListAssetMobile(props: {
           size="medium"
         >
           {
-            rowPerPageOptions.map((row) => {
+            rowsPerPageOptions.map((row) => {
               return (
                 <MenuItem value={row} key={row}>{row}</MenuItem>
               )

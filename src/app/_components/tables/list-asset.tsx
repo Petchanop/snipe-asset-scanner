@@ -2,6 +2,8 @@ import {
   AssetStatusEnum,
   INLOCATION,
   assetStatusOptions,
+  rowsPerPageOptions,
+  startRowsPerPage,
   tableHeaders,
   tableHeadersAdditional
 } from "@/_constants/constants";
@@ -20,7 +22,7 @@ import {
   handleChangeRowsPerPage,
   Order
 } from "@/_components/tables/utility";
-import { OUTLOCATION, TAssetRow, TAssetTab } from "@/_types/types";
+import { OUTLOCATION, TAssetRow, TAssetTab } from "../../_types/types";
 import { JSX } from "@emotion/react/jsx-runtime";
 import Checkbox from "@mui/material/Checkbox";
 import { blue } from "@mui/material/colors";
@@ -37,7 +39,7 @@ import Button from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import { useReportContext } from "@/_components/tableLayout";
+import { useReportContext } from "@/_contexts/context";
 import ImageComponent from "@/_components/ImageComponent";
 import { decode } from 'html-entities'
 import { TextareaAutosize } from "@mui/material";
@@ -297,7 +299,7 @@ export function AssetTable(props: {
     tabValue
   } = props
   const [tablePage, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(startRowsPerPage);
   return (
     <>
       <Table stickyHeader size="small" sx={{
@@ -323,7 +325,7 @@ export function AssetTable(props: {
               showFirstButton
               showLastButton
               rowsPerPageOptions={
-                [5, 10, 25]
+                rowsPerPageOptions
               }
               colSpan={5}
               count={data.length}

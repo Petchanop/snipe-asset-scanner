@@ -1,4 +1,4 @@
-import RegisterComponent from "@/_components/registerComponent";
+import RegisterComponent from "@/auth/register/registerComponent";
 import { redirect } from 'next/navigation'
 
 export default async function RegisterPage(){

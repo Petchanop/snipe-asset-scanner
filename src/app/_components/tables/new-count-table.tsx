@@ -1,11 +1,9 @@
 'use client'
 
 import {
-  createContext,
   Dispatch,
   SetStateAction,
   SyntheticEvent,
-  useContext,
   useEffect, useState
 } from "react";
 import Typography from "@mui/material/Typography";
@@ -14,22 +12,20 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { AssetTable } from "@/_components/tables/list-asset";
 import {
-  AssetCount, AssetCountLine, AssetCountLocation,
+  AssetCount, AssetCountLocation,
   INLOCATION, OUTLOCATION,
   TAssetRow, TAssetTab, User
 } from "@/_types/types";
-import { BulkCreateAssetCountLine, GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
+import { GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
 import dayjs, { Dayjs } from "dayjs";
-import { ReportContext, useReportContext } from "@/_components/tableLayout";
+import { DateValueContext, ReportContext, useDateContext, useReportContext } from "@/_contexts/context";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import {
   CheckAllDataCount,
-  getAssetByLocationId,
   getAssetCountLineByAssetCount,
   updateAssetCountReport,
 } from "@/_libs/report.utils";
 import { getAssetById } from "@/api/snipe-it/snipe-it.api";
-import toast from "react-hot-toast";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
 import Tabs from "@mui/material/Tabs";
@@ -37,7 +33,7 @@ import Tab from "@mui/material/Tab";
 import { LoadingTableSkeleton, useWindowSize } from "@/_components/loading";
 import { ReportState } from "@/_constants/constants";
 import ListAssetMobile from "@/_components/tables/list-asset-mobile";
-import { mapAssetData, parseDataForCreateAssetCountLine } from "@/_components/tables/utility";
+import { mapAssetData } from "@/_components/tables/utility";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
@@ -47,6 +43,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import SummarizeIcon from '@mui/icons-material/Summarize';
+import EditIcon from '@mui/icons-material/Edit'
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
@@ -86,7 +83,8 @@ function CheckAssetButton(props: {
     <SpeedDial
       ariaLabel="Floating Action Button"
       sx={{ position: 'absolute', bottom: dialPosition, right: dialPosition }}
-      icon={<SpeedDialIcon />}
+      FabProps={{ color: 'default' }}
+      icon={<EditIcon />}
     >
       {actions.map((action) => (
         <SpeedDialAction
@@ -295,13 +293,6 @@ export function NewCountInput(props: {
 export type PNewCountTableProps =
   { name: string, id: number, rtd_location_id?: number }
 
-type TDateValueContext = {
-  dateValue: Dayjs;
-  setDateValue: Dispatch<SetStateAction<Dayjs | null>>
-}
-
-export const DateValueContext = createContext<TDateValueContext | null>(null)
-
 export default function NewCountTable(props: {
   allLocation: TLocation[],
   parentLocation: TLocation[],
@@ -314,6 +305,7 @@ export default function NewCountTable(props: {
   report: AssetCount | null;
   user: any;
   baseUrl: string;
+  assetCountLocation: AssetCountLocation[];
 }) {
   const {
     allLocation,
@@ -326,7 +318,9 @@ export default function NewCountTable(props: {
     users,
     user,
     baseUrl,
-    report } = props
+    report,
+    assetCountLocation
+  } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
@@ -352,8 +346,7 @@ export default function NewCountTable(props: {
   useEffect(() => {
     setData([])
     const setChangeLocationProp = async () => {
-      const locationIds = await GetAssetCountLocationByAssetCountReport(report!.id)
-      const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
+      const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
       setLocationProp(assetLocationId!)
     }
     setChangeLocationProp()
@@ -362,8 +355,20 @@ export default function NewCountTable(props: {
   useEffect(() => {
     setData([])
     const setChangeLocationProp = async () => {
-      const locationIds = await GetAssetCountLocationByAssetCountReport(report!.id)
-      const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
+      const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
+      const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
+      const AssetData = await Promise.all(
+        assetCountLineReport.map(async (asset) => {
+          const data = users.find((user) => user.id as number == asset.assigned_to)
+          let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
+          if (!asset.previous_loc_id && asset.is_not_asset_loc) {
+            const assetData = await getAssetById(asset.asset_id)
+            prev_loc = assetData.data?.location as unknown as TLocation
+          }
+          return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
+        }))
+      const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+      setData(sortMapData)
       setLocationProp(assetLocationId!)
     }
     setChangeLocationProp()
@@ -377,24 +382,9 @@ export default function NewCountTable(props: {
         setData([])
       } else {
         setDocumentNumber(report.document_number)
-        const locationIds = await GetAssetCountLocationByAssetCountReport(report.id)
-        const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
+        const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
         setLocationProp(assetLocationId!)
-        let assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
-        if (assetCountLineReport.length == 0) {
-          const { data, error } = await getAssetByLocationId(location.id)
-          if (error || !data) {
-            toast.error(`${report.document_number} asset data not found.`)
-          }
-          const assetCountLineList = data?.map((asset) => {
-            return parseDataForCreateAssetCountLine(
-              asset, location, user, assetLocationId as AssetCountLocation, allLocation, report
-            )
-          })
-          await BulkCreateAssetCountLine(assetCountLineList!)
-          assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
-        }
-        // setAssetCountLine(assetCountLineReport)
+        const assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
         const AssetData = await Promise.all(
           assetCountLineReport.map(async (asset) => {
             const data = users.find((user) => user.id as number == asset.assigned_to)
@@ -494,31 +484,7 @@ export default function NewCountTable(props: {
           {
             loading ?
               <LoadingTableSkeleton />
-              // :
-              // IsSearch ?
-              //   <div className="p-4
-              //     bg-white 
-              //     rounded-2xl 
-              //     shadow-lg 
-              //     transition 
-              //     duration-300 
-              //     transform 
-              //     hover:-translate-y-1 
-              //     hover:shadow-2xl
-              //     ">
-              //     <Typography>Check asset</Typography>
-              //     {locationId && (
-              //       <SearchAsset
-              //         assetCountReport={report!}
-              //         assetInReport={assetCountLine}
-              //         locationId={locationProp!}
-              //         users={users}
-              //         user={user}
-              //       />
-              //     )}
-              //   </div> 
-              :
-              media.width as number < 500 ?
+              : media.width as number < 500 ?
                 <>
                   <ListAssetMobile
                     data={data.filter((loc) => loc.notInLocation == false) as unknown as TAssetRow[]}
@@ -559,10 +525,3 @@ export default function NewCountTable(props: {
   )
 }
 
-export function useDateContext() {
-  const context = useContext(DateValueContext)
-  if (!context) {
-    throw new Error("useLocatoinUrlContext must be use within Context provider")
-  }
-  return context
-}

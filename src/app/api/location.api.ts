@@ -1,7 +1,7 @@
 import { prisma } from "@/_libs/prisma"
-import { Location } from "@/_types/types"
+import { Location } from "../_types/types"
 import { createGateway, TResponse } from "@/api/next.api";
-import { TLocation } from "@/_types/snipe-it.type";
+import { TLocation } from "../_types/snipe-it.type";
 
 const client = await createGateway();
 

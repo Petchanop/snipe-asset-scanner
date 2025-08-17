@@ -1,4 +1,4 @@
-import { AssetCount, AssetCountLine, AssetCountLocation, TAssetRow } from "@/_types/types";
+import { AssetCount, AssetCountLine, AssetCountLocation, TAssetRow } from "./types";
 
 
 export interface HeadersLocationTable {

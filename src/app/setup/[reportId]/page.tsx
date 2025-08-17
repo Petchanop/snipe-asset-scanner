@@ -1,11 +1,11 @@
 import { GetAssetCountLocationByAssetCountReport } from "@/api/report.api"
 import { fetchLocations } from "@/api/snipe-it/snipe-it.api"
-import SetupPlanComponent from "@/_components/setUpPlanComponent"
+import SetupPlanComponent from "@/setup/[reportId]/setUpPlanComponent"
 import { ReportState } from "@/_constants/constants"
 import { getChildrenLocation, getOtherLocation, getParentLocation } from "@/_libs/location.utils"
 import { getAssetCountReport } from "@/_libs/report.utils"
-import { TLocation } from "@/_types/snipe-it.type"
-import { AssetCount, AssetCountLocation } from "@/_types/types"
+import { TLocation } from "../../_types/snipe-it.type"
+import { AssetCount, AssetCountLocation } from "../../_types/types"
 
 export default async function SetUpPage(
     { params }: { params: Promise<{ reportId: string }> }

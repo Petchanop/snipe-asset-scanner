@@ -1,4 +1,4 @@
-import { HeadersAssetTable } from "@/_types/interfaces"
+import { HeadersAssetTable } from "../_types/interfaces"
 import { blue, green, grey, red, deepOrange, brown } from "@mui/material/colors"
 
 export const INLOCATION = "INLOCATION"
@@ -28,7 +28,8 @@ export enum ReportState {
     NEW = "NEW",
     INPROGRESS = "IN PROGRESS",
     COMPLETED = "COMPLETED",
-    CANCEL = "CANCEL"
+    CANCEL = "CANCEL",
+    ALL = "ALL"
 }
 
 export const MapActionColor: Record<string, { [key: number]: string }> = {
@@ -163,4 +164,6 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
     }
 ]
 
+export const startRowsPerPage = 10
+export const rowsPerPageOptions = [10, 20, 30]
 

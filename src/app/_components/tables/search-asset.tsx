@@ -4,7 +4,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow"
-import { AssetStatusEnum, assetStatusOptions, tableHeadersAdditional } from "@/_constants/constants";
+import { AssetStatusEnum, assetStatusOptions, rowsPerPageOptions, startRowsPerPage, tableHeadersAdditional } from "@/_constants/constants";
 import { ChangeEvent, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Table from "@mui/material/Table";
@@ -23,10 +23,9 @@ import { UpdateAssetCountLine } from "@/_libs/report.utils";
 import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/search-asset.utils";
 import Tooltip from "@mui/material/Tooltip";
 import ListAssetMobile from "./list-asset-mobile";
-import { useWindowSize } from "../loading";
-// import { useReportContext } from "../tableLayout";
+import { useWindowSize } from "@/_components/loading";
 import { useRouter } from "next/navigation";
-import { ReportContext } from "../tableLayout";
+import { ReportContext } from "@/_contexts/context";
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
@@ -120,7 +119,7 @@ function SearchAssetTable(props: {
 }) {
   const { data } = props
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(startRowsPerPage);
   const headers = tableHeadersAdditional
   return (
     <>
@@ -153,7 +152,7 @@ function SearchAssetTable(props: {
           <TablePagination
             showFirstButton
             showLastButton
-            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+            rowsPerPageOptions={rowsPerPageOptions}
             colSpan={4}
             count={data.length}
             rowsPerPage={rowsPerPage}
@@ -228,7 +227,6 @@ export default function SearchAsset(
           if (!searchResult.find((res) => res.assetCode == data.asset_tag)) {
             const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
             toast.success(`${result.rawValue} was found.`)
-            console.log(asset)
             setSearchResult([asset, ...searchResult])
           }
           toast.success(`${result.rawValue} has been checked.`)

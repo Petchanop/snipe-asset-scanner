@@ -1,28 +1,14 @@
 'use client'
 
-import { TLocation } from "@/_types/snipe-it.type"
+import { TLocation } from "../../_types/snipe-it.type"
 import { Button } from "@mui/material"
 import LocationTable from "@/_components/tables/location-table"
-import { useState, createContext, Dispatch, SetStateAction, useContext, useEffect } from "react"
-import CreatePlanComponent from "@/_components/planComponent"
+import { useState, useEffect } from "react"
+import CreatePlanComponent from "@/reports/_components/planComponent"
 import dayjs, { Dayjs } from "dayjs"
-import { AssetCount } from "@/_types/types"
+import { AssetCount } from "../../_types/types"
 import { getAllAssetCount } from "@/_libs/report.utils"
-
-type TDateValueContext = {
-  dateValue: Dayjs;
-  setDateValue: Dispatch<SetStateAction<Dayjs | null>>
-}
-
-const DateValueContext = createContext<TDateValueContext | null>(null)
-
-export function useDateContext() {
-  const context = useContext(DateValueContext)
-  if (!context) {
-    throw new Error("useDateValueContext must be use within Context provider")
-  }
-  return context
-}
+import { DateValueContext } from "@/_contexts/context"
 
 export default function ReportComponent(props: {
   locations: TLocation[],
