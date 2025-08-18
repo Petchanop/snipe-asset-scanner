@@ -32,6 +32,8 @@ import { toast } from "react-hot-toast";
 import { parseDataForCreateAssetCountLine } from "@/_components/tables/utility";
 import { PNewCountTableProps } from "@/_components/tables/new-count-table";
 import { CreateReportContext, useCreateReportContext } from "@/_contexts/context";
+import MobileStepper from "@mui/material/MobileStepper";
+import { useWindowSize } from "@/_components/loading";
 
 const steps = ["เลือกวันที่", "ตั้งชื่อรายงานตรวจนับ", "เพิ่มสถานที่", "ยืนยัน"];
 
@@ -263,9 +265,11 @@ export default function CreatePlanComponent(props: {
   const [activeStep, setActiveStep] = useState(0);
   const [disableButton, setDisableButton] = useState(false)
   const { push } = useRouter()
+  const windowSize = useWindowSize()
 
   const handleNext = async () => {
     if (activeStep < steps.length) {
+      console.log(reportForm)
       setActiveStep((prev) => prev + 1)
       if (!ValidReportForm(reportForm))
         setDisableButton(true)
@@ -297,10 +301,7 @@ export default function CreatePlanComponent(props: {
             state: assetCountReport.state as ReportState,
             asset_count_location: (reportForm as unknown as TReportForm).asset_count_location
           }
-          setReportForm((prev) => ({
-            ...prev,
-            newReport
-          }))
+          setReportForm(newReport)
           setReportList((prev) => [...prev, newReport])
         }
       }
@@ -317,6 +318,7 @@ export default function CreatePlanComponent(props: {
 
   const handleReset = () => {
     setActiveStep(0);
+    setReportList((prev) => prev.filter((items) => items.id != reportForm.id))
   };
 
   const handleNewRequest = () => {
@@ -341,13 +343,34 @@ export default function CreatePlanComponent(props: {
   return (
     <div className="flex flex-col w-full py-2 pl-2 lg:pl-10 place-items-center space-y-2">
       <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", mt: 4 }}>
-        <Stepper activeStep={activeStep}>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+        {
+          windowSize.width as number > 500 ?
+            <Stepper activeStep={activeStep}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            :
+            <MobileStepper
+              activeStep={activeStep}
+              backButton={
+                <Button
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  variant="outlined"
+                >
+                  ย้อนกลับ
+                </Button>}
+              nextButton={
+                <Button onClick={handleNext} variant="contained" disabled={disableButton}>
+                  {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
+                </Button>
+              } steps={steps.length}          >
+
+            </MobileStepper>
+        }
 
         <Box sx={{ mt: 4, mx: 2 }}>
           {activeStep === steps.length ? (
@@ -396,19 +419,22 @@ export default function CreatePlanComponent(props: {
                   </Stepper>
                 </CreateReportContext>
               </div>
-
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Button
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  variant="outlined"
-                >
-                  ย้อนกลับ
-                </Button>
-                <Button onClick={handleNext} variant="contained" disabled={disableButton}>
-                  {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
-                </Button>
-              </Box>
+              {
+                windowSize.width as number > 500 && (
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Button
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+                      variant="outlined"
+                    >
+                      ย้อนกลับ
+                    </Button>
+                    <Button onClick={handleNext} variant="contained" disabled={disableButton}>
+                      {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
+                    </Button>
+                  </Box>
+                )
+              }
             </>
           )}
         </Box>
