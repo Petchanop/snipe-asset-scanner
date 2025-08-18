@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState, MouseEvent, MouseEventHandler } from 'react';
+import { Dispatch, SetStateAction, useState, MouseEvent } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
