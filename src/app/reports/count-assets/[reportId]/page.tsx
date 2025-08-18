@@ -9,7 +9,6 @@ import { ReportState } from "@/_constants/constants";
 import { notFound } from "next/navigation";
 import { hasOwnProperty, Location } from "../../../_types/types"
 import { getSession } from "auth";
-import { SearchParams } from "next/dist/server/request/search-params";
 
 export default async function AssetsTablePage({
     params,

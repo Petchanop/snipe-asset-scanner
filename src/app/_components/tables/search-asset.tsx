@@ -14,7 +14,6 @@ import { fetchSearchAsset } from "@/api/snipe-it/snipe-it.api";
 import { toast, ToastBar, Toaster } from 'react-hot-toast';
 import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
-import Typography from "@mui/material/Typography";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
 import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
@@ -31,7 +30,6 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import SearchIcon from '@mui/icons-material/Search';
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment"
-import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
@@ -195,7 +193,7 @@ export default function SearchAsset(
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [show, setShow] = useState(true)
-  const { back, push } = useRouter()
+  const { push } = useRouter()
   const pathname = usePathname()
   async function callFetchAssetSearch() {
     if (searchInput && fetchData) {

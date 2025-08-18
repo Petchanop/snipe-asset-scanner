@@ -152,11 +152,8 @@ function SelectCountButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void
 }) {
   const {
-    selectedLocation,
-    setLocation,
     setIsCheckTable
   } = props
-  // const { replace } = useRouter()
   const params = useParams<{ reportId: string }>()
   const documentNumber = params.reportId ? parseInt(params.reportId) : 0
   const documentContext = useReportContext()
@@ -336,9 +333,7 @@ export default function NewCountTable(props: {
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [IsSearch, setIsSearch] = useState<boolean>(false)
   const media = useWindowSize()
-  const { push, replace } = useRouter()
-  const pathname = usePathname()
-  // replace(pathname)
+  const { push } = useRouter()
   useEffect(() => {
     if (!dateValue) {
       setDateValue(dayjs(report?.document_date))
@@ -356,7 +351,6 @@ export default function NewCountTable(props: {
   useEffect(() => {
     setData([])
     const setChangeLocationProp = async () => {
-      // replace(`${pathname}?location=${location.id}`)
       setLoading(true)
       const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
       const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
