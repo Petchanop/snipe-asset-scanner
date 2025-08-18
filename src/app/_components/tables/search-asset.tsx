@@ -24,13 +24,17 @@ import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/search-asset.uti
 import Tooltip from "@mui/material/Tooltip";
 import ListAssetMobile from "./list-asset-mobile";
 import { useWindowSize } from "@/_components/loading";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ReportContext } from "@/_contexts/context";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import SearchIcon from '@mui/icons-material/Search';
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment"
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
-  // actionLabel: string,
-  // assetCountReport: AssetCount
 }) {
   const { data } = props
   const { id, assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, prev_location } = data;
@@ -123,7 +127,6 @@ function SearchAssetTable(props: {
   const headers = tableHeadersAdditional
   return (
     <>
-
       <TableHead>
         <TableRow className="place-content-center">
           {headers.map((header) => (
@@ -153,7 +156,7 @@ function SearchAssetTable(props: {
             showFirstButton
             showLastButton
             rowsPerPageOptions={rowsPerPageOptions}
-            colSpan={4}
+            colSpan={10}
             count={data.length}
             rowsPerPage={rowsPerPage}
             page={page}
@@ -192,8 +195,8 @@ export default function SearchAsset(
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [show, setShow] = useState(true)
-  // const reportContext = useReportContext()
-  const { back } = useRouter()
+  const { back, push } = useRouter()
+  const pathname = usePathname()
   async function callFetchAssetSearch() {
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
@@ -237,7 +240,6 @@ export default function SearchAsset(
     fetchAssetFromScanData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanData])
-
 
   const media = useWindowSize()
   return (
@@ -284,24 +286,41 @@ export default function SearchAsset(
         setUpdate: setUpdate,
         setSearch: setIsSearch
       }}>
-        <div className="space-y-2">
-          <div className="flex flex-row w-full py-2 pl-2 lg:pl-10 space-x-2 content-center">
+        <Button onClick={() => 
+          push(`${pathname.replace('/\check', '')}?location=${locationId.location_id}`)}
+        ><ArrowBackIcon /> Back</Button>
+        <div className="space-y-2 justify-items-center">
+          <div className="flex flex-row
+            lg:w-3/4 w-full 
+            py-2 pl-2 lg:pl-10 
+            lg:space-x-4 space-x-2 content-center"
+          >
             <TextField
               id="search-asset"
               label="Search asset"
               variant="outlined"
               size="small"
-              className="w-1/2"
+              className="w-full"
               onChange={(event) => setSearchInput(event.target.value)}
               disabled={show}
               value={searchInput}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={
+                        () => setShow((pre) => !pre)
+                      } size="small" className="p-0">
+                        <PhotoCameraIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }
+              }}
             />
-            <Button onClick={() => setFetchData(true)}>Search</Button>
-            <Typography className="content-center">OR</Typography>
-            <Button onClick={() => setShow((pre) => !pre)}>Scan</Button>
-            {/* <Button onClick={() => reportContext.setSearch(false)}>Back</Button> */}
-            <Button onClick={() => back()}>Back</Button>
-
+            <IconButton color="primary" onClick={() => setFetchData(true)} className="bg-blue-200">
+              <SearchIcon />
+            </IconButton>
           </div>
           {
             show ?

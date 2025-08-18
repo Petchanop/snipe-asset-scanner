@@ -378,7 +378,7 @@ export default function CreatePlanComponent(props: {
               <Typography sx={{ mb: 2 }}>
                 ขั้นตอนที่ {activeStep + 1}: {steps[activeStep]}
               </Typography>
-              <div className="flex flex-row items-center">
+              <div className="items-center w-full">
                 <CreateReportContext value={
                   { report: reportForm!, setReport: setReportForm }
                 }>

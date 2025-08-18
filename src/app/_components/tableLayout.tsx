@@ -48,7 +48,7 @@ export default function TableLayout({
   return <>
     <CardContent className="space-y-4">
       <Tabs
-        value={pathname}
+        value={pathname.replace('/\check', '')}
         className="pl-2"
         onChange={handleOnChange}
       >
@@ -79,6 +79,5 @@ export default function TableLayout({
         </TableContainer>
       </Paper>
     </CardContent>
-    {/* </Card > */}
   </>
 }

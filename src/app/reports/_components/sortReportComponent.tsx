@@ -7,6 +7,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ImportExportIcon from '@mui/icons-material/ImportExport'
 import { Order } from '@/_components/tables/utility';
 import { AssetCount } from '@/_types/types';
+import Dialog from '@mui/material/Dialog';
 
 export default function SortReportComponent(
   props: {
@@ -16,6 +17,7 @@ export default function SortReportComponent(
     setOrderBy: Dispatch<SetStateAction<keyof AssetCount>>,
   }) {
   const { order, orderBy, setOrder, setOrderBy} = props
+  const [ selected, setSelected ] = useState("")
   const [open, setOpen] = useState(false);
 
   const handleRequestSort = (
@@ -29,6 +31,7 @@ export default function SortReportComponent(
 
   const createSortHandler = (property: keyof AssetCount) => (event: MouseEvent<unknown>) => {
     handleRequestSort(event, property)
+    setSelected(property)
   }
 
   return (
@@ -48,11 +51,11 @@ export default function SortReportComponent(
       </Button>
 
       {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 h-full w-64
-          bg-white shadow-lg transform transition-transform 
-          duration-300 z-40 ${open ? 'translate-x-0' : '-translate-x-full'
-          }`}
+      <Dialog open={open}
+        // className={`fixed top-0 left-0 h-full w-64
+        //   bg-white shadow-lg transform transition-transform 
+        //   duration-300 z-40 ${open ? 'translate-x-0' : '-translate-x-full'
+        //   }`}
       >
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-semibold">Sort Options</h2>
@@ -62,20 +65,27 @@ export default function SortReportComponent(
         </div>
 
         <List className="p-2 space-y-2">
-          <ListItemButton onClick={createSortHandler("document_number")}>
+          <ListItemButton 
+            onClick={createSortHandler("document_number")}
+            className={`${selected == "document_number" ? 
+              'bg-blue-100 text-blue-700 font-semibold': ''  }` }
+          >
             <Typography>Document no.</Typography>
           </ListItemButton>
-          <ListItemButton onClick={createSortHandler("document_name")}>
+          <ListItemButton onClick={createSortHandler("document_name")}
+           className={`${selected == "document_name" ? 
+              'bg-blue-100 text-blue-700 font-semibold': ''  }` }
+          >
             <Typography>Name</Typography>
           </ListItemButton>
-          <ListItemButton onClick={createSortHandler("document_date")}>
-            <Typography>Date</Typography>
-          </ListItemButton>
-           <ListItemButton onClick={createSortHandler("state")}>
+          <ListItemButton onClick={createSortHandler("document_date")}
+           className={`${selected == "document_date" ? 
+              'bg-blue-100 text-blue-700 font-semibold': ''  }` }
+          >
             <Typography>Date</Typography>
           </ListItemButton>
         </List>
-      </div>
+      </Dialog>
     </div>
   );
 }

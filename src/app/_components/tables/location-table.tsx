@@ -239,7 +239,7 @@ export function ChildrenSelectComponent(props: {
             label="sub location"
             name={parent?.name}
             value={childLocation.current}
-            className="mt-3 p-4 lg:w-3/5 w-full"
+            className="mt-3 p-4 lg:w-3/5"
             onChange={(event) => handleOnClick(event.target)}
             disabled={isCheckTable}
           >
@@ -251,7 +251,7 @@ export function ChildrenSelectComponent(props: {
               )
             }
           </TextField>
-          : <></>
+          : <div className="p-4 mt-3 lg:w-3/5"></div>
       }
     </>
   )
@@ -269,12 +269,13 @@ export function ParentSelectComponent(props: {
       select
       label="location"
       value={parentProp ? parentProp.name : parentLocation[0]!.name! as string}
-      className="mt-3 p-4 lg:w-3/5 w-full"
+      className="mt-3 p-4 lg:w-3/5" 
       disabled={isCheckTable}
       onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const newParent = parentLocation.find((loc) => loc.name == event.target.value);
         setParent(newParent!)
-      }}>
+      }}
+      >
       {
         parentLocation ?
           parentLocation.map((loc) =>

@@ -1,6 +1,6 @@
 'use client'
 import { ReportState } from "@/_constants/constants";
-import { AssetCount, AssetCountLocation, TReportForm } from "../../_types/types";
+import { AssetCount, AssetCountLocation, TReportForm } from "@/_types/types";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -14,7 +14,7 @@ import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/ta
 import AddIcon from "@mui/icons-material/Add"
 import IconButton from "@mui/material/IconButton";
 import { TLocation } from "../../_types/snipe-it.type";
-import { ObjectList } from "@/reports/planComponent";
+import { ObjectList } from "@/reports/_components/planComponent";
 import { CreateAssetCountLocation, DeleteAssetCountLocationByAssetCountId } from "@/api/report.api";
 
 export default function SetupPlanComponent(
@@ -153,7 +153,7 @@ export default function SetupPlanComponent(
                     parentLocation={parentLocation}
                     parentProp={parent!}
                     setParent={setParent} />
-                <div className="flex flex-row max-md:flex-col items-center space-x-2">
+                <div className="flex flex-row items-center space-x-2">
                     <ChildrenSelectComponent
                         parent={parent!}
                         locationByParent={childrenLocation}

@@ -42,7 +42,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
-import SummarizeIcon from '@mui/icons-material/Summarize';
 import EditIcon from '@mui/icons-material/Edit'
 
 function CheckAssetButton(props: {
@@ -168,14 +167,14 @@ function SelectCountButton(props: {
     // replace(`${window.location.href}`)
   }
 
-  async function handleGetData() {
-    setLocation(selectedLocation);
-    documentContext.setDocumentNumber(documentNumber)
-    documentContext.setRefetchReport(true)
-  }
+  // async function handleGetData() {
+  //   setLocation(selectedLocation);
+  //   documentContext.setDocumentNumber(documentNumber)
+  //   documentContext.setRefetchReport(true)
+  // }
 
   const actions = [
-    { icon: <SummarizeIcon />, name: 'เรียกดูข้อมูล', onClick: handleGetData },
+    // { icon: <SummarizeIcon />, name: 'เรียกดูข้อมูล', onClick: handleGetData },
     { icon: <PlayCircleFilledIcon />, name: 'เริ่มตรวจนับ', onClick: handleClickStart },
   ];
   const windowSize = useWindowSize()
@@ -258,7 +257,7 @@ export function NewCountInput(props: {
             isCheckTable={isCheckTable}
           />
         </div>
-        <div className="flex md:flex-row flex-col md:items-center">
+        <div className="flex md:flex-row flex-col md:items-center w-full">
           <Typography className="w-25 max-lg:w-21">Location</Typography>
           <ParentSelectComponent
             parentLocation={parentLocation}
@@ -337,7 +336,9 @@ export default function NewCountTable(props: {
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [IsSearch, setIsSearch] = useState<boolean>(false)
   const media = useWindowSize()
-  const { push } = useRouter()
+  const { push, replace } = useRouter()
+  const pathname = usePathname()
+  // replace(pathname)
   useEffect(() => {
     if (!dateValue) {
       setDateValue(dayjs(report?.document_date))
@@ -355,6 +356,8 @@ export default function NewCountTable(props: {
   useEffect(() => {
     setData([])
     const setChangeLocationProp = async () => {
+      // replace(`${pathname}?location=${location.id}`)
+      setLoading(true)
       const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
       const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
       const AssetData = await Promise.all(
@@ -370,6 +373,7 @@ export default function NewCountTable(props: {
       const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
       setData(sortMapData)
       setLocationProp(assetLocationId!)
+      setLoading(false)
     }
     setChangeLocationProp()
   }, [location])
