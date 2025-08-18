@@ -1,20 +1,25 @@
 import NewCountTable, { PNewCountTableProps } from "@/_components/tables/new-count-table";
 import { fetchLocations } from "@/api/snipe-it/snipe-it.api";
 import { getParentLocation } from "@/_libs/location.utils";
-import { TLocation } from "@/_types/snipe-it.type";
+import { TLocation } from "../../../_types/snipe-it.type";
 import { getLocationByIdSnipeIt } from "@/api/location.api";
 import { GetAllUserPrisma, GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
 import { findAssetCount, getAssetCountReport, updateAssetCountReport } from "@/_libs/report.utils";
 import { ReportState } from "@/_constants/constants";
 import { notFound } from "next/navigation";
-import { hasOwnProperty, Location } from "@/_types/types"
+import { hasOwnProperty, Location } from "../../../_types/types"
 import { getSession } from "auth";
+import { SearchParams } from "next/dist/server/request/search-params";
 
-export default async function AssetsTablePage({ params }: {
-    params: Promise<{ reportId: string }>
-}
-) {
-    const { reportId } = await params
+export default async function AssetsTablePage({
+    params,
+    searchParams,
+}: {
+    params: Promise<{ reportId: string }>;
+    searchParams: Promise<{ location: number }>;
+}) {
+    const { reportId } = await params;
+    const { location } = await searchParams;
     // if (!resolveLocationId)
     //     notFound()
     //fetch data here
@@ -63,6 +68,7 @@ export default async function AssetsTablePage({ params }: {
         .find((child: { id: number, name: string }) => locationId.find((loc) => child.id == loc.location_id))
     ) as TLocation
     const baseUrl = process.env.SNIPE_URL
+    const defaultLocation = location ? locationData.find((loc) => loc.id == location) : locationData![0] as unknown as TLocation
     return (
         <>
             <NewCountTable
@@ -70,8 +76,9 @@ export default async function AssetsTablePage({ params }: {
                 parentLocation={listOfParent as unknown as TLocation[]}
                 childrenLocation={locationData as unknown as TLocation[]}
                 locations={locationData as PNewCountTableProps[]}
-                defaultLocation={locationData[0] as unknown as TLocation}
-                locationId={locationData[0]?.id as number}
+                defaultLocation={defaultLocation as unknown as TLocation}
+                locationId={defaultLocation?.id as number}
+                assetCountLocation={locationId}
                 parentProp={parent}
                 users={users}
                 report={report}

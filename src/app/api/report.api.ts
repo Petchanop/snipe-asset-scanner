@@ -1,5 +1,5 @@
 "use server"
-import { AssetCount, AssetCountLine, AssetCountLocation, ExtendAssetResponse, User } from "@/_types/types";
+import { AssetCount, AssetCountLine, AssetCountLocation, ExtendAssetResponse, User } from "../_types/types";
 import { prisma } from "@/_libs/prisma"
 import { TResponse } from "@/api/next.api";
 import dayjs from "dayjs";

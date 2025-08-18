@@ -1,9 +1,9 @@
 import { AddAssetCountLine } from "@/api/report.api"
 import { AssetResponse } from "@/api/snipe-it/snipe-it.api"
 import { assetStatusOptions } from "@/_constants/constants"
-import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User, assetUser, ExtendAssetResponse } from "@/_types/types"
+import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User, assetUser, ExtendAssetResponse } from "../_types/types"
 import { UpdateAssetCountLine } from "./report.utils"
-import { TLocation } from "@/_types/snipe-it.type"
+import { TLocation } from "../_types/snipe-it.type"
 
 export async function CreatAssetCountLine(
     data: AssetResponse,
