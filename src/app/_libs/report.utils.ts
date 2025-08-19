@@ -48,7 +48,7 @@ export async function findAssetCount(document_number: number): Promise<AssetCoun
 export async function createAssetCountReport(
     payload: FCreateAssetCountReport)
     : Promise<AssetCount> {
-    if (payload.id != "") {
+    if (payload.id != "" && payload.id != undefined) {
         return await prisma.asset_count.update({
             where: {
                 id: payload.id,
