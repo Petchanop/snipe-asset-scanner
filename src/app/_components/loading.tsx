@@ -83,7 +83,6 @@ export const LoadingTableSkeleton = () => {
 };
 
 export const EditReportSkeleton = () => {
-  const media = useWindowSize()
   const rows = Array.from({ length: 4 }); // 5 loading rows
   return (
     <>
