@@ -194,7 +194,6 @@ function StepComponent(props: {
                   ADD
                   </Button>
               }
-              {/* <div className="flex flex-row items-center space-x-2"> */}
               <ChildrenSelectComponent
                 parent={parent!}
                 locationByParent={childrenLocation}
@@ -451,7 +450,7 @@ export default function CreatePlanComponent(props: {
                   disabled={activeStep === 0}
                   onClick={handleBack}
                   variant="outlined"
-                  className="fixed bottom-20 left-1/4 transform -translate-x-1/2 z-50"
+                  className="fixed bottom-20 left-1/4 max-md:bottom-10 transform -translate-x-1/2 z-50 w-40 h-10"
                 >
                   ย้อนกลับ
                 </Button>
@@ -459,14 +458,14 @@ export default function CreatePlanComponent(props: {
                   activeStep < steps.length ? (
                     <>
                       <Button onClick={handleNext} variant="contained" disabled={disableButton}
-                        className="fixed bottom-20 left-3/4 transform -translate-x-1/2 z-50"
+                        className="fixed bottom-20  max-md:bottom-10 left-3/4 transform -translate-x-1/2 z-50 w-40 h-10"
                       >
                         {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
                       </Button>
                     </>
                   ) :
                     <Button onClick={() => replace('/')} variant="contained" disabled={disableButton}
-                      className="fixed bottom-20 left-3/4 transform -translate-x-1/2 z-50"
+                      className="fixed bottom-20 max-md:bottom-10 left-3/4 transform -translate-x-1/2 z-50 w-40 h-10"
                     >
                       กลับหน้ารายงาน
                     </Button>
