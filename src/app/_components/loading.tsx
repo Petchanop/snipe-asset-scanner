@@ -2,7 +2,6 @@
 import Skeleton from "@mui/material/Skeleton";
 
 export function LoadingSkeleton() {
-
   return (
     <>
       <Skeleton className='w-screen h-screen lg:w-4/6 lg:h-3/4 absolute lg:top-22' />
@@ -82,3 +81,25 @@ export const LoadingTableSkeleton = () => {
     </TableContainer>
   );
 };
+
+export const EditReportSkeleton = () => {
+  const media = useWindowSize()
+  const rows = Array.from({ length: 4 }); // 5 loading rows
+  return (
+    <>
+       <div className="flex flex-col lg:items-center p-4 space-y-5">
+      {
+        rows.map((_, index) => {
+          return (
+            <>
+            <Skeleton key={index} className="lg:w-3/5 mt-3 p-4 w-full h-[5rem]" />
+            </>
+          )
+        })
+      }
+      <Skeleton className="w-[9rem] h-[3rem]"/>
+      <Skeleton className="w-full h-[10rem]"/>
+      </div>
+    </>
+  )
+}
