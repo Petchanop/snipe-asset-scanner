@@ -42,11 +42,23 @@ export default function ReportComponent(props: {
       <div className="flex flex-col space-x-4">
         <div className="flex flex-row">
           <Button onClick={() => setShow(true)}
-            variant="outlined" className={`${show ? "bg-blue-200" : ""}`}>
+            variant="outlined" className={`${show ? "bg-blue-200" : ""}`}
+            sx={{
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+              borderBottomLeftRadius: 0
+            }}
+          >
             {"ประวัติรายงานตรวจนับ"}
           </Button>
           <Button onClick={() => setShow(false)}
-            variant="outlined" className={`${!show ? "bg-blue-200" : ""}`}>
+            variant="outlined" className={`${!show ? "bg-blue-200" : ""}`}
+            sx={{
+              borderTopLeftRadius: 0,
+              borderBottomRightRadius: 0,
+              borderBottomLeftRadius: 0
+            }}
+          >
             {"สร้าง รายงานตรวจนับ"}
           </Button>
         </div>

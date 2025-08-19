@@ -20,7 +20,6 @@ import IconButton from "@mui/material/IconButton";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add"
 import { createAssetCountReport, getAssetByLocationId } from "@/_libs/report.utils";
 import { CreateDocumentStep, ReportState } from "@/_constants/constants";
 import { BulkCreateAssetCountLine, CreateAssetCountLocation } from "@/api/report.api";
@@ -178,25 +177,41 @@ function StepComponent(props: {
     case CreateDocumentStep.ADDLOCATION:
       return (
         <>
-          <div className="flex flex-col">
-            <div className="flex lg:flex-row max-md:flex-col">
+          <div className="flex flex-col w-full">
+            <div className="flex lg:flex-row flex-col items-center w-full">
               <ParentSelectComponent
                 parentLocation={parentLocation}
                 parentProp={parent!}
                 setParent={setParent} />
-              <div className="flex flex-row items-center space-x-2">
-                <ChildrenSelectComponent
-                  parent={parent!}
-                  locationByParent={childrenLocation}
-                  childId={childId!}
-                  setChildId={setChildId} />
-                <IconButton
-                  color="primary"
-                  onClick={() => setSelected(true)}
-                >
-                  <AddIcon />
-                </IconButton>
-              </div>
+              {
+                childrenLocation.length && parent ? <></>
+                  : <Button
+                    variant='contained'
+                    color="primary"
+                    onClick={() => setSelected(true)}
+                    className="m-4 p-0 h-10 lg:w-3/5 max-md:w-40"
+                  >
+                  ADD
+                  </Button>
+              }
+              {/* <div className="flex flex-row items-center space-x-2"> */}
+              <ChildrenSelectComponent
+                parent={parent!}
+                locationByParent={childrenLocation}
+                childId={childId!}
+                setChildId={setChildId} />
+              {
+                childrenLocation.length && parent && (
+                  <Button
+                    variant='contained'
+                    color="primary"
+                    onClick={() => setSelected(true)}
+                    className="m-4 p-0 h-10 lg:w-3/5 max-md:w-40"
+                  >
+                  ADD
+                  </Button>
+                )
+              }
             </div>
             <div className="flex flex-row">
               <ObjectList
@@ -264,12 +279,11 @@ export default function CreatePlanComponent(props: {
   const [reportList, setReportList] = useState<TReportForm[]>([])
   const [activeStep, setActiveStep] = useState(0);
   const [disableButton, setDisableButton] = useState(false)
-  const { push } = useRouter()
+  const { push, replace } = useRouter()
   const windowSize = useWindowSize()
 
   const handleNext = async () => {
     if (activeStep < steps.length) {
-      console.log(reportForm)
       setActiveStep((prev) => prev + 1)
       if (!ValidReportForm(reportForm))
         setDisableButton(true)
@@ -302,7 +316,7 @@ export default function CreatePlanComponent(props: {
             asset_count_location: (reportForm as unknown as TReportForm).asset_count_location
           }
           setReportForm(newReport)
-          setReportList((prev) => [...prev, newReport])
+          setReportList((prev) => [...prev.filter((report) => report.id !== newReport.id), newReport])
         }
       }
     }
@@ -341,8 +355,8 @@ export default function CreatePlanComponent(props: {
   }, [])
 
   return (
-    <div className="flex flex-col w-full py-2 pl-2 lg:pl-10 place-items-center space-y-2">
-      <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", mt: 4 }}>
+    <div className="flex flex-col w-full h-screen py-2 pl-2 lg:pl-0 place-items-center space-y-2">
+      <Box sx={{ width: "100%", maxWidth: 800, mx: "auto", mt: 4 }}>
         {
           windowSize.width as number > 500 ?
             <Stepper activeStep={activeStep}>
@@ -364,9 +378,18 @@ export default function CreatePlanComponent(props: {
                   ย้อนกลับ
                 </Button>}
               nextButton={
-                <Button onClick={handleNext} variant="contained" disabled={disableButton}>
-                  {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
-                </Button>
+                <>
+                  {
+                    activeStep < steps.length ? (
+                      <Button onClick={handleNext} variant="contained" disabled={disableButton}>
+                        {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
+                      </Button>
+                    ) :
+                      <Button onClick={() => replace('/')} variant="contained" disabled={disableButton}>
+                        กลับหน้ารายงาน
+                      </Button>
+                  }
+                </>
               } steps={steps.length}          >
 
             </MobileStepper>
@@ -419,26 +442,40 @@ export default function CreatePlanComponent(props: {
                   </Stepper>
                 </CreateReportContext>
               </div>
-              {
-                windowSize.width as number > 500 && (
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Button
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      variant="outlined"
-                    >
-                      ย้อนกลับ
-                    </Button>
-                    <Button onClick={handleNext} variant="contained" disabled={disableButton}>
-                      {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
-                    </Button>
-                  </Box>
-                )
-              }
             </>
           )}
+          {
+            windowSize.width as number > 500 && (
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Button
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  variant="outlined"
+                  className="fixed bottom-20 left-1/4 transform -translate-x-1/2 z-50"
+                >
+                  ย้อนกลับ
+                </Button>
+                {
+                  activeStep < steps.length ? (
+                    <>
+                      <Button onClick={handleNext} variant="contained" disabled={disableButton}
+                        className="fixed bottom-20 left-3/4 transform -translate-x-1/2 z-50"
+                      >
+                        {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
+                      </Button>
+                    </>
+                  ) :
+                    <Button onClick={() => replace('/')} variant="contained" disabled={disableButton}
+                      className="fixed bottom-20 left-3/4 transform -translate-x-1/2 z-50"
+                    >
+                      กลับหน้ารายงาน
+                    </Button>
+                }
+              </Box>
+            )
+          }
         </Box>
       </Box>
-    </div>
+    </div >
   )
 }
