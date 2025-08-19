@@ -81,7 +81,7 @@ function CheckAssetButton(props: {
   return (
     <SpeedDial
       ariaLabel="Floating Action Button"
-      sx={{ position: 'absolute', bottom: dialPosition, right: dialPosition }}
+      sx={{ position: 'fixed', bottom: dialPosition, right: dialPosition }}
       FabProps={{ color: 'default' }}
       icon={<EditIcon />}
     >
