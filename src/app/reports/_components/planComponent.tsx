@@ -189,9 +189,9 @@ function StepComponent(props: {
                     variant='contained'
                     color="primary"
                     onClick={() => setSelected(true)}
-                    className="m-4 p-0 h-10 lg:w-3/5 max-md:w-40"
+                    className="m-4 p-0 h-[2.5rem] lg:w-3/5 max-md:w-[9rem]"
                   >
-                  ADD
+                    ADD LOCATION
                   </Button>
               }
               <ChildrenSelectComponent
@@ -205,9 +205,9 @@ function StepComponent(props: {
                     variant='contained'
                     color="primary"
                     onClick={() => setSelected(true)}
-                    className="m-4 p-0 h-10 lg:w-3/5 max-md:w-40"
+                    className="m-4 p-0 h-[2.5rem] lg:w-3/5 max-md:w-[9rem]"
                   >
-                  ADD
+                    ADD LOCATION
                   </Button>
                 )
               }
