@@ -218,8 +218,9 @@ export function ChildrenSelectComponent(props: {
         defaultValue = childrenLocationChange[0]
         locationId = childrenLocationChange[0]?.id!
       }
+
       if (!locationId)
-        locationId = parent.id as unknown as number
+        locationId = parent?.id as unknown as number
       context.setLocationId(locationId)
       // context.selected.current = `${pathname}?location=${locationId}`
       setChildId(locationId)

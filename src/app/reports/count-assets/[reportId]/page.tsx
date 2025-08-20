@@ -35,10 +35,10 @@ export default async function AssetsTablePage({
     const listOfParent: Location[] = []
     for (const loc of locationId) {
         const { data, error } = await getLocationByIdSnipeIt(loc.location_id)
-        if (error) {
+        if (data?.status === 'error' || error) {
             return notFound()
         }
-        if (hasOwnProperty(data.parent!, 'id')) {
+        if (hasOwnProperty(data?.parent!, 'id')) {
             //@ts-expect-error some use parent_id some parent.id
             const filterParent = parentLocation.find((parent) => parent.id == data.parent.id as unknown as number)
             if (!listOfParent.includes(filterParent as unknown as Location)) {
