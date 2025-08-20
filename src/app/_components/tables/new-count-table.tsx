@@ -408,12 +408,12 @@ export default function NewCountTable(props: {
         //     }
         //     return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
         //   }))
-        // if (await CheckAllDataCount(report.id) == true) {
-        //   await updateAssetCountReport(report.document_number, {
-        //     ...report,
-        //     state: ReportState.COMPLETED
-        //   })
-        // }
+        if (await CheckAllDataCount(report.id) == true) {
+          await updateAssetCountReport(report.document_number, {
+            ...report,
+            state: ReportState.COMPLETED
+          })
+        }
         // const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
         const sortMapData = await getSortMapData(assetLocationId!)
         setData(sortMapData)

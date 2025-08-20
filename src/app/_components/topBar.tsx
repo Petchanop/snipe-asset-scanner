@@ -5,9 +5,11 @@ import Image from 'next/image'
 import CititexLogo from "@/public/cititexlogo.png"
 import { signOut, useSession } from "next-auth/react"
 import Button from "@mui/material/Button";
+import { useRouter } from "next/navigation";
 
 export default function TopBar() {
   const session = useSession()
+  const { push } = useRouter()
   return (
     <>
       <CardHeader
@@ -18,6 +20,7 @@ export default function TopBar() {
             height={50}
             src={CititexLogo.src}
             alt="cititex logo"
+            onClick={() => push('/reports')}
           />
         }
         slotProps={{

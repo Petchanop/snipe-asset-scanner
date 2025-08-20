@@ -35,7 +35,6 @@ export default async function AssetsTablePage({
     const listOfParent: Location[] = []
     for (const loc of locationId) {
         const { data, error } = await getLocationByIdSnipeIt(loc.location_id)
-        console.log(data, loc.location_id)
         if (data?.status === 'error' || error) {
             return notFound()
         }

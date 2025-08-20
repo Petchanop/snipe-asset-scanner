@@ -15,6 +15,7 @@ import { TLocation } from "@/_types/snipe-it.type";
 import { ObjectList } from "@/reports/_components/planComponent";
 import { CreateAssetCountLocation, DeleteAssetCountLocationByAssetCountId } from "@/api/report.api";
 import { EditReportSkeleton } from "@/_components/loading";
+import Gone410 from "@/_components/locationNotFound";
 
 export default function SetupPlanComponent(
   props: {
@@ -48,6 +49,7 @@ export default function SetupPlanComponent(
         parentLocation.find((loc) => loc.id === countLocation.location_id) ||
         otherLocation.find((loc) => loc.id === countLocation.location_id) as TLocation
     }))
+
 
   const [reportForm, setReportForm] = useState<TReportForm>({
     document_date: document_date,
@@ -133,6 +135,10 @@ export default function SetupPlanComponent(
     setSelected(false)
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected, childId])
+
+  if (documentLocation.length > 0 && documentLocation.some((loc)=> loc == undefined)) {
+    return <Gone410 reportId={assetCountReport.document_number}/> 
+  }
 
   return (
     <>
