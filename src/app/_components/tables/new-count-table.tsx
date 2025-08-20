@@ -320,8 +320,6 @@ export default function NewCountTable(props: {
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  // const [assetCountLine, setAssetCountLine] = useState<AssetCountLine[]>([])
-  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [locationProp, setLocationProp] = useState<AssetCountLocation>(defaultLocation as unknown as AssetCountLocation)
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
@@ -334,11 +332,28 @@ export default function NewCountTable(props: {
   const [IsSearch, setIsSearch] = useState<boolean>(false)
   const media = useWindowSize()
   const { push } = useRouter()
+
+  const getSortMapData = async (assetLocationId : AssetCountLocation ) => {
+      const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
+      const AssetData = await Promise.all(
+        assetCountLineReport.map(async (asset) => {
+          const data = users.find((user) => user.id as number == asset.assigned_to)
+          let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
+          if (!asset.previous_loc_id && asset.is_not_asset_loc) {
+            const assetData = await getAssetById(asset.asset_id)
+            prev_loc = assetData.data?.location as unknown as TLocation
+          }
+          return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
+        }))
+      return AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+  }
+
   useEffect(() => {
     if (!dateValue) {
       setDateValue(dayjs(report?.document_date))
     }
   }, [dateValue, report])
+
   useEffect(() => {
     setData([])
     const setChangeLocationProp = async () => {
@@ -353,20 +368,20 @@ export default function NewCountTable(props: {
     const setChangeLocationProp = async () => {
       setLoading(true)
       const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
-      const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
-      const AssetData = await Promise.all(
-        assetCountLineReport.map(async (asset) => {
-          const data = users.find((user) => user.id as number == asset.assigned_to)
-          let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
-          if (!asset.previous_loc_id && asset.is_not_asset_loc) {
-            const assetData = await getAssetById(asset.asset_id)
-            prev_loc = assetData.data?.location as unknown as TLocation
-          }
-          return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
-        }))
-      const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
-      setData(sortMapData)
       setLocationProp(assetLocationId!)
+      // const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
+      // const AssetData = await Promise.all(
+      //   assetCountLineReport.map(async (asset) => {
+      //     const data = users.find((user) => user.id as number == asset.assigned_to)
+      //     let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
+      //     if (!asset.previous_loc_id && asset.is_not_asset_loc) {
+      //       const assetData = await getAssetById(asset.asset_id)
+      //       prev_loc = assetData.data?.location as unknown as TLocation
+      //     }
+      //     return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
+      //   }))
+      const sortMapData = await getSortMapData(assetLocationId!)
+      setData(sortMapData)
       setLoading(false)
     }
     setChangeLocationProp()
@@ -382,24 +397,25 @@ export default function NewCountTable(props: {
         setDocumentNumber(report.document_number)
         const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
         setLocationProp(assetLocationId!)
-        const assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
-        const AssetData = await Promise.all(
-          assetCountLineReport.map(async (asset) => {
-            const data = users.find((user) => user.id as number == asset.assigned_to)
-            let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
-            if (!asset.previous_loc_id && asset.is_not_asset_loc) {
-              const assetData = await getAssetById(asset.asset_id)
-              prev_loc = assetData.data?.location as unknown as TLocation
-            }
-            return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
-          }))
-        if (await CheckAllDataCount(report.id) == true) {
-          await updateAssetCountReport(report.document_number, {
-            ...report,
-            state: ReportState.COMPLETED
-          })
-        }
-        const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+        // const assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
+        // const AssetData = await Promise.all(
+        //   assetCountLineReport.map(async (asset) => {
+        //     const data = users.find((user) => user.id as number == asset.assigned_to)
+        //     let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
+        //     if (!asset.previous_loc_id && asset.is_not_asset_loc) {
+        //       const assetData = await getAssetById(asset.asset_id)
+        //       prev_loc = assetData.data?.location as unknown as TLocation
+        //     }
+        //     return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
+        //   }))
+        // if (await CheckAllDataCount(report.id) == true) {
+        //   await updateAssetCountReport(report.document_number, {
+        //     ...report,
+        //     state: ReportState.COMPLETED
+        //   })
+        // }
+        // const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+        const sortMapData = await getSortMapData(assetLocationId!)
         setData(sortMapData)
         setRefetchReport(false)
         setLoading(false)
@@ -409,25 +425,30 @@ export default function NewCountTable(props: {
       fetchReport()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchReport])
-
+  
   useEffect(() => {
     const updateAssetCountLine = async () => {
       if (update && report) {
+        setLoading(true)
         const locationIds = await GetAssetCountLocationByAssetCountReport(report.id)
         const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
-        const assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
-        const AssetData = await Promise.all(
-          assetCountLineReport.map(async (asset) => {
-            const data = users.find((user) => user.id as number == asset.assigned_to)
-            let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
-            if (!asset.previous_loc_id && asset.is_not_asset_loc) {
-              const assetData = await getAssetById(asset.asset_id)
-              prev_loc = assetData.data?.location as unknown as TLocation
-            }
-            return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
-          }))
-        const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+        // const assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
+        // const AssetData = await Promise.all(
+        //   assetCountLineReport.map(async (asset) => {
+        //     const data = users.find((user) => user.id as number == asset.assigned_to)
+        //     let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
+        //     if (!asset.previous_loc_id && asset.is_not_asset_loc) {
+        //       const assetData = await getAssetById(asset.asset_id)
+        //       prev_loc = assetData.data?.location as unknown as TLocation
+        //     }
+        //     return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
+        //   }))
+        // const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+        const sortMapData = await getSortMapData(assetLocationId!)
         setData(sortMapData)
+        setTimeout(() => {
+          setLoading(false)
+        }, 500)
         setUpdate(false)
       }
     }
@@ -458,7 +479,6 @@ export default function NewCountTable(props: {
           setSearch: setIsSearch
         }}
         >
-
           <NewCountInput
             parentLocation={parentLocation}
             childrenLocation={childrenLocation}
@@ -518,7 +538,6 @@ export default function NewCountTable(props: {
           }
         </ReportContext>
       </DateValueContext>
-
     </>
   )
 }
