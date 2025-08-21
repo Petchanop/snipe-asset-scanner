@@ -113,7 +113,6 @@ export default function SetupPlanComponent(
     setTimeout(() => {
       setLoading(false)
     }, 1500)
-    // push(`/reports`)
   }
 
   const handleCancel = () => {

@@ -30,6 +30,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import SearchIcon from '@mui/icons-material/Search';
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment"
+import { createServerSearchParamsForMetadata } from "next/dist/server/request/search-params";
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
@@ -181,6 +182,7 @@ export default function SearchAsset(
   const { assetCountReport, assetInReport, locationId, users, user } = props
   const [searchInput, setSearchInput] = useState<string>("")
   const [scanData, setScanData] = useState<IDetectedBarcode[]>([])
+  // const [scanData, setScanData] = useState<string[]>([])
   const [fetchData, setFetchData] = useState<boolean>(false)
   const [searchResult, setSearchResult] = useState<TAssetRow[]>([])
   const [documentNumber, setDocumentNumber] = useState<number | undefined>(
@@ -195,6 +197,7 @@ export default function SearchAsset(
   const [show, setShow] = useState(true)
   const { push } = useRouter()
   const pathname = usePathname()
+  let searchData: string[] = []
   async function callFetchAssetSearch() {
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
@@ -219,23 +222,26 @@ export default function SearchAsset(
   }, [fetchData])
 
   useEffect(() => {
-    const fetchAssetFromScanData = async () => {
-      scanData?.map(async (result) => {
-        const { data, error } = await fetchSearchAsset(encodeURIComponent(result.rawValue));
+    const fetchAssetFromScanData = async (result: string) => {
+        if (searchResult.filter((asset) => asset.assetCode == result).length > 0)
+          return
+        const { data, error } = await fetchSearchAsset(result);
         if (error) {
-          toast.error(`${result.rawValue} not found.`)
+          toast.error(`${result} not found.`)
         } else {
-          if (!searchResult.find((res) => res.assetCode == data.asset_tag)) {
-            const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
-            toast.success(`${result.rawValue} was found.`)
-            setSearchResult([asset, ...searchResult])
-          }
-          toast.success(`${result.rawValue} has been checked.`)
+          const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
+          toast.success(`${result} was found.`)
+          toast.success(`${result} has been checked.`)
+          setSearchResult((prev) => [asset, ...prev.filter((item) => item.assetCode != result)])
         }
-        setScanData([])
-      })
     }
-    fetchAssetFromScanData()
+    if (scanData.length > 0) {
+      for (const data of scanData) {
+        if (searchData.filter((item) => item == data.rawValue).length == 0)
+          searchData.unshift(data.rawValue) 
+          fetchAssetFromScanData(data.rawValue)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanData])
 
@@ -284,7 +290,7 @@ export default function SearchAsset(
         setUpdate: setUpdate,
         setSearch: setIsSearch
       }}>
-        <Button onClick={() => 
+        <Button onClick={() =>
           push(`${pathname.replace('/\check', '')}?location=${locationId.location_id}`)}
         ><ArrowBackIcon /> Back</Button>
         <div className="space-y-2 justify-items-center">
@@ -329,28 +335,29 @@ export default function SearchAsset(
               : <></>
           }
           {
-            media.width as number < 500 ?
-              <ListAssetMobile
-                data={searchResult}
-                isCheckTable={true}
-              /> :
-              <Table stickyHeader size="small" sx={{
-                minWidth: 650,
-                border: 'solid',
-                borderLeft: 'none',
-                borderRight: 'none',
-                borderBottom: 'none',
-                borderWidth: 1,
-                borderColor: blue[400]
-              }}>
-                <SearchAssetTable
+            loading ? <></>
+              : media.width as number < 500 ?
+                <ListAssetMobile
                   data={searchResult}
                   isCheckTable={true}
-                  assetTab={false}
-                  assetCountReport={assetCountReport}
-                  assetInReport={assetInReport}
-                />
-              </Table>
+                /> :
+                <Table stickyHeader size="small" sx={{
+                  minWidth: 650,
+                  border: 'solid',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  borderBottom: 'none',
+                  borderWidth: 1,
+                  borderColor: blue[400]
+                }}>
+                  <SearchAssetTable
+                    data={searchResult}
+                    isCheckTable={true}
+                    assetTab={false}
+                    assetCountReport={assetCountReport}
+                    assetInReport={assetInReport}
+                  />
+                </Table>
           }
         </div>
       </ReportContext>

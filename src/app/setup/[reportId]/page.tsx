@@ -4,8 +4,8 @@ import SetupPlanComponent from "@/setup/[reportId]/setUpPlanComponent"
 import { ReportState } from "@/_constants/constants"
 import { getChildrenLocation, getOtherLocation, getParentLocation } from "@/_libs/location.utils"
 import { getAssetCountReport } from "@/_libs/report.utils"
-import { TLocation } from "../../_types/snipe-it.type"
-import { AssetCount, AssetCountLocation } from "../../_types/types"
+import { TLocation } from "@/_types/snipe-it.type"
+import { AssetCount, AssetCountLocation } from "@/_types/types"
 
 export default async function SetUpPage(
     { params }: { params: Promise<{ reportId: string }> }
@@ -24,7 +24,6 @@ export default async function SetUpPage(
     const parentLocation = getParentLocation(locations.data!.rows)
     const childrenLocation = getChildrenLocation(locations.data!.rows)
     const otherLocation = getOtherLocation(locations.data!.rows)
-    // const childProp = typeof location !== 'undefined' ? childrenLocation.find((loc) => loc.id == location) : childrenLocation[0]
     const parentProp = parentLocation[0] as TLocation
     return <>
         <SetupPlanComponent
