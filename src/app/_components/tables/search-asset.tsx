@@ -30,7 +30,6 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import SearchIcon from '@mui/icons-material/Search';
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment"
-import { createServerSearchParamsForMetadata } from "next/dist/server/request/search-params";
 
 function CreateSearchAssetTableCell(props: {
   data: TAssetRow,
@@ -197,7 +196,7 @@ export default function SearchAsset(
   const [show, setShow] = useState(true)
   const { push } = useRouter()
   const pathname = usePathname()
-  let searchData: string[] = []
+  const searchData: string[] = []
   async function callFetchAssetSearch() {
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
