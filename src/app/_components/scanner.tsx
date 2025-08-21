@@ -10,21 +10,28 @@ export default function ScannerComponent(
     setScanData: Dispatch<SetStateAction<IDetectedBarcode[]>>
   }
 ) {
-  const { scanData, setScanData } = props
+  const { 
+    scanData, setScanData
+  } = props
 
   return (
     <>
-      <Scanner 
-      allowMultiple={true}
-      onScan={(result) => setScanData(result)} sound
-      components={{
-        zoom:true
-      }}  
+      <Scanner
+        allowMultiple={true}
+        onScan={(result) => 
+            setScanData(result) 
+        }
+        sound
+        components={{
+          zoom: true
+        }}
       />
       {
         scanData ?
           scanData.map((data) =>
-            <Alert key={`${data.format}-${data.rawValue}`} icon={<CheckIcon fontSize="inherit" />} severity="success">
+            <Alert key={`${data.format}-${data.rawValue}`}
+            icon={<CheckIcon fontSize="inherit" />} severity="success"
+            >
               {data.rawValue}
             </Alert>
           )

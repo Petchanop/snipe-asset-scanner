@@ -1,13 +1,13 @@
 import NewCountTable, { PNewCountTableProps } from "@/_components/tables/new-count-table";
 import { fetchLocations } from "@/api/snipe-it/snipe-it.api";
 import { getParentLocation } from "@/_libs/location.utils";
-import { TLocation } from "../../../_types/snipe-it.type";
+import { TLocation } from "@/_types/snipe-it.type";
 import { getLocationByIdSnipeIt } from "@/api/location.api";
 import { GetAllUserPrisma, GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
 import { findAssetCount, getAssetCountReport, updateAssetCountReport } from "@/_libs/report.utils";
 import { ReportState } from "@/_constants/constants";
 import { notFound } from "next/navigation";
-import { hasOwnProperty, Location } from "../../../_types/types"
+import { hasOwnProperty, Location } from "@/_types/types"
 import { getSession } from "auth";
 
 export default async function AssetsTablePage({
@@ -19,11 +19,6 @@ export default async function AssetsTablePage({
 }) {
     const { reportId } = await params;
     const { location } = await searchParams;
-    // if (!resolveLocationId)
-    //     notFound()
-    //fetch data here
-    //use mock data before implement api call
-    //fetch location from snipe api
     const session = await getSession()
     const assetCountReport = await getAssetCountReport(parseInt(reportId))
     if (!assetCountReport)
@@ -67,7 +62,9 @@ export default async function AssetsTablePage({
         .find((child: { id: number, name: string }) => locationId.find((loc) => child.id == loc.location_id))
     ) as TLocation
     const baseUrl = process.env.SNIPE_URL
-    const defaultLocation = location ? locationData.find((loc) => loc.id == location) : locationData![0] as unknown as TLocation
+    const defaultLocation = location ?
+        locationData.find((loc) => loc.id == location)
+        : locationData![0] as unknown as TLocation
     return (
         <>
             <NewCountTable
@@ -84,7 +81,7 @@ export default async function AssetsTablePage({
                 user={session?.user}
                 baseUrl={baseUrl as string}
             />
-          
+
         </>
     )
 }
