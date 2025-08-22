@@ -55,8 +55,8 @@ export default function AssetReport(
           height={100}
         ></Image>
         <Button href={`/api/${document_number}`} sx={{
-          maxHeight: '3rem'
-        }}><DownloadIcon sx={{ color: blue[400] }}/></Button>
+          maxHeight: '5rem'
+        }}><DownloadIcon sx={{ fontSize: '2.5rem', color: blue[400] }}/></Button>
         
       </div>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -82,7 +82,7 @@ export default function AssetReport(
             <TableCell>Asset Name</TableCell>
             <TableCell>Assign Name</TableCell>
             <TableCell>Count Check</TableCell>
-            <TableCell>Assign Not Correct</TableCell>
+            <TableCell>Assign Incorrect</TableCell>
             <TableCell>Asset Damaged</TableCell>
             <TableCell>Location</TableCell>
           </TableRow>

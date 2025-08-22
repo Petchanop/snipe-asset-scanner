@@ -43,6 +43,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DoneIcon from '@mui/icons-material/Done';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import EditIcon from '@mui/icons-material/Edit'
+import toast, { Toaster } from "react-hot-toast";
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
@@ -62,6 +63,7 @@ function CheckAssetButton(props: {
     await updateAssetCountReport(reportContext.DocumentNumber!, {
       state: ReportState.COMPLETED
     })
+    toast.success(`Asset check has been finished`)
   }
 
   const actions = [
@@ -333,19 +335,19 @@ export default function NewCountTable(props: {
   const media = useWindowSize()
   const { push } = useRouter()
 
-  const getSortMapData = async (assetLocationId : AssetCountLocation ) => {
-      const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
-      const AssetData = await Promise.all(
-        assetCountLineReport.map(async (asset) => {
-          const data = users.find((user) => user.id as number == asset.assigned_to)
-          let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
-          if (!asset.previous_loc_id && asset.is_not_asset_loc) {
-            const assetData = await getAssetById(asset.asset_id)
-            prev_loc = assetData.data?.location as unknown as TLocation
-          }
-          return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
-        }))
-      return AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
+  const getSortMapData = async (assetLocationId: AssetCountLocation) => {
+    const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
+    const AssetData = await Promise.all(
+      assetCountLineReport.map(async (asset) => {
+        const data = users.find((user) => user.id as number == asset.assigned_to)
+        let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
+        if (!asset.previous_loc_id && asset.is_not_asset_loc) {
+          const assetData = await getAssetById(asset.asset_id)
+          prev_loc = assetData.data?.location as unknown as TLocation
+        }
+        return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
+      }))
+    return AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
   }
 
   useEffect(() => {
@@ -413,6 +415,7 @@ export default function NewCountTable(props: {
             ...report,
             state: ReportState.COMPLETED
           })
+          toast.success(`All assets have been checked`)
         }
         // const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
         const sortMapData = await getSortMapData(assetLocationId!)
@@ -425,7 +428,7 @@ export default function NewCountTable(props: {
       fetchReport()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchReport])
-  
+
   useEffect(() => {
     const updateAssetCountLine = async () => {
       if (update && report) {
@@ -479,6 +482,21 @@ export default function NewCountTable(props: {
           setSearch: setIsSearch
         }}
         >
+          <Toaster
+            containerStyle={{
+              position: 'relative',
+              top: '20%',
+            }}
+            toastOptions={{
+              success: {
+                duration: 2500,
+                style: {
+                  background: '#45b42fff',
+                  color: '#fff',
+                }
+              }
+            }}
+          ></Toaster>
           <NewCountInput
             parentLocation={parentLocation}
             childrenLocation={childrenLocation}
