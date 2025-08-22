@@ -193,6 +193,7 @@ export default function SearchAsset(
   const [IsSearch, setIsSearch] = useState<boolean>(false)
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
+  const [ isPause, setIsPause ] = useState<boolean>(false)
   const [show, setShow] = useState(true)
   const { push } = useRouter()
   const pathname = usePathname()
@@ -235,11 +236,13 @@ export default function SearchAsset(
         }
     }
     if (scanData.length > 0) {
+      setIsPause(true)
       for (const data of scanData) {
         if (searchData.filter((item) => item == data.rawValue).length == 0)
           searchData.unshift(data.rawValue) 
           fetchAssetFromScanData(data.rawValue)
       }
+      setIsPause(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanData])
@@ -330,6 +333,7 @@ export default function SearchAsset(
               <ScannerComponent
                 scanData={scanData!}
                 setScanData={setScanData}
+                isPause={isPause}
               />
               : <></>
           }

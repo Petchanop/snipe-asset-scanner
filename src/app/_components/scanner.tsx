@@ -8,10 +8,11 @@ export default function ScannerComponent(
   props: {
     scanData: IDetectedBarcode[],
     setScanData: Dispatch<SetStateAction<IDetectedBarcode[]>>
+    isPause: boolean;
   }
 ) {
   const { 
-    scanData, setScanData
+    scanData, setScanData, isPause
   } = props
 
   return (
@@ -21,6 +22,7 @@ export default function ScannerComponent(
         onScan={(result) => 
             setScanData(result) 
         }
+        paused={isPause}
         sound
         components={{
           zoom: true
