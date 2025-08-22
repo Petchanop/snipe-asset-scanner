@@ -59,7 +59,7 @@ export async function UpdateAssetCountLineForSearchAssetPage(
         asset = await CreatAssetCountLine(data, assetCountReport, assetInReport, locationId, user)
         await UpdateAssetCountLine(asset.id as string, { asset_check: true })
     } else {
-        const result = await UpdateAssetCountLine(IsInLocation.id, { asset_check: true })
+        const result = await UpdateAssetCountLine(IsInLocation.id, { asset_check: true, checked_by: parseInt(user.id) as number })
         const assigned_to = users.find((data: User) => data.id == result?.assigned_to as number)
         asset = {
             id: result?.id,

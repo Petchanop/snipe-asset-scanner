@@ -63,7 +63,7 @@ function CheckAssetButton(props: {
     await updateAssetCountReport(reportContext.DocumentNumber!, {
       state: ReportState.COMPLETED
     })
-    toast.success(`Asset check has been finished`)
+    toast.success(`จบการตรวจนับทรัพย์สิน`)
   }
 
   const actions = [

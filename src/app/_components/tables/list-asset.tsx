@@ -43,6 +43,7 @@ import { useReportContext } from "@/_contexts/context";
 import ImageComponent from "@/_components/ImageComponent";
 import { decode } from 'html-entities'
 import { TextareaAutosize } from "@mui/material";
+import { useSession } from "next-auth/react";
 
 export function CreateAssetTableCell(
   props: {
@@ -50,9 +51,10 @@ export function CreateAssetTableCell(
     assetTab: TAssetTab,
     action: JSX.Element,
     actionLabel: string,
-    isCheckTable: boolean
+    isCheckTable: boolean,
+    user: any
   }) {
-  const { data, assetTab, actionLabel, action, isCheckTable } = props
+  const { data, assetTab, actionLabel, action, isCheckTable,user } = props
   const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, image, remarks } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
@@ -216,6 +218,7 @@ export default function ListAsset(props: {
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof TAssetRow>('assetCode')
   const headers = assetTab == INLOCATION ? tableHeaders : tableHeadersAdditional
+  const { data: session } = useSession()
 
   const handleRequestSort = (
     event: MouseEvent<unknown>,
@@ -263,6 +266,7 @@ export default function ListAsset(props: {
                   action={<Checkbox disabled={!isCheckTable} />}
                   actionLabel={"[Del]"}
                   isCheckTable={isCheckTable}
+                  user={session?.user}
                 />
               </TableRow>
             ) :
