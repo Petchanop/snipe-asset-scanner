@@ -7,7 +7,7 @@ import {
   tableHeaders,
   tableHeadersAdditional
 } from "@/_constants/constants"
-import { UpdateAssetCountLine } from "@/_libs/report.utils";
+import { UpdateAssetCountLine } from "@/_repositories/assetCountLine";
 import { TAssetRow, TAssetTab } from "@/_types/types"
 import Checkbox from "@mui/material/Checkbox";
 import { grey } from "@mui/material/colors";

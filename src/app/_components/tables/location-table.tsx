@@ -28,10 +28,10 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { MapActionColor, MapColor, ReportState, rowsPerPageOptions, startRowsPerPage } from "@/_constants/constants";
-import { locationTableData } from "../../_types/types";
+import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
-import { TLocation } from "../../_types/snipe-it.type";
-import { AssetCount, Location } from "../../_types/types";
+import { TLocation } from "@/_types/snipe-it.type";
+import { AssetCount, Location } from "@/_types/types";
 import { HiddenCellContext, useLocationUrlContext } from "@/_contexts/context";
 import { useRouter } from "next/navigation";
 import { TableSortLabel } from "@mui/material";
@@ -46,7 +46,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import FilterReportComponent from "@/reports/_components/filterReportComponent";
 import SortReportComponent from "@/reports/_components/sortReportComponent";
-import { filterReportBytype } from "@/_libs/report.utils";
+import { filterReportBytype } from "@/_libs/assetCount";
 
 function processAction(state: string): { label: string, value: string } {
   switch (state) {

@@ -22,7 +22,7 @@ import {
   handleChangeRowsPerPage,
   Order
 } from "@/_components/tables/utility";
-import { OUTLOCATION, TAssetRow, TAssetTab } from "../../_types/types";
+import { OUTLOCATION, TAssetRow, TAssetTab } from "@/_types/types";
 import { JSX } from "@emotion/react/jsx-runtime";
 import Checkbox from "@mui/material/Checkbox";
 import { blue } from "@mui/material/colors";
@@ -33,7 +33,7 @@ import TableFooter from "@mui/material/TableFooter";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow"
-import { UpdateAssetCountLine } from "@/_libs/report.utils";
+import { UpdateAssetCountLine } from "@/_repositories/assetCountLine";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Button from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
@@ -54,7 +54,7 @@ export function CreateAssetTableCell(
     isCheckTable: boolean,
     user: any
   }) {
-  const { data, assetTab, actionLabel, action, isCheckTable,user } = props
+  const { data, assetTab, actionLabel, action, isCheckTable } = props
   const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, image, remarks } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)

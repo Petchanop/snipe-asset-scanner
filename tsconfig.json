@@ -19,7 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/app/*"],
+      "@/*": ["./src/app/*", "./src/*"],
       "@/prisma/*": ["./prisma/*"],
       "@/public/*": ["./public/*"],
       "auth": ["./auth"]

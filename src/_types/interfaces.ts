@@ -1,6 +1,5 @@
 import { AssetCount, AssetCountLine, AssetCountLocation, TAssetRow } from "./types";
 
-
 export interface HeadersLocationTable {
     label: string;
     isSelectBox: boolean;

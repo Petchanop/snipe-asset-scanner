@@ -1,13 +1,13 @@
 'use client'
 
-import { TLocation } from "../../_types/snipe-it.type"
+import { TLocation } from "@/_types/snipe-it.type"
 import { Button } from "@mui/material"
 import LocationTable from "@/_components/tables/location-table"
 import { useState, useEffect } from "react"
 import CreatePlanComponent from "@/reports/_components/planComponent"
 import dayjs, { Dayjs } from "dayjs"
-import { AssetCount } from "../../_types/types"
-import { getAllAssetCount } from "@/_libs/report.utils"
+import { AssetCount } from "@/_types/types"
+import { getAllAssetCount } from "@/_repositories/assetCount"
 import { DateValueContext } from "@/_contexts/context"
 
 export default function ReportComponent(props: {

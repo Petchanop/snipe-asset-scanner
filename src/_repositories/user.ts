@@ -1,5 +1,6 @@
 'use server'
-import { prisma } from "@/_libs/prisma";
+import { User } from "@/_types/types";
+import { prisma } from "@/_libs/prisma"
 import * as bcrypt from 'bcrypt';
 
 export async function CreateAssetCountUser(userInput: any) {
@@ -15,9 +16,9 @@ export async function CreateAssetCountUser(userInput: any) {
     return await prisma.asset_count_user.create({
         data: {
             id: user.id,
-            user_id : user.id,
-            username : userInput.FirstName + '.' + userInput.LastName[0] as string,
-            password: hashPassword 
+            user_id: user.id,
+            username: userInput.FirstName + '.' + userInput.LastName[0] as string,
+            password: hashPassword
         }
     })
 }
@@ -27,9 +28,26 @@ export async function GetAssetCountUser(data: any) {
         where: {
             username: data.username
         },
-        include : {
+        include: {
             user: true
         }
     })
     return user
+}
+
+export async function getUserByIdPrisma(userId: number): Promise<Partial<User> | null> {
+    return await prisma.users.findUnique({
+        where: {
+            id: userId
+        },
+        select: {
+            first_name: true,
+            last_name: true,
+            id: true
+        }
+    })
+}
+
+export async function GetAllUserPrisma(): Promise<User[]> {
+    return await prisma.users.findMany()
 }

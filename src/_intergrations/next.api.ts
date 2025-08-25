@@ -1,5 +1,5 @@
 import createClient, { Client } from "openapi-fetch";
-import type {paths} from "../../../snipe-it.schema";
+import type {paths} from "../../snipe-it.schema";
 //use next public url because it need to expose env variable to client component
 
 export type TStatusResponse = {

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { CreateAssetCountUser } from '@/api/auth.api';
+import { CreateAssetCountUser } from '@/_repositories/user';
 
 export const POST = async (request: NextRequest) => {
     const { FirstName, LastName, Password } = await request.json();

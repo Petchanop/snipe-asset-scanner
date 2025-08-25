@@ -16,16 +16,14 @@ import {
   INLOCATION, OUTLOCATION,
   TAssetRow, TAssetTab, User
 } from "@/_types/types";
-import { GetAssetCountLocationByAssetCountReport } from "@/api/report.api";
+import { GetAssetCountLocationByAssetCountReport } from "@/_repositories/assetCountLocation";
 import dayjs, { Dayjs } from "dayjs";
 import { DateValueContext, ReportContext, useDateContext, useReportContext } from "@/_contexts/context";
 import { usePathname, useRouter, useParams } from "next/navigation";
-import {
-  CheckAllDataCount,
-  getAssetCountLineByAssetCount,
-  updateAssetCountReport,
-} from "@/_libs/report.utils";
-import { getAssetById } from "@/api/snipe-it/snipe-it.api";
+import { getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine";
+import { CheckAllDataCount } from "@/_libs/assetCount";
+import { updateAssetCountReport } from "@/_repositories/assetCount";
+import { getAssetById } from "@/_intergrations/snipeit/assets";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
 import Tabs from "@mui/material/Tabs";

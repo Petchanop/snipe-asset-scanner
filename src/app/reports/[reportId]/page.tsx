@@ -1,9 +1,10 @@
 import AssetReport from '@/reports/[reportId]/assetReport'
-import { getAssetCountLineByAssetCount, getAssetCountReport } from '@/_libs/report.utils'
-import { AssetCountWithLineAndLocation } from '../../_types/interfaces'
-import { AssetCountLine, User } from '../../_types/types'
-import { GetAllUserPrisma } from '@/api/report.api'
-import { fetchLocations } from '@/api/snipe-it/snipe-it.api'
+import { getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine"
+import { getAssetCountReport } from '@/_repositories/assetCount'
+import { AssetCountWithLineAndLocation } from '@/_types/interfaces'
+import { AssetCountLine, User } from '@/_types/types'
+import { GetAllUserPrisma } from '@/_repositories/user'
+import { fetchLocations } from '@/_intergrations/snipeit/locations'
 import { getSession } from 'auth'
 import { notFound, redirect } from 'next/navigation'
 

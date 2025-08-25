@@ -1,9 +1,9 @@
 'use client'
 
 import { AssetStatusEnum } from '@/_constants/constants';
-import { AssetCountWithLineAndLocation } from '../../_types/interfaces';
-import { TLocation } from '../../_types/snipe-it.type';
-import { AssetCountLine, User } from '../../_types/types';
+import { AssetCountWithLineAndLocation } from '@/_types/interfaces';
+import { TLocation } from '@/_types/snipe-it.type';
+import { AssetCountLine, User } from '@/_types/types';
 import cititexLogo from '@/public/cititexlogo.png'
 import Typography from '@mui/material/Typography'
 import Table from '@mui/material/Table'

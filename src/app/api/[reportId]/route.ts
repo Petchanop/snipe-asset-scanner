@@ -1,11 +1,12 @@
 'use server'
-import { getAssetCountLineByAssetCount, getAssetCountReport } from "@/_libs/report.utils";
+import { getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine"
+import { getAssetCountReport } from "@/_repositories/assetCount";
 import * as Excel from 'exceljs'
 import { NextRequest } from "next/server";
-import { AssetCountWithLineAndLocation } from "../../_types/interfaces";
+import { AssetCountWithLineAndLocation } from "@/_types/interfaces";
 import path from "path";
-import { fetchLocations } from "@/api/snipe-it/snipe-it.api";
-import { GetAllUserPrisma } from "@/api/report.api";
+import { fetchLocations } from "@/_intergrations/snipeit/locations";
+import { GetAllUserPrisma } from "@/_repositories/user";
 import { getSession } from "auth";
 import { redirect } from "next/navigation";
 import { AssetStatusEnum } from "@/_constants/constants";
