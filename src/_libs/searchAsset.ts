@@ -42,11 +42,11 @@ export async function CreatAssetCountLine(
             first_name: data.assigned_to!.first_name,
             last_name: data.assigned_to!.last_name
         },
-        countCheck: assetCountLine.asset_check ? assetCountLine.asset_check : false,
+        countCheck: assetCountLine.asset_check,
         assignIncorrect: assetCountLine.is_assigned_incorrectly,
-        notInLocation: assetCountLine.is_not_asset_loc ? assetCountLine.is_not_asset_loc : false,
+        notInLocation: assetCountLine.is_not_asset_loc,
         status: assetCountLine.asset_count_line_status_id,
-        prev_location: data.location,
+        prev_location: data.location?.name,
         image: assetCountLine.image
     } as unknown as TAssetRow
     return asset

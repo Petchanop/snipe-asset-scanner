@@ -43,7 +43,7 @@ export default async function ReportPage({ params }: { params: Promise<{ reportI
         <AssetReport
             assetCountReport={assetCountReport}
             locations={locationsProp as any}
-            assetCountLine={allAssetCountLine}
+            assetCountLine={allAssetCountLine.sort((a,b) => b.assigned_to! - a.assigned_to!)}
             user={user}
             listOfUser={users}
         />

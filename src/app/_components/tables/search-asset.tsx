@@ -41,26 +41,25 @@ function CreateSearchAssetTableCell(props: {
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
 
-  useEffect(() => {
-    UpdateAssetCountLine(id!, { asset_check: count })
-  }, [count, id])
+  // useEffect(() => {
+  //   UpdateAssetCountLine(id!, { asset_check: count })
+  // }, [count, id])
 
-  useEffect(() => {
-    UpdateAssetCountLine(id!, { is_assigned_incorrectly: incorrect })
-  }, [incorrect, id])
+  // useEffect(() => {
+  //   UpdateAssetCountLine(id!, { is_assigned_incorrectly: incorrect })
+  // }, [incorrect, id])
 
-  useEffect(() => {
-    UpdateAssetCountLine(id!, { is_not_asset_loc: wrongLocation })
-  }, [wrongLocation, id])
+  // useEffect(() => {
+  //   UpdateAssetCountLine(id!, { is_not_asset_loc: wrongLocation })
+  // }, [wrongLocation, id])
 
-  useEffect(() => {
-    UpdateAssetCountLine(id!,
-      {
-        asset_count_line_status_id: assetStatus ?
-          AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-      })
-  }, [assetStatus, id])
-
+  // useEffect(() => {
+  //   UpdateAssetCountLine(id!,
+  //     {
+  //       asset_count_line_status_id: assetStatus ?
+  //         AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+  //     })
+  // }, [assetStatus, id])
   return (
     <>
       <TableCell>
@@ -74,27 +73,31 @@ function CreateSearchAssetTableCell(props: {
       </TableCell>
       <TableCell align="center" padding="checkbox">
         <Checkbox checked={count}
-          onChange={async () => {
-            setCount((pre) => !pre)
+          onChange={async (event) => {
+            UpdateAssetCountLine(id!, { asset_check: event.target.checked })
           }}
         />
       </TableCell>
       <TableCell align="center" padding="checkbox">
         <Checkbox checked={incorrect}
-          onChange={async () => {
-            setIncorrect((pre) => !pre)
+          onChange={async (event) => {
+            UpdateAssetCountLine(id!, { is_assigned_incorrectly: event.target.checked })
           }}
         />
       </TableCell>
       <TableCell align="center" padding="checkbox">
         <Checkbox
           checked={wrongLocation}
-          onChange={() => setWrongLocation(pre => !pre)} />
+          onChange={async (event) => UpdateAssetCountLine(id!, { is_not_asset_loc: event.target.checked })} />
       </TableCell>
       <TableCell align="center" padding="checkbox">
         <Checkbox
           checked={assetStatus}
-          onChange={() => setAssetStatus(pre => !pre)}
+          onChange={async (event) => UpdateAssetCountLine(id!,
+            {
+              asset_count_line_status_id: event?.target.checked ?
+                AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+            })}
         ></Checkbox>
       </TableCell>
       {
@@ -193,7 +196,7 @@ export default function SearchAsset(
   const [IsSearch, setIsSearch] = useState<boolean>(false)
   //eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
-  const [ isPause, setIsPause ] = useState<boolean>(false)
+  const [isPause, setIsPause] = useState<boolean>(false)
   const [show, setShow] = useState(true)
   const { push } = useRouter()
   const pathname = usePathname()
@@ -223,24 +226,24 @@ export default function SearchAsset(
 
   useEffect(() => {
     const fetchAssetFromScanData = async (result: string) => {
-        if (searchResult.filter((asset) => asset.assetCode == result).length > 0)
-          return
-        const { data, error } = await fetchSearchAsset(result);
-        if (error) {
-          toast.error(`${result} not found.`)
-        } else {
-          const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
-          toast.success(`${result} was found.`)
-          toast.success(`${result} has been checked.`)
-          setSearchResult((prev) => [asset, ...prev.filter((item) => item.assetCode != result)])
-        }
+      if (searchResult.filter((asset) => asset.assetCode == result).length > 0)
+        return
+      const { data, error } = await fetchSearchAsset(result);
+      if (error) {
+        toast.error(`${result} not found.`)
+      } else {
+        const asset = await UpdateAssetCountLineForSearchAssetPage(assetInReport, data, assetCountReport, users, locationId, user)
+        toast.success(`${result} was found.`)
+        toast.success(`${result} has been checked.`)
+        setSearchResult((prev) => [asset, ...prev.filter((item) => item.assetCode != result)])
+      }
     }
     if (scanData.length > 0) {
       setIsPause(true)
       for (const data of scanData) {
         if (searchData.filter((item) => item == data.rawValue).length == 0)
-          searchData.unshift(data.rawValue) 
-          fetchAssetFromScanData(data.rawValue)
+          searchData.unshift(data.rawValue)
+        fetchAssetFromScanData(data.rawValue)
       }
       setIsPause(false)
     }

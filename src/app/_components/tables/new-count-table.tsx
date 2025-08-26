@@ -18,14 +18,19 @@ import {
 } from "@/_types/types";
 import { GetAssetCountLocationByAssetCountReport } from "@/_repositories/assetCountLocation";
 import dayjs, { Dayjs } from "dayjs";
-import { DateValueContext, ReportContext, useDateContext, useReportContext } from "@/_contexts/context";
+import {
+  DateValueContext,
+  ReportContext,
+  useDateContext,
+  useReportContext
+} from "@/_contexts/context";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import { getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine";
 import { CheckAllDataCount } from "@/_libs/assetCount";
 import { updateAssetCountReport } from "@/_repositories/assetCount";
 import { getAssetById } from "@/_intergrations/snipeit/assets";
 import { TLocation } from "@/_types/snipe-it.type";
-import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
+import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/selectLocationBox";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { LoadingTableSkeleton, useWindowSize } from "@/_components/loading";
@@ -68,7 +73,6 @@ function CheckAssetButton(props: {
     {
       icon: <SearchIcon />, name: 'ค้นหา', onClick: () => {
         push(`${pathname}/check?location=${childId}`)
-        // reportContext.setSearch(true)
       }
     },
     { icon: <CancelIcon />, name: 'ยกเลิก', onClick: () => setIsCheckTable((pre) => !pre) },
@@ -161,17 +165,9 @@ function SelectCountButton(props: {
   async function handleClickStart() {
     setIsCheckTable((pre) => !pre)
     documentContext.setDocumentNumber(documentNumber)
-    // replace(`${window.location.href}`)
   }
 
-  // async function handleGetData() {
-  //   setLocation(selectedLocation);
-  //   documentContext.setDocumentNumber(documentNumber)
-  //   documentContext.setRefetchReport(true)
-  // }
-
   const actions = [
-    // { icon: <SummarizeIcon />, name: 'เรียกดูข้อมูล', onClick: handleGetData },
     { icon: <PlayCircleFilledIcon />, name: 'เริ่มตรวจนับ', onClick: handleClickStart },
   ];
   const windowSize = useWindowSize()
@@ -246,7 +242,9 @@ export function NewCountInput(props: {
       <div className="flex flex-col md:basis-lg space-y-2">
         {
           isCheckTable ?
-            <Typography className="mt-2 mb-4">รายงานหมายเลข {documentContext.DocumentNumber}</Typography>
+            <Typography className="mt-2 mb-4">
+              รายงานหมายเลข {documentContext.DocumentNumber}
+            </Typography>
             : <></>
         }
         <div className="flex md:flex-row flex-col md:items-center">
@@ -273,7 +271,10 @@ export function NewCountInput(props: {
         {
           isCheckTable ?
             assetTab ?
-              <CheckAssetButton setIsCheckTable={setIsCheckTable} childId={childId!} />
+              <CheckAssetButton
+                setIsCheckTable={setIsCheckTable}
+                childId={childId!}
+              />
               : <></>
             : <SelectCountButton
               selectedLocation={location}
@@ -354,14 +355,14 @@ export default function NewCountTable(props: {
     }
   }, [dateValue, report])
 
-  useEffect(() => {
-    setData([])
-    const setChangeLocationProp = async () => {
-      const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
-      setLocationProp(assetLocationId!)
-    }
-    setChangeLocationProp()
-  }, [locationId])
+  // useEffect(() => {
+  //   setData([])
+  //   const setChangeLocationProp = async () => {
+  //     const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
+  //     setLocationProp(assetLocationId!)
+  //   }
+  //   setChangeLocationProp()
+  // }, [locationId])
 
   useEffect(() => {
     setData([])
@@ -369,17 +370,6 @@ export default function NewCountTable(props: {
       setLoading(true)
       const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
       setLocationProp(assetLocationId!)
-      // const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
-      // const AssetData = await Promise.all(
-      //   assetCountLineReport.map(async (asset) => {
-      //     const data = users.find((user) => user.id as number == asset.assigned_to)
-      //     let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
-      //     if (!asset.previous_loc_id && asset.is_not_asset_loc) {
-      //       const assetData = await getAssetById(asset.asset_id)
-      //       prev_loc = assetData.data?.location as unknown as TLocation
-      //     }
-      //     return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
-      //   }))
       const sortMapData = await getSortMapData(assetLocationId!)
       setData(sortMapData)
       setLoading(false)
@@ -397,17 +387,6 @@ export default function NewCountTable(props: {
         setDocumentNumber(report.document_number)
         const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
         setLocationProp(assetLocationId!)
-        // const assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
-        // const AssetData = await Promise.all(
-        //   assetCountLineReport.map(async (asset) => {
-        //     const data = users.find((user) => user.id as number == asset.assigned_to)
-        //     let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
-        //     if (!asset.previous_loc_id && asset.is_not_asset_loc) {
-        //       const assetData = await getAssetById(asset.asset_id)
-        //       prev_loc = assetData.data?.location as unknown as TLocation
-        //     }
-        //     return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
-        //   }))
         if (await CheckAllDataCount(report.id) == true) {
           await updateAssetCountReport(report.document_number, {
             ...report,
@@ -415,7 +394,6 @@ export default function NewCountTable(props: {
           })
           toast.success(`All assets have been checked`)
         }
-        // const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
         const sortMapData = await getSortMapData(assetLocationId!)
         setData(sortMapData)
         setRefetchReport(false)
@@ -433,18 +411,6 @@ export default function NewCountTable(props: {
         setLoading(true)
         const locationIds = await GetAssetCountLocationByAssetCountReport(report.id)
         const assetLocationId = locationIds.find((loc) => loc.location_id == location.id)
-        // const assetCountLineReport = await getAssetCountLineByAssetCount(report.id, assetLocationId?.id as string)
-        // const AssetData = await Promise.all(
-        //   assetCountLineReport.map(async (asset) => {
-        //     const data = users.find((user) => user.id as number == asset.assigned_to)
-        //     let prev_loc = allLocation.find((loc) => loc.id == asset.previous_loc_id) as TLocation
-        //     if (!asset.previous_loc_id && asset.is_not_asset_loc) {
-        //       const assetData = await getAssetById(asset.asset_id)
-        //       prev_loc = assetData.data?.location as unknown as TLocation
-        //     }
-        //     return mapAssetData(asset, data as User, prev_loc, baseUrl) as TAssetRow
-        //   }))
-        // const sortMapData = AssetData.sort((a, b) => Number(b.countCheck) - Number(a.countCheck))
         const sortMapData = await getSortMapData(assetLocationId!)
         setData(sortMapData)
         setTimeout(() => {

@@ -64,50 +64,6 @@ export function CreateAssetTableCell(
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
   const reportContext = useReportContext()
-  useEffect(() => {
-    const updateData = async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      data.countCheck = count,
-        await UpdateAssetCountLine(data.id as string, {
-          asset_check: data.countCheck,
-        })
-    }
-
-    updateData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count])
-
-  useEffect(() => {
-    const updateAssignNotCorrect = async () => {
-      data.assignIncorrect = incorrect
-      await UpdateAssetCountLine(data.id as string, {
-        is_assigned_incorrectly: incorrect,
-      })
-    }
-
-    updateAssignNotCorrect()
-  }, [incorrect, data])
-
-  useEffect(() => {
-    const updateIncorrectLocation = async () => {
-      data.notInLocation = wrongLocation
-      await UpdateAssetCountLine(data.id as string, {
-        is_not_asset_loc: wrongLocation,
-      })
-    }
-
-    updateIncorrectLocation()
-  }, [wrongLocation, data])
-
-  useEffect(() => {
-    const updateAssetStatus = async () => {
-      data.status = assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-      await UpdateAssetCountLine(data.id as string, {
-        asset_count_line_status_id: assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-      })
-    }
-    updateAssetStatus()
-  }, [assetStatus, data])
 
   useEffect(() => {
     const updateRemark = async () => {
@@ -140,15 +96,12 @@ export function CreateAssetTableCell(
                   {decode(assetName)}
                 </DialogTitle>
                 <DialogContent>
-                  {
-                    image ?
-                      <ImageComponent
-                        src={image}
-                        alt={assetName as string}
-                        width={400}
-                        height={400}
-                      /> : "No image display"
-                  }
+                  <ImageComponent
+                    src={image}
+                    alt={assetName as string}
+                    width={400}
+                    height={400}
+                  />
                 </DialogContent>
               </Dialog>
             </TableCell>
@@ -160,7 +113,19 @@ export function CreateAssetTableCell(
                 <TableCell className="" align="center" padding="checkbox">
                   <Checkbox checked={count}
                     disabled={!isCheckTable}
-                    onChange={() => setCount(pre => !pre)} />
+                    onChange={async (event) => {
+                      const updateData = async () => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                        data.countCheck = event.target.checked,
+                          await UpdateAssetCountLine(data.id as string, {
+                            asset_check: data.countCheck,
+                          })
+                      }
+
+                      updateData()
+                      setCount(pre => !pre)
+                    }}
+                  />
                 </TableCell>
                 : <></>
             }
@@ -168,13 +133,33 @@ export function CreateAssetTableCell(
               <Checkbox
                 checked={incorrect}
                 disabled={!isCheckTable}
-                onChange={() => setIncorrect(pre => !pre)} />
+                onChange={async (event) => {
+                  const updateAssignNotCorrect = async () => {
+                    data.assignIncorrect = event.target.checked
+                    await UpdateAssetCountLine(data.id as string, {
+                      is_assigned_incorrectly: event.target.checked,
+                    })
+                  }
+
+                  updateAssignNotCorrect()
+                  setIncorrect(pre => !pre)
+                }}
+              />
             </TableCell>
             <TableCell className="" align="center" padding="checkbox">
               <Checkbox
                 checked={wrongLocation}
                 disabled={!isCheckTable}
-                onChange={() => setWrongLocation(pre => !pre)} />
+                onChange={async (event) => {
+                  const updateIncorrectLocation = async () => {
+                    data.notInLocation = event.target.checked
+                    await UpdateAssetCountLine(data.id as string, {
+                      is_not_asset_loc: event.target.checked,
+                    })
+                  }
+                  updateIncorrectLocation()
+                  setWrongLocation(pre => !pre)
+                }} />
             </TableCell>
             {
               !assetTab ?
@@ -186,7 +171,16 @@ export function CreateAssetTableCell(
             <TableCell align="center" padding="checkbox">
               <Checkbox
                 checked={assetStatus}
-                onChange={() => setAssetStatus(pre => !pre)}
+                onChange={async (event) => {
+                  const updateAssetStatus = async () => {
+                    data.status = event.target.checked ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+                    await UpdateAssetCountLine(data.id as string, {
+                      asset_count_line_status_id: data.status 
+                    })
+                  }
+                  updateAssetStatus()
+                  setAssetStatus(pre => !pre)
+                }}
                 disabled={!isCheckTable}
               >
               </Checkbox>

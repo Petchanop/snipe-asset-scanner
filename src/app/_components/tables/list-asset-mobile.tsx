@@ -38,7 +38,7 @@ type TRenderCellProps = {
   setCount: Dispatch<SetStateAction<boolean | undefined>>,
   incorrect: boolean | undefined,
   setIncorrect: Dispatch<SetStateAction<boolean | undefined>>,
-  wrongLocation: boolean | undefined, 
+  wrongLocation: boolean | undefined,
   setWrongLocation: Dispatch<SetStateAction<boolean | undefined>>,
   assetStatus: boolean,
   setAssetStatus: Dispatch<SetStateAction<boolean>>,
@@ -90,7 +90,16 @@ function RenderCellValueByAssetKey(props: {
           {header}
           <Checkbox checked={count}
             disabled={!isCheckTable}
-            onChange={() => setCount(pre => !pre)}
+            onChange={(event) => {
+              const updateData = async () => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                await UpdateAssetCountLine(data.id as string, {
+                  asset_check: event.target.checked,
+                })
+              }
+              updateData()
+              setCount(pre => !pre)
+            }}
             sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           />
         </div>
@@ -103,7 +112,16 @@ function RenderCellValueByAssetKey(props: {
           <Checkbox
             checked={incorrect}
             disabled={!isCheckTable}
-            onChange={() => setIncorrect(pre => !pre)}
+            onChange={(event) => {
+              const updateAssignNotCorrect = async () => {
+                await UpdateAssetCountLine(data.id as string, {
+                  is_assigned_incorrectly: event.target.checked,
+                })
+              }
+
+              updateAssignNotCorrect()
+              setIncorrect(pre => !pre)
+            }}
             sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           />
         </div>
@@ -115,7 +133,16 @@ function RenderCellValueByAssetKey(props: {
           <Checkbox
             checked={wrongLocation}
             disabled={!isCheckTable}
-            onChange={() => setWrongLocation(pre => !pre)}
+            onChange={(event) => {
+              const updateIncorrectLocation = async () => {
+                await UpdateAssetCountLine(data.id as string, {
+                  is_not_asset_loc: event.target.checked,
+                })
+              }
+
+              updateIncorrectLocation()
+              setWrongLocation(pre => !pre)
+            }}
             sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           />
         </div>
@@ -127,7 +154,16 @@ function RenderCellValueByAssetKey(props: {
           {header}
           <Checkbox
             checked={assetStatus}
-            onChange={() => setAssetStatus(pre => !pre)}
+            onChange={(event) => {
+              const updateAssetStatus = async () => {
+                data.status = event.target.checked ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+                await UpdateAssetCountLine(data.id as string, {
+                  asset_count_line_status_id: data.status
+                })
+              }
+              updateAssetStatus()
+              setAssetStatus(pre => !pre)
+            }}
             disabled={!isCheckTable}
             sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
           />
@@ -181,15 +217,12 @@ function RenderCellValueByAssetKey(props: {
             {assetCode}
           </div>
           <Button onClick={() => setOpen((prev) => !prev)}>
-            {
-              image ?
-                <ImageComponent
-                  src={image}
-                  alt={assetName as string}
-                  width={400}
-                  height={400}
-                /> : "No image display"
-            }
+            <ImageComponent
+              src={image}
+              alt={assetName as string}
+              width={400}
+              height={400}
+            />
           </Button>
           <Dialog
             open={open}
@@ -201,15 +234,12 @@ function RenderCellValueByAssetKey(props: {
               {decode(assetName)}
             </DialogTitle>
             <DialogContent>
-              {
-                image ?
-                  <ImageComponent
-                    src={image}
-                    alt={assetName as string}
-                    width={400}
-                    height={400}
-                  /> : "No image display"
-              }
+              <ImageComponent
+                src={image}
+                alt={assetName as string}
+                width={400}
+                height={400}
+              />
             </DialogContent>
           </Dialog>
           <div className="text-black text-lg" key={assetCode}>
@@ -238,55 +268,6 @@ function AssetCard(props: {
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions
     .find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const reportContext = useReportContext()
-
-  useEffect(() => {
-    const updateData = async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      data.countCheck = count,
-        await UpdateAssetCountLine(data.id as string, {
-          asset_check: data.countCheck,
-        })
-    }
-    updateData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count])
-
-  useEffect(() => {
-    const updateAssignNotCorrect = async () => {
-      data.assignIncorrect = incorrect
-      await UpdateAssetCountLine(data.id as string, {
-        is_assigned_incorrectly: incorrect,
-      })
-    }
-
-    updateAssignNotCorrect()
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [incorrect])
-
-  useEffect(() => {
-    const updateIncorrectLocation = async () => {
-      data.notInLocation = wrongLocation
-      await UpdateAssetCountLine(data.id as string, {
-        is_not_asset_loc: wrongLocation,
-      })
-    }
-
-    updateIncorrectLocation()
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wrongLocation])
-
-  useEffect(() => {
-    const updateAssetStatus = async () => {
-      data.status = assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-      await UpdateAssetCountLine(data.id as string, {
-        asset_count_line_status_id: assetStatus ?
-          AssetStatusEnum.MALFUNCTIONING
-          : AssetStatusEnum.DEPLOYABLE
-      })
-    }
-    updateAssetStatus()
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assetStatus])
 
   useEffect(() => {
     const updateRemark = async () => {

@@ -91,22 +91,7 @@ export async function AddAssetCountLine(data: ExtendAssetResponse, assetCountRep
             asset_count_line_status_id: await findStatusId(data),
             previous_loc_id: data.prev_location?.id,
             image: data.image
-        },
-        // create: {
-        //     asset_check: false,
-        //     asset_id: data.id,
-        //     asset_name: data.name!,
-        //     asset_code: data.asset_tag!,
-        //     asset_count_id: assetCountReport.id,
-        //     assigned_to: data.assigned_to?.id,
-        //     asset_name_not_correct: false,
-        //     is_not_asset_loc: data.is_not_asset_loc,
-        //     checked_on: dayjs().toDate(),
-        //     asset_count_line_location_id: data.location_id,
-        //     asset_count_line_status_id: await findStatusId(data),
-        //     previous_loc_id: data.prev_location?.id,
-        //     image: data.image
-        // }
+        }
     })
 }
 
