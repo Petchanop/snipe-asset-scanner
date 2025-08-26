@@ -310,7 +310,6 @@ export default function NewCountTable(props: {
     childrenLocation,
     locations,
     defaultLocation,
-    locationId,
     parentProp,
     users,
     user,
@@ -354,15 +353,6 @@ export default function NewCountTable(props: {
       setDateValue(dayjs(report?.document_date))
     }
   }, [dateValue, report])
-
-  // useEffect(() => {
-  //   setData([])
-  //   const setChangeLocationProp = async () => {
-  //     const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
-  //     setLocationProp(assetLocationId!)
-  //   }
-  //   setChangeLocationProp()
-  // }, [locationId])
 
   useEffect(() => {
     setData([])

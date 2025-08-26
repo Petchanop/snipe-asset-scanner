@@ -41,25 +41,6 @@ function CreateSearchAssetTableCell(props: {
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
 
-  // useEffect(() => {
-  //   UpdateAssetCountLine(id!, { asset_check: count })
-  // }, [count, id])
-
-  // useEffect(() => {
-  //   UpdateAssetCountLine(id!, { is_assigned_incorrectly: incorrect })
-  // }, [incorrect, id])
-
-  // useEffect(() => {
-  //   UpdateAssetCountLine(id!, { is_not_asset_loc: wrongLocation })
-  // }, [wrongLocation, id])
-
-  // useEffect(() => {
-  //   UpdateAssetCountLine(id!,
-  //     {
-  //       asset_count_line_status_id: assetStatus ?
-  //         AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-  //     })
-  // }, [assetStatus, id])
   return (
     <>
       <TableCell>
@@ -75,6 +56,7 @@ function CreateSearchAssetTableCell(props: {
         <Checkbox checked={count}
           onChange={async (event) => {
             UpdateAssetCountLine(id!, { asset_check: event.target.checked })
+            setCount((prev) => !prev)
           }}
         />
       </TableCell>
@@ -82,22 +64,28 @@ function CreateSearchAssetTableCell(props: {
         <Checkbox checked={incorrect}
           onChange={async (event) => {
             UpdateAssetCountLine(id!, { is_assigned_incorrectly: event.target.checked })
+            setIncorrect((prev) => !prev)
           }}
         />
       </TableCell>
       <TableCell align="center" padding="checkbox">
         <Checkbox
           checked={wrongLocation}
-          onChange={async (event) => UpdateAssetCountLine(id!, { is_not_asset_loc: event.target.checked })} />
+          onChange={async (event) => {
+            UpdateAssetCountLine(id!, { is_not_asset_loc: event.target.checked })
+            setWrongLocation((prev) => !prev)
+          }} />
       </TableCell>
       <TableCell align="center" padding="checkbox">
         <Checkbox
           checked={assetStatus}
-          onChange={async (event) => UpdateAssetCountLine(id!,
+          onChange={async (event) => { 
+            setAssetStatus((prev) => !prev)
+            UpdateAssetCountLine(id!,
             {
               asset_count_line_status_id: event?.target.checked ?
                 AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-            })}
+            })}}
         ></Checkbox>
       </TableCell>
       {
