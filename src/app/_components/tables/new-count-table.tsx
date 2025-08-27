@@ -236,7 +236,8 @@ export function NewCountInput(props: {
   const documentContext = useReportContext()
   useEffect(() => {
     setLocation(locations?.find((loc) => childId ? loc.id == childId : loc.id == parent.id)!);
-  }, [childId, locations, setLocation, parent?.id])
+    //eslint-disable-next-line react-hooks/exhaustive-deps 
+  }, [childId, parent?.id, locations ])
   return (
     <div className="flex md:flex-row flex-col w-full py-2 pl-2 lg:pl-10 content-center">
       <div className="flex flex-col md:basis-lg space-y-2">
@@ -319,8 +320,6 @@ export default function NewCountTable(props: {
   } = props
   const [location, setLocation] = useState<PNewCountTableProps>(defaultLocation as unknown as PNewCountTableProps)
   const [isCheckTable, setIsCheckTable] = useState<boolean>(false)
-  //eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  const [locationProp, setLocationProp] = useState<AssetCountLocation>(defaultLocation as unknown as AssetCountLocation)
   const [refetchReport, setRefetchReport] = useState<boolean>(false)
   const [assetTab, setAssetTab] = useState<TAssetTab>("INLOCATION");
   const [data, setData] = useState<TAssetRow[]>([])
@@ -359,13 +358,12 @@ export default function NewCountTable(props: {
     const setChangeLocationProp = async () => {
       setLoading(true)
       const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
-      setLocationProp(assetLocationId!)
       const sortMapData = await getSortMapData(assetLocationId!)
       setData(sortMapData)
       setLoading(false)
     }
     setChangeLocationProp()
-  }, [location])
+  }, [location.id])
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -376,7 +374,6 @@ export default function NewCountTable(props: {
       } else {
         setDocumentNumber(report.document_number)
         const assetLocationId = assetCountLocation.find((loc) => loc.location_id == location.id)
-        setLocationProp(assetLocationId!)
         if (await CheckAllDataCount(report.id) == true) {
           await updateAssetCountReport(report.document_number, {
             ...report,
@@ -405,7 +402,7 @@ export default function NewCountTable(props: {
         setData(sortMapData)
         setTimeout(() => {
           setLoading(false)
-        }, 500)
+        }, 200)
         setUpdate(false)
       }
     }

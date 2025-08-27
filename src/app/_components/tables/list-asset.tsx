@@ -54,7 +54,7 @@ export function CreateAssetTableCell(
     isCheckTable: boolean,
     user: any
   }) {
-  const { data, assetTab, actionLabel, action, isCheckTable } = props
+  const { data, assetTab, actionLabel, action, isCheckTable,user } = props
   const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, image, remarks } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
@@ -68,7 +68,9 @@ export function CreateAssetTableCell(
   useEffect(() => {
     const updateRemark = async () => {
       if (reportContext.update) {
-        await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset })
+        await UpdateAssetCountLine(data.id as string, 
+          { remarks: remarkAsset , checked_by: parseInt(user.id)}
+        )
       }
     }
     updateRemark()
@@ -119,10 +121,11 @@ export function CreateAssetTableCell(
                         data.countCheck = event.target.checked,
                           await UpdateAssetCountLine(data.id as string, {
                             asset_check: data.countCheck,
+                            checked_by: parseInt(user?.id)
                           })
                       }
 
-                      updateData()
+                      await updateData()
                       setCount(pre => !pre)
                     }}
                   />
@@ -138,10 +141,11 @@ export function CreateAssetTableCell(
                     data.assignIncorrect = event.target.checked
                     await UpdateAssetCountLine(data.id as string, {
                       is_assigned_incorrectly: event.target.checked,
+                      checked_by: parseInt(user?.id)
                     })
                   }
 
-                  updateAssignNotCorrect()
+                  await updateAssignNotCorrect()
                   setIncorrect(pre => !pre)
                 }}
               />
@@ -155,9 +159,10 @@ export function CreateAssetTableCell(
                     data.notInLocation = event.target.checked
                     await UpdateAssetCountLine(data.id as string, {
                       is_not_asset_loc: event.target.checked,
+                      checked_by: parseInt(user?.id)
                     })
                   }
-                  updateIncorrectLocation()
+                  await updateIncorrectLocation()
                   setWrongLocation(pre => !pre)
                 }} />
             </TableCell>
@@ -175,10 +180,11 @@ export function CreateAssetTableCell(
                   const updateAssetStatus = async () => {
                     data.status = event.target.checked ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
                     await UpdateAssetCountLine(data.id as string, {
-                      asset_count_line_status_id: data.status 
+                      asset_count_line_status_id: data.status,
+                      checked_by: parseInt(user?.id)
                     })
                   }
-                  updateAssetStatus()
+                  await updateAssetStatus()
                   setAssetStatus(pre => !pre)
                 }}
                 disabled={!isCheckTable}
@@ -205,7 +211,8 @@ export function CreateAssetTableCell(
 }
 
 export default function ListAsset(props: {
-  data: TAssetRow[], isCheckTable: boolean, assetTab: TAssetTab
+  data: TAssetRow[], isCheckTable: boolean, 
+  assetTab: TAssetTab,
   page: number, rowsPerPage: number
 }) {
   const { data, isCheckTable, assetTab, page, rowsPerPage } = props

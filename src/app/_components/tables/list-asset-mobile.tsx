@@ -32,6 +32,7 @@ import IconButton from "@mui/material/IconButton";
 import { DialogActions } from "@mui/material";
 import ImageComponent from "@/_components/ImageComponent";
 import { decode } from 'html-entities'
+import { useSession } from "next-auth/react";
 
 type TRenderCellProps = {
   count: boolean | undefined,
@@ -55,9 +56,10 @@ function RenderCellValueByAssetKey(props: {
   cellCase: string,
   isCheckTable: boolean,
   header: string,
-  renderCellProps: TRenderCellProps
+  renderCellProps: TRenderCellProps,
+  user: any
 }) {
-  const { data, cellCase, isCheckTable, header, renderCellProps } = props
+  const { data, cellCase, isCheckTable, header, renderCellProps,user } = props
   const { assetCode, assetName, assignedTo, image } = data;
   const {
     count, setCount,
@@ -90,14 +92,14 @@ function RenderCellValueByAssetKey(props: {
           {header}
           <Checkbox checked={count}
             disabled={!isCheckTable}
-            onChange={(event) => {
+            onChange={async (event) => {
               const updateData = async () => {
-                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 await UpdateAssetCountLine(data.id as string, {
                   asset_check: event.target.checked,
+                  checked_by: parseInt(user?.id)
                 })
               }
-              updateData()
+              await updateData()
               setCount(pre => !pre)
             }}
             sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
@@ -112,14 +114,15 @@ function RenderCellValueByAssetKey(props: {
           <Checkbox
             checked={incorrect}
             disabled={!isCheckTable}
-            onChange={(event) => {
+            onChange={async (event) => {
               const updateAssignNotCorrect = async () => {
                 await UpdateAssetCountLine(data.id as string, {
                   is_assigned_incorrectly: event.target.checked,
+                  checked_by: parseInt(user?.id)
                 })
               }
 
-              updateAssignNotCorrect()
+              await updateAssignNotCorrect()
               setIncorrect(pre => !pre)
             }}
             sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
@@ -133,14 +136,15 @@ function RenderCellValueByAssetKey(props: {
           <Checkbox
             checked={wrongLocation}
             disabled={!isCheckTable}
-            onChange={(event) => {
+            onChange={async (event) => {
               const updateIncorrectLocation = async () => {
                 await UpdateAssetCountLine(data.id as string, {
                   is_not_asset_loc: event.target.checked,
+                  checked_by: parseInt(user?.id)
                 })
               }
 
-              updateIncorrectLocation()
+              await updateIncorrectLocation()
               setWrongLocation(pre => !pre)
             }}
             sx={{ '& .MuiSvgIcon-root': { fontSize: 34 } }}
@@ -154,14 +158,15 @@ function RenderCellValueByAssetKey(props: {
           {header}
           <Checkbox
             checked={assetStatus}
-            onChange={(event) => {
+            onChange={async (event) => {
               const updateAssetStatus = async () => {
                 data.status = event.target.checked ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
                 await UpdateAssetCountLine(data.id as string, {
-                  asset_count_line_status_id: data.status
+                  asset_count_line_status_id: data.status,
+                  checked_by: parseInt(user?.id)
                 })
               }
-              updateAssetStatus()
+              await updateAssetStatus()
               setAssetStatus(pre => !pre)
             }}
             disabled={!isCheckTable}
@@ -198,7 +203,8 @@ function RenderCellValueByAssetKey(props: {
               >ยกเลิก</Button>
               <Button onClick={() => {
                 const updateRemark = async () => {
-                  await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset })
+                  await UpdateAssetCountLine(data.id as string, 
+                    { remarks: remarkAsset,  checked_by: parseInt(user?.id) })
                 }
                 updateRemark()
                 setOpenModal((prev) => !prev)
@@ -254,9 +260,10 @@ function AssetCard(props: {
   data: TAssetRow,
   assetTab?: TAssetTab,
   tabValue?: TAssetTab,
-  isCheckTable: boolean
+  isCheckTable: boolean,
+  user: any
 }) {
-  const { data, assetTab, tabValue, isCheckTable } = props
+  const { data, assetTab, tabValue, isCheckTable,user } = props
   const headers = assetTab == INLOCATION ? tableHeaders : tableHeadersAdditional
   const { countCheck, assignIncorrect, notInLocation, status, remarks } = data;
   const [count, setCount] = useState(countCheck)
@@ -272,7 +279,7 @@ function AssetCard(props: {
   useEffect(() => {
     const updateRemark = async () => {
       if (reportContext.update) {
-        await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset })
+        await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset, checked_by: parseInt(user?.id)})
       }
     }
     updateRemark()
@@ -329,6 +336,7 @@ function AssetCard(props: {
                     cellCase={header.value}
                     header={header.label}
                     renderCellProps={RenderCellValue}
+                    user={user}
                   />
                 </TableCell>
               </TableRow>
@@ -350,6 +358,7 @@ export default function ListAssetMobile(props: {
   const { data, isCheckTable, assetTab, tabValue } = props
   const [itemPerPage, setItemPerPage] = useState(startRowsPerPage)
   const [page, setPage] = useState<number>(1);
+  const { data: session } = useSession()
 
   function dataPerPage(data: any, page: number, rowsPerPage: number): any[] {
     return data.length ?
@@ -381,6 +390,7 @@ export default function ListAssetMobile(props: {
                     assetTab={assetTab}
                     isCheckTable={isCheckTable}
                     tabValue={tabValue}
+                    user={session?.user}
                   />
                 </Paper>
               )

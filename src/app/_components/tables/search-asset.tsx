@@ -4,7 +4,10 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow"
-import { AssetStatusEnum, assetStatusOptions, rowsPerPageOptions, startRowsPerPage, tableHeadersAdditional } from "@/_constants/constants";
+import { AssetStatusEnum, assetStatusOptions, 
+  rowsPerPageOptions, startRowsPerPage, 
+  tableHeadersAdditional 
+} from "@/_constants/constants";
 import { ChangeEvent, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Table from "@mui/material/Table";
@@ -20,7 +23,6 @@ import TablePagination from "@mui/material/TablePagination";
 import { dataPerPage, handleChangePage, handleChangeRowsPerPage } from "@/_components/tables/utility";
 import { UpdateAssetCountLine } from "@/_repositories/assetCountLine";
 import { UpdateAssetCountLineForSearchAssetPage } from "@/_libs/searchAsset";
-import Tooltip from "@mui/material/Tooltip";
 import ListAssetMobile from "./list-asset-mobile";
 import { useWindowSize } from "@/_components/loading";
 import { usePathname, useRouter } from "next/navigation";
@@ -30,65 +32,86 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import SearchIcon from '@mui/icons-material/Search';
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment"
+import { decode } from "html-entities";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
+import { useSession } from "next-auth/react";
 
 function CreateSearchAssetTableCell(props: {
-  data: TAssetRow,
+  assetData: TAssetRow,
 }) {
-  const { data } = props
-  const { id, assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, prev_location } = data;
+  const { assetData } = props
+  const { id, assetCode, assetName, assignedTo,
+    countCheck, assignIncorrect, notInLocation,
+    status, prev_location, remarks
+  } = assetData;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
-  const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
+  const [remarkAsset, setRemarkAsset] = useState(remarks ? remarks : prev_location)
+  const [assetStatus, setAssetStatus] = useState(
+    assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
+  const assignedToName = assignedTo.first_name != undefined ? assignedTo?.first_name + " " + assignedTo?.last_name : ""
+  const { data: session } = useSession()
+  const user = session?.user
 
-  return (
-    <>
-      <TableCell>
-        {assetCode}
-      </TableCell>
-      <TableCell>
-        {assetName}
-      </TableCell>
-      <TableCell>
-        {assignedTo?.first_name} {assignedTo?.last_name}
-      </TableCell>
-      <TableCell align="center" padding="checkbox">
-        <Checkbox checked={count}
-          onChange={async (event) => {
-            UpdateAssetCountLine(id!, { asset_check: event.target.checked })
-            setCount((prev) => !prev)
-          }}
-        />
-      </TableCell>
-      <TableCell align="center" padding="checkbox">
-        <Checkbox checked={incorrect}
-          onChange={async (event) => {
-            UpdateAssetCountLine(id!, { is_assigned_incorrectly: event.target.checked })
-            setIncorrect((prev) => !prev)
-          }}
-        />
-      </TableCell>
-      <TableCell align="center" padding="checkbox">
-        <Checkbox
-          checked={wrongLocation}
-          onChange={async (event) => {
-            UpdateAssetCountLine(id!, { is_not_asset_loc: event.target.checked })
-            setWrongLocation((prev) => !prev)
-          }} />
-      </TableCell>
-      <TableCell align="center" padding="checkbox">
-        <Checkbox
-          checked={assetStatus}
-          onChange={async (event) => { 
-            setAssetStatus((prev) => !prev)
-            UpdateAssetCountLine(id!,
+  useEffect(() => {
+    const updateRemark = async () => {
+      await UpdateAssetCountLine(id as string,
+        { remarks: remarkAsset, checked_by: parseInt(user!.id) }
+      )
+    }
+    updateRemark()
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remarkAsset])
+return (
+  <>
+    <TableCell>
+      {decode(assetCode)}
+    </TableCell>
+    <TableCell>
+      {decode(assetName)}
+    </TableCell>
+    <TableCell>
+      {assignedToName}
+    </TableCell>
+    <TableCell align="center" padding="checkbox">
+      <Checkbox checked={count}
+        onChange={async (event) => {
+          UpdateAssetCountLine(id!, { asset_check: event.target.checked })
+          setCount((prev) => !prev)
+        }}
+      />
+    </TableCell>
+    <TableCell align="center" padding="checkbox">
+      <Checkbox checked={incorrect}
+        onChange={async (event) => {
+          UpdateAssetCountLine(id!, { is_assigned_incorrectly: event.target.checked })
+          setIncorrect((prev) => !prev)
+        }}
+      />
+    </TableCell>
+    <TableCell align="center" padding="checkbox">
+      <Checkbox
+        checked={wrongLocation}
+        onChange={async (event) => {
+          UpdateAssetCountLine(id!, { is_not_asset_loc: event.target.checked })
+          setWrongLocation((prev) => !prev)
+        }} />
+    </TableCell>
+    <TableCell align="center" padding="checkbox">
+      <Checkbox
+        checked={assetStatus}
+        onChange={async (event) => {
+          setAssetStatus((prev) => !prev)
+          UpdateAssetCountLine(id!,
             {
               asset_count_line_status_id: event?.target.checked ?
                 AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-            })}}
-        ></Checkbox>
-      </TableCell>
-      {
+            })
+        }}
+      ></Checkbox>
+    </TableCell>
+    {/* {
         wrongLocation ?
           <TableCell align="center">
             <Tooltip title={prev_location}
@@ -98,9 +121,17 @@ function CreateSearchAssetTableCell(props: {
             </Tooltip>
           </TableCell>
           : <></>
-      }
-    </>
-  )
+      } */}
+    <TableCell align="center">
+      <TextareaAutosize
+        id="remark"
+        onChange={(event) => setRemarkAsset(event.target.value)}
+        value={remarkAsset}
+        className="w-full"
+      />
+    </TableCell>
+  </>
+)
 }
 
 function SearchAssetTable(props: {
@@ -131,11 +162,10 @@ function SearchAssetTable(props: {
             dataPerPage(data, page, rowsPerPage).map((asset: TAssetRow) => {
               return (
                 <TableRow key={`${asset.assetCode}${asset.assetName}`} >
-                  <CreateSearchAssetTableCell data={asset} />
+                  <CreateSearchAssetTableCell assetData={asset} />
                 </TableRow>
               )
-            }
-            )
+            })
             : <></>
         }
       </TableBody >
@@ -172,7 +202,6 @@ export default function SearchAsset(
   const { assetCountReport, assetInReport, locationId, users, user } = props
   const [searchInput, setSearchInput] = useState<string>("")
   const [scanData, setScanData] = useState<IDetectedBarcode[]>([])
-  // const [scanData, setScanData] = useState<string[]>([])
   const [fetchData, setFetchData] = useState<boolean>(false)
   const [searchResult, setSearchResult] = useState<TAssetRow[]>([])
   const [documentNumber, setDocumentNumber] = useState<number | undefined>(
@@ -315,7 +344,8 @@ export default function SearchAsset(
                 }
               }}
             />
-            <IconButton color="primary" onClick={() => setFetchData(true)} className="bg-blue-200">
+            <IconButton color="primary"
+              onClick={() => setFetchData(true)} className="bg-blue-200">
               <SearchIcon />
             </IconButton>
           </div>
