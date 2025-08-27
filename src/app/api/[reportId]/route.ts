@@ -1,11 +1,12 @@
 'use server'
-import { getAssetCountLineByAssetCount, getAssetCountReport } from "@/_libs/report.utils";
+import { getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine"
+import { getAssetCountReport } from "@/_repositories/assetCount";
 import * as Excel from 'exceljs'
 import { NextRequest } from "next/server";
-import { AssetCountWithLineAndLocation } from "../../_types/interfaces";
+import { AssetCountWithLineAndLocation } from "@/_types/interfaces";
 import path from "path";
-import { fetchLocations } from "@/api/snipe-it/snipe-it.api";
-import { GetAllUserPrisma } from "@/api/report.api";
+import { fetchLocations } from "@/_intergrations/snipeit/locations";
+import { GetAllUserPrisma } from "@/_repositories/user";
 import { getSession } from "auth";
 import { redirect } from "next/navigation";
 import { AssetStatusEnum } from "@/_constants/constants";
@@ -21,7 +22,7 @@ export async function GET(
         const { reportId } = await params
         if (!reportId) throw new Error('Report id required')
         const assetCountReport = await getAssetCountReport(parseInt(reportId), true) as AssetCountWithLineAndLocation
-        const filePath = path.join(process.cwd(), 'src/app/api/[reportId]/Asset_Report_edit.xlsx')
+        const filePath = path.join(process.cwd(), 'src/app/api/[reportId]/Asset_Report.xlsx')
         const newWorkBook = new Excel.Workbook();
         await newWorkBook.xlsx.readFile(filePath)
         const sheet = newWorkBook.getWorksheet(1)
@@ -57,19 +58,25 @@ async function CreateAssetCountReportFile(
     dataSheet.getCell(`B5`).value = assetCountReport.document_number
     dataSheet.getCell(`B6`).value = assetCountReport.document_date.toLocaleDateString('th-BK')
     dataSheet.getCell(`B7`).value = user ?  user?.first_name + " " + user?.last_name : ""
-    dataSheet.getColumn(1).width = 15
+    dataSheet.getColumn(1).width = 25
     dataSheet.getColumn(2).width = 30
     dataSheet.getColumn(3).width = 55
     dataSheet.getColumn(4).width = 30
     dataSheet.getColumn(8).width = 40
+    dataSheet.getColumn(10).width = 40
     let assetQuantity = 0
-    let assetCodeCol = 12
+    let assetNotCheck = 0
+    let assetMalFunction = 0
+    let assetAdditional = 0
+    let assetAssignedIncorrect = 0
+    let assetCodeCol = 16
     let i = 0
     let locationData = ""
 
     for (let j = 0; j < assetCountReport.AssetCountLocation.length; j++) {
         const location = assetCountReport.AssetCountLocation[j]
-        const assetCountLine = await getAssetCountLineByAssetCount(assetCountReport.id, location!.id)
+        const assetCountLine = (await getAssetCountLineByAssetCount(assetCountReport.id, location!.id))
+                                    .sort((a,b) => b.assigned_to! - a.assigned_to!)
         const getLocation = locations.data?.rows.find((loc) => loc.id == location?.location_id)
         locationData += getLocation?.name
         if (j < assetCountReport.AssetCountLocation.length - 1)
@@ -79,7 +86,17 @@ async function CreateAssetCountReportFile(
             const getUser = users.find((user) => user.id == countLine.assigned_to)
             const countCheck = countLine.asset_check ? "Yes" : "No"
             const assingedInCorrect = countLine.is_assigned_incorrectly ? "Yes" : "No"
+            const isNotInLocation = countLine.is_not_asset_loc ? "Yes" : "No"
             const useAble = countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "Yes" : "No"
+            if (!countLine.asset_check && !countLine.is_not_asset_loc)
+                assetNotCheck++
+            if (countLine.is_not_asset_loc)
+                assetAdditional++
+            if (countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING && !countLine.is_not_asset_loc) 
+                assetMalFunction++
+            if (countLine.is_assigned_incorrectly)
+                assetAssignedIncorrect++
+
             dataSheet.getCell(`A${assetCodeCol}`).value = i + 1
             dataSheet.getCell(`B${assetCodeCol}`).value = countLine.asset_code
             dataSheet.getCell(`C${assetCodeCol}`).value = countLine.asset_name
@@ -87,7 +104,9 @@ async function CreateAssetCountReportFile(
             dataSheet.getCell(`E${assetCodeCol}`).value = countCheck
             dataSheet.getCell(`F${assetCodeCol}`).value = assingedInCorrect
             dataSheet.getCell(`G${assetCodeCol}`).value = useAble
-            dataSheet.getCell(`H${assetCodeCol}`).value = getLocation!.name
+            dataSheet.getCell(`I${assetCodeCol}`).value = getLocation!.name
+            dataSheet.getCell(`H${assetCodeCol}`).value = isNotInLocation
+            dataSheet.getCell(`J${assetCodeCol}`).value = locations.data?.rows.find((loc) => loc.id == countLine.previous_loc_id)?.name
             createBorder(dataSheet, assetCodeCol)
             assetCodeCol += 1
             i++
@@ -95,6 +114,10 @@ async function CreateAssetCountReportFile(
     }
     dataSheet.getCell(`B8`).value = locationData
     dataSheet.getCell(`B9`).value = assetQuantity
+    dataSheet.getCell(`B10`).value = assetNotCheck
+    dataSheet.getCell(`B11`).value = assetAdditional
+    dataSheet.getCell(`B12`).value = assetAssignedIncorrect
+    dataSheet.getCell(`B13`).value = assetMalFunction
     return dataSheet
 }
 
@@ -104,7 +127,7 @@ function createBorder(sheet: Excel.Worksheet, assetCodeCol: number) {
     const row = sheet.getRow(assetCodeCol)
     row.height = 30
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 12; i++) {
         const sumAscii = ascii + i
         const cell = String.fromCharCode(sumAscii) + `${assetCodeCol}`
         const cellObj = sheet.getCell(`${cell}`)

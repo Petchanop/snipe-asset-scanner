@@ -1,10 +1,9 @@
 import SearchAsset from "@/_components/tables/search-asset"
-import { prisma } from "@/_libs/prisma"
-import { getAssetCountLineByAssetCount } from "@/_libs/report.utils"
-import { GetAllUserPrisma } from "@/api/report.api"
+import { getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine"
+import { GetAllUserPrisma } from "@/_repositories/user"
 import { notFound } from "next/navigation"
-import { AssetCountWithAssetLocation } from "@/_types/interfaces"
 import { getSession } from "auth"
+import { getAssetCountByDocumentNumber } from "@/_repositories/assetCount"
 
 export default async function CheckAssetPage(
   { params, searchParams }: {
@@ -20,18 +19,9 @@ export default async function CheckAssetPage(
   //fetch data here
   //use mock data before implement api cal
   //fetch location from snipe api
-  const assetCountReport = await prisma.asset_count.findUnique({
-    where: {
-      document_number: parseInt(documentNumber)
-    },
-    include: {
-      AssetCountLocation: true
-    }
-  }) as AssetCountWithAssetLocation
-
+  const assetCountReport = await getAssetCountByDocumentNumber(documentNumber)
   if (!assetCountReport)
     return notFound()
-
   const locationId = assetCountReport.AssetCountLocation.find((loc) => loc.location_id == resolveLocationId)
   const assetInReport = await getAssetCountLineByAssetCount(assetCountReport!.id!, locationId?.id as string)
   const users = await GetAllUserPrisma()

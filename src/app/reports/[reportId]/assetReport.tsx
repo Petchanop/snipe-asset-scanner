@@ -1,9 +1,9 @@
 'use client'
 
 import { AssetStatusEnum } from '@/_constants/constants';
-import { AssetCountWithLineAndLocation } from '../../_types/interfaces';
-import { TLocation } from '../../_types/snipe-it.type';
-import { AssetCountLine, User } from '../../_types/types';
+import { AssetCountWithLineAndLocation } from '@/_types/interfaces';
+import { TLocation } from '@/_types/snipe-it.type';
+import { AssetCountLine, User } from '@/_types/types';
 import cititexLogo from '@/public/cititexlogo.png'
 import Typography from '@mui/material/Typography'
 import Table from '@mui/material/Table'
@@ -55,8 +55,8 @@ export default function AssetReport(
           height={100}
         ></Image>
         <Button href={`/api/${document_number}`} sx={{
-          maxHeight: '3rem'
-        }}><DownloadIcon sx={{ color: blue[400] }}/></Button>
+          maxHeight: '5rem'
+        }}><DownloadIcon sx={{ fontSize: '2.5rem', color: blue[400] }}/></Button>
         
       </div>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -82,7 +82,7 @@ export default function AssetReport(
             <TableCell>Asset Name</TableCell>
             <TableCell>Assign Name</TableCell>
             <TableCell>Count Check</TableCell>
-            <TableCell>Assign Not Correct</TableCell>
+            <TableCell>Assign Incorrect</TableCell>
             <TableCell>Asset Damaged</TableCell>
             <TableCell>Location</TableCell>
           </TableRow>

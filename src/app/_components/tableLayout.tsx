@@ -1,6 +1,6 @@
 'use client'
 import { LocationUrlContext } from "@/_contexts/context";
-import { checkSamePathName, checkTabPathname } from "@/_libs/location.utils";
+import { checkSamePathName, checkTabPathname } from "../../_libs/location";
 import CardContent from "@mui/material/CardContent";
 import Paper from "@mui/material/Paper";
 import Tab from "@mui/material/Tab";

@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
 import { getServerSession } from "next-auth";
-import { GetAssetCountUser } from "@/api/auth.api";
+import { GetAssetCountUser } from "@/_repositories/user";
 import * as bcrypt from 'bcrypt'
 
 export const authOptions = {

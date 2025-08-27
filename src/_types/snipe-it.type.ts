@@ -1,4 +1,4 @@
-import type { paths } from "../../../snipe-it.schema";
+import type { paths } from "../../snipe-it.schema";
 
 export type HasKey<T, K extends PropertyKey> = K extends keyof T ? true : false
 export type MissingKey<T, K extends PropertyKey> = K extends keyof T ? false : true

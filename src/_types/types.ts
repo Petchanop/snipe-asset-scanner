@@ -1,13 +1,21 @@
 import { ReportState } from "@/_constants/constants";
 import { asset_count, asset_count_line, asset_count_location, assets, locations, users } from "@/prisma/generated/prisma";
 import { TLocation } from "./snipe-it.type";
-import { AssetResponse } from "@/api/snipe-it/snipe-it.api";
+import { AssetResponse } from "../_intergrations/snipeit/snipe-it";
 //eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export function hasOwnProperty<X extends {}, Y extends PropertyKey>
     (obj: X, prop: Y): obj is X & Record<Y, unknown> {
     if (obj == null)
         return false
     return obj.hasOwnProperty(prop)
+}
+
+export type FCreateAssetCountReport = {
+    id?: string;
+    created_by?: number | null;
+    document_name?: string | null;
+    document_date?: Date | null;
+    state?: string;
 }
 
 export type TSnipeDocument = {

@@ -22,7 +22,7 @@ import {
   handleChangeRowsPerPage,
   Order
 } from "@/_components/tables/utility";
-import { OUTLOCATION, TAssetRow, TAssetTab } from "../../_types/types";
+import { OUTLOCATION, TAssetRow, TAssetTab } from "@/_types/types";
 import { JSX } from "@emotion/react/jsx-runtime";
 import Checkbox from "@mui/material/Checkbox";
 import { blue } from "@mui/material/colors";
@@ -33,7 +33,7 @@ import TableFooter from "@mui/material/TableFooter";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow"
-import { UpdateAssetCountLine } from "@/_libs/report.utils";
+import { UpdateAssetCountLine } from "@/_repositories/assetCountLine";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Button from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
@@ -43,6 +43,7 @@ import { useReportContext } from "@/_contexts/context";
 import ImageComponent from "@/_components/ImageComponent";
 import { decode } from 'html-entities'
 import { TextareaAutosize } from "@mui/material";
+import { useSession } from "next-auth/react";
 
 export function CreateAssetTableCell(
   props: {
@@ -50,9 +51,10 @@ export function CreateAssetTableCell(
     assetTab: TAssetTab,
     action: JSX.Element,
     actionLabel: string,
-    isCheckTable: boolean
+    isCheckTable: boolean,
+    user: any
   }) {
-  const { data, assetTab, actionLabel, action, isCheckTable } = props
+  const { data, assetTab, actionLabel, action, isCheckTable,user } = props
   const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, image, remarks } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
@@ -62,55 +64,13 @@ export function CreateAssetTableCell(
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
   const reportContext = useReportContext()
-  useEffect(() => {
-    const updateData = async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      data.countCheck = count,
-        await UpdateAssetCountLine(data.id as string, {
-          asset_check: data.countCheck,
-        })
-    }
-
-    updateData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count])
-
-  useEffect(() => {
-    const updateAssignNotCorrect = async () => {
-      data.assignIncorrect = incorrect
-      await UpdateAssetCountLine(data.id as string, {
-        is_assigned_incorrectly: incorrect,
-      })
-    }
-
-    updateAssignNotCorrect()
-  }, [incorrect, data])
-
-  useEffect(() => {
-    const updateIncorrectLocation = async () => {
-      data.notInLocation = wrongLocation
-      await UpdateAssetCountLine(data.id as string, {
-        is_not_asset_loc: wrongLocation,
-      })
-    }
-
-    updateIncorrectLocation()
-  }, [wrongLocation, data])
-
-  useEffect(() => {
-    const updateAssetStatus = async () => {
-      data.status = assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-      await UpdateAssetCountLine(data.id as string, {
-        asset_count_line_status_id: assetStatus ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-      })
-    }
-    updateAssetStatus()
-  }, [assetStatus, data])
 
   useEffect(() => {
     const updateRemark = async () => {
       if (reportContext.update) {
-        await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset })
+        await UpdateAssetCountLine(data.id as string, 
+          { remarks: remarkAsset , checked_by: parseInt(user.id)}
+        )
       }
     }
     updateRemark()
@@ -138,15 +98,12 @@ export function CreateAssetTableCell(
                   {decode(assetName)}
                 </DialogTitle>
                 <DialogContent>
-                  {
-                    image ?
-                      <ImageComponent
-                        src={image}
-                        alt={assetName as string}
-                        width={400}
-                        height={400}
-                      /> : "No image display"
-                  }
+                  <ImageComponent
+                    src={image}
+                    alt={assetName as string}
+                    width={400}
+                    height={400}
+                  />
                 </DialogContent>
               </Dialog>
             </TableCell>
@@ -158,7 +115,20 @@ export function CreateAssetTableCell(
                 <TableCell className="" align="center" padding="checkbox">
                   <Checkbox checked={count}
                     disabled={!isCheckTable}
-                    onChange={() => setCount(pre => !pre)} />
+                    onChange={async (event) => {
+                      const updateData = async () => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                        data.countCheck = event.target.checked,
+                          await UpdateAssetCountLine(data.id as string, {
+                            asset_check: data.countCheck,
+                            checked_by: parseInt(user?.id)
+                          })
+                      }
+
+                      await updateData()
+                      setCount(pre => !pre)
+                    }}
+                  />
                 </TableCell>
                 : <></>
             }
@@ -166,13 +136,35 @@ export function CreateAssetTableCell(
               <Checkbox
                 checked={incorrect}
                 disabled={!isCheckTable}
-                onChange={() => setIncorrect(pre => !pre)} />
+                onChange={async (event) => {
+                  const updateAssignNotCorrect = async () => {
+                    data.assignIncorrect = event.target.checked
+                    await UpdateAssetCountLine(data.id as string, {
+                      is_assigned_incorrectly: event.target.checked,
+                      checked_by: parseInt(user?.id)
+                    })
+                  }
+
+                  await updateAssignNotCorrect()
+                  setIncorrect(pre => !pre)
+                }}
+              />
             </TableCell>
             <TableCell className="" align="center" padding="checkbox">
               <Checkbox
                 checked={wrongLocation}
                 disabled={!isCheckTable}
-                onChange={() => setWrongLocation(pre => !pre)} />
+                onChange={async (event) => {
+                  const updateIncorrectLocation = async () => {
+                    data.notInLocation = event.target.checked
+                    await UpdateAssetCountLine(data.id as string, {
+                      is_not_asset_loc: event.target.checked,
+                      checked_by: parseInt(user?.id)
+                    })
+                  }
+                  await updateIncorrectLocation()
+                  setWrongLocation(pre => !pre)
+                }} />
             </TableCell>
             {
               !assetTab ?
@@ -184,7 +176,17 @@ export function CreateAssetTableCell(
             <TableCell align="center" padding="checkbox">
               <Checkbox
                 checked={assetStatus}
-                onChange={() => setAssetStatus(pre => !pre)}
+                onChange={async (event) => {
+                  const updateAssetStatus = async () => {
+                    data.status = event.target.checked ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+                    await UpdateAssetCountLine(data.id as string, {
+                      asset_count_line_status_id: data.status,
+                      checked_by: parseInt(user?.id)
+                    })
+                  }
+                  await updateAssetStatus()
+                  setAssetStatus(pre => !pre)
+                }}
                 disabled={!isCheckTable}
               >
               </Checkbox>
@@ -209,13 +211,15 @@ export function CreateAssetTableCell(
 }
 
 export default function ListAsset(props: {
-  data: TAssetRow[], isCheckTable: boolean, assetTab: TAssetTab
+  data: TAssetRow[], isCheckTable: boolean, 
+  assetTab: TAssetTab,
   page: number, rowsPerPage: number
 }) {
   const { data, isCheckTable, assetTab, page, rowsPerPage } = props
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof TAssetRow>('assetCode')
   const headers = assetTab == INLOCATION ? tableHeaders : tableHeadersAdditional
+  const { data: session } = useSession()
 
   const handleRequestSort = (
     event: MouseEvent<unknown>,
@@ -263,6 +267,7 @@ export default function ListAsset(props: {
                   action={<Checkbox disabled={!isCheckTable} />}
                   actionLabel={"[Del]"}
                   isCheckTable={isCheckTable}
+                  user={session?.user}
                 />
               </TableRow>
             ) :

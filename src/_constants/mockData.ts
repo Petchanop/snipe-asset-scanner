@@ -1,4 +1,4 @@
-import { HeadersLocationTable } from "../_types/interfaces";
+import { HeadersLocationTable } from "@/_types/interfaces";
 
 export const mockLocationTableData = [
   {

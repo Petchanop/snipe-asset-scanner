@@ -8,12 +8,16 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { ChangeEvent, useEffect, useState } from "react";
-import { updateAssetCountReport } from "@/_libs/report.utils";
+import { updateAssetCountReport } from "@/_repositories/assetCount";
 import { useRouter } from "next/navigation";
-import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
+import { ChildrenSelectComponent, 
+  ParentSelectComponent 
+} from "@/_components/tables/selectLocationBox";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ObjectList } from "@/reports/_components/planComponent";
-import { CreateAssetCountLocation, DeleteAssetCountLocationByAssetCountId } from "@/api/report.api";
+import { CreateAssetCountLocation, 
+  DeleteAssetCountLocationByAssetCountId 
+} from "@/_repositories/assetCountLocation";
 import { EditReportSkeleton } from "@/_components/loading";
 import Gone410 from "@/_components/locationNotFound";
 

@@ -13,16 +13,21 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/location-table";
+import {
+  ChildrenSelectComponent,
+  ParentSelectComponent
+} from "@/_components/tables/selectLocationBox";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import IconButton from "@mui/material/IconButton";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { createAssetCountReport, getAssetByLocationId } from "@/_libs/report.utils";
+import { createAssetCountReport } from "@/_repositories/assetCount";
 import { CreateDocumentStep, ReportState } from "@/_constants/constants";
-import { BulkCreateAssetCountLine, CreateAssetCountLocation } from "@/api/report.api";
+import { BulkCreateAssetCountLine } from "@/_repositories/assetCountLine";
+import { CreateAssetCountLocation } from "@/_repositories/assetCountLocation";
+import { getAssetByLocationId } from "@/_intergrations/snipeit/assets";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
 import { AssetCountLocation, TReportForm } from "@/_types/types";
@@ -94,9 +99,10 @@ function StepComponent(props: {
   const [parent, setParent] = useState(parentProp)
   const [childId, setChildId] = useState<number | null>()
   const [selected, setSelected] = useState(false)
-  const [documentLocation, setDocumentLocation] = useState<TLocation[]>(CreateReportContext.report.asset_count_location.map((id: number) => {
-    return childrenLocation.find((loc) => loc.id === id) || parentLocation.find((loc) => loc.id === id) as TLocation
-  }))
+  const [documentLocation, setDocumentLocation] = useState<TLocation[]>(
+    CreateReportContext.report.asset_count_location.map((id: number) => {
+      return childrenLocation.find((loc) => loc.id === id) || parentLocation.find((loc) => loc.id === id) as TLocation
+    }))
   const dateContext = useDateContext()
   const handleDateOnChange = (value: dayjs.Dayjs | null) => {
     if (value) {
@@ -397,13 +403,20 @@ export default function CreatePlanComponent(props: {
         <Box sx={{ mt: 4, mx: 2 }}>
           {activeStep === steps.length ? (
             <div className="space-x-4">
-              <Typography sx={{ mb: 2 }}>เสร็จสิ้นขั้นตอนทั้งหมด</Typography>
-              <Button onClick={handleReset} variant="outlined">แก้ไขรายงาน</Button>
-              <Button variant="outlined" onClick={handleNewRequest}>สร้างรายงานใหม่</Button>
-
+              <Typography sx={{ mb: 2 }}>
+                เสร็จสิ้นขั้นตอนทั้งหมด
+              </Typography>
+              <Button onClick={handleReset} variant="outlined">
+                แก้ไขรายงาน
+              </Button>
+              <Button variant="outlined" onClick={handleNewRequest}>
+                สร้างรายงานใหม่
+              </Button>
               <div className="flex flex-col mt-4 space-y-2">
                 <Typography>รายชื่อรายการที่ได้ทำการสร้าง</Typography>
-                <Typography className="text-md text-red-400">* คลิกที่รายงานเพื่อทำการเริ่มตรวจนับ</Typography>
+                <Typography className="text-md text-red-400">
+                  * คลิกที่รายงานเพื่อทำการเริ่มตรวจนับ
+                </Typography>
                 {
                   reportList.length > 0 ?
                     reportList.map((report) => {
@@ -458,7 +471,7 @@ export default function CreatePlanComponent(props: {
                   activeStep < steps.length ? (
                     <>
                       <Button onClick={handleNext} variant="contained" disabled={disableButton}
-                        className="fixed bottom-20  max-md:bottom-10 left-3/4 transform -translate-x-1/2 z-50 w-40 h-10"
+                        className="fixed bottom-20 max-md:bottom-10 left-3/4 transform -translate-x-1/2 z-50 w-40 h-10"
                       >
                         {activeStep === steps.length - 1 ? "ยืนยัน" : "ถัดไป"}
                       </Button>

@@ -1,11 +1,9 @@
 'use server'
-
-import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } from "@/api/next.api";
-import { TAsset, TLocation, TUser, TUserList } from "../../_types/snipe-it.type";
-import { ConvertImageUrl } from "@/_libs/convert_url.utils";
+import { checkIfIsTStatusResponse, createGateway, TResponse, TStatusResponse } from "@/_intergrations/next.api";
+import { ConvertImageUrl } from "@/_libs/convertUrl";
+import { AssetResponse } from "@/_intergrations/snipeit/snipe-it";
 
 const client = await createGateway();
-export type AssetResponse = Exclude<TAsset, TStatusResponse>
 export async function fetchSearchAsset(searchInput: string) : Promise<TResponse<AssetResponse>>{
     const result = await client.GET("/hardware/bytag/{asset_tag}", {
         params: {
@@ -52,39 +50,16 @@ export async function getAssetById(assetId: number) : Promise<TResponse<AssetRes
     return { data: data as AssetResponse, error: null}
 }
 
-type TArrayResponse<T> = {
-    total: number;
-    rows:  T[];
-}
-
-export async function fetchLocations() : Promise<TResponse<TArrayResponse<TLocation>>>{
-    const { data, error } = await client.GET("/locations")
-    if (error) {
-        return { data: null, error: error}
-    }
-    else if ("rows" in data && "total" in data) {
-        return { data: { total: data.total, rows: data.rows} , error: null}
-    }
-    return { data: null, error: data}
-}
-
-export async function getUserById(Id : number) : Promise<TResponse<TUser>> {
-    const {data, error } = await client.GET("/users/{id}", {
+export async function getAssetByLocationId(
+    locationId: number
+): Promise<TResponse<AssetResponse[]>> {
+    const { data, error } = await client.GET("/hardware", {
         params: {
-            path: { id: Id }
-            }
+            query: { location_id: locationId }
         }
-    )
+    })
     if (error) {
-        return { data: null, error: error}
+        return { data: null, error: error }
     }
-    return {data: data, error: null}
-}
-
-export async function getAllUser() : Promise<TResponse<TUserList>> {
-    const { data, error } = await client.GET("/users")
-    if (error) {
-        return { data: null, error: error}
-    }
-    return { data: data, error: null}
+    return { data: data.rows as AssetResponse[], error: null }
 }
