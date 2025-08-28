@@ -32,6 +32,7 @@ type FUpdateAssetCountLine = {
     asset_count_line_status_id?: number;
     image?: string;
     remarks?: string;
+    owned_by?: number | null;
 }
 
 export async function findStatusId(data: ExtendAssetResponse): Promise<number> {

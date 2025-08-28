@@ -4,9 +4,10 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow"
-import { AssetStatusEnum, assetStatusOptions, 
-  rowsPerPageOptions, startRowsPerPage, 
-  tableHeadersAdditional 
+import {
+  AssetStatusEnum, assetStatusOptions,
+  rowsPerPageOptions, startRowsPerPage,
+  tableHeadersAdditional
 } from "@/_constants/constants";
 import { ChangeEvent, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
@@ -15,7 +16,7 @@ import { blue } from "@mui/material/colors";
 import Button from "@mui/material/Button";
 import { fetchSearchAsset } from "@/_intergrations/snipeit/assets";
 import { toast, ToastBar, Toaster } from 'react-hot-toast';
-import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User } from "@/_types/types";
+import { AssetCount, AssetCountLine, TAssetRow, AssetCountLocation, User, userNameId } from "@/_types/types";
 import ScannerComponent from "@/_components/scanner";
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner";
 import TableFooter from "@mui/material/TableFooter";
@@ -58,80 +59,68 @@ function CreateSearchAssetTableCell(props: {
     const updateRemark = async () => {
       await UpdateAssetCountLine(id as string,
         { remarks: remarkAsset, checked_by: parseInt(user!.id) }
-      )
-    }
+      )}
     updateRemark()
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remarkAsset])
-return (
-  <>
-    <TableCell>
-      {decode(assetCode)}
-    </TableCell>
-    <TableCell>
-      {decode(assetName)}
-    </TableCell>
-    <TableCell>
-      {assignedToName}
-    </TableCell>
-    <TableCell align="center" padding="checkbox">
-      <Checkbox checked={count}
-        onChange={async (event) => {
-          UpdateAssetCountLine(id!, { asset_check: event.target.checked })
-          setCount((prev) => !prev)
-        }}
-      />
-    </TableCell>
-    <TableCell align="center" padding="checkbox">
-      <Checkbox checked={incorrect}
-        onChange={async (event) => {
-          UpdateAssetCountLine(id!, { is_assigned_incorrectly: event.target.checked })
-          setIncorrect((prev) => !prev)
-        }}
-      />
-    </TableCell>
-    <TableCell align="center" padding="checkbox">
-      <Checkbox
-        checked={wrongLocation}
-        onChange={async (event) => {
-          UpdateAssetCountLine(id!, { is_not_asset_loc: event.target.checked })
-          setWrongLocation((prev) => !prev)
-        }} />
-    </TableCell>
-    <TableCell align="center" padding="checkbox">
-      <Checkbox
-        checked={assetStatus}
-        onChange={async (event) => {
-          setAssetStatus((prev) => !prev)
-          UpdateAssetCountLine(id!,
-            {
-              asset_count_line_status_id: event?.target.checked ?
-                AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-            })
-        }}
-      ></Checkbox>
-    </TableCell>
-    {/* {
-        wrongLocation ?
-          <TableCell align="center">
-            <Tooltip title={prev_location}
-              placement="top-start"
-            >
-              <Button variant="text">{prev_location}</Button>
-            </Tooltip>
-          </TableCell>
-          : <></>
-      } */}
-    <TableCell align="center">
-      <TextareaAutosize
-        id="remark"
-        onChange={(event) => setRemarkAsset(event.target.value)}
-        value={remarkAsset}
-        className="w-full"
-      />
-    </TableCell>
-  </>
-)
+  return (
+    <>
+      <TableCell>
+        {decode(assetCode)}
+      </TableCell>
+      <TableCell>
+        {decode(assetName)}
+      </TableCell>
+      <TableCell>
+        {assignedToName}
+      </TableCell>
+      <TableCell align="center" padding="checkbox">
+        <Checkbox checked={count}
+          onChange={async (event) => {
+            UpdateAssetCountLine(id!, { asset_check: event.target.checked })
+            setCount((prev) => !prev)
+          }}
+        />
+      </TableCell>
+      <TableCell align="center" padding="checkbox">
+        <Checkbox checked={incorrect}
+          onChange={async (event) => {
+            UpdateAssetCountLine(id!, { is_assigned_incorrectly: event.target.checked })
+            setIncorrect((prev) => !prev)
+          }}
+        />
+      </TableCell>
+      <TableCell align="center" padding="checkbox">
+        <Checkbox
+          checked={wrongLocation}
+          onChange={async (event) => {
+            UpdateAssetCountLine(id!, { is_not_asset_loc: event.target.checked })
+            setWrongLocation((prev) => !prev)
+          }} />
+      </TableCell>
+      <TableCell align="center" padding="checkbox">
+        <Checkbox
+          checked={assetStatus}
+          onChange={async (event) => {
+            setAssetStatus((prev) => !prev)
+            UpdateAssetCountLine(id!,
+              {
+                asset_count_line_status_id: event?.target.checked ?
+                  AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+              })
+          }}
+        ></Checkbox>
+      </TableCell>
+      <TableCell align="center">
+        <TextareaAutosize
+          id="remark"
+          onChange={(event) => setRemarkAsset(event.target.value)}
+          value={remarkAsset}
+          className="w-full"
+        />
+      </TableCell>
+    </>
+  )
 }
 
 function SearchAssetTable(props: {
@@ -218,6 +207,12 @@ export default function SearchAsset(
   const { push } = useRouter()
   const pathname = usePathname()
   const searchData: string[] = []
+  const usersProp : userNameId[] = users.map((user) => {
+    return {
+      id: user.id,
+      name: user.first_name + " " + user.last_name
+    }
+  })
   async function callFetchAssetSearch() {
     if (searchInput && fetchData) {
       const { data, error } = await fetchSearchAsset(searchInput);
@@ -364,6 +359,7 @@ export default function SearchAsset(
                 <ListAssetMobile
                   data={searchResult}
                   isCheckTable={true}
+                  users={usersProp}
                 /> :
                 <Table stickyHeader size="small" sx={{
                   minWidth: 650,

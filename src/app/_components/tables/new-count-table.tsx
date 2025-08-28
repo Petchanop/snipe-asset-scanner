@@ -14,7 +14,8 @@ import { AssetTable } from "@/_components/tables/list-asset";
 import {
   AssetCount, AssetCountLocation,
   INLOCATION, OUTLOCATION,
-  TAssetRow, TAssetTab, User
+  TAssetRow, TAssetTab, User,
+  userNameId
 } from "@/_types/types";
 import { GetAssetCountLocationByAssetCountReport } from "@/_repositories/assetCountLocation";
 import dayjs, { Dayjs } from "dayjs";
@@ -237,7 +238,7 @@ export function NewCountInput(props: {
   useEffect(() => {
     setLocation(locations?.find((loc) => childId ? loc.id == childId : loc.id == parent.id)!);
     //eslint-disable-next-line react-hooks/exhaustive-deps 
-  }, [childId, parent?.id, locations ])
+  }, [childId, parent?.id, locations])
   return (
     <div className="flex md:flex-row flex-col w-full py-2 pl-2 lg:pl-10 content-center">
       <div className="flex flex-col md:basis-lg space-y-2">
@@ -417,6 +418,13 @@ export default function NewCountTable(props: {
     if (!user)
       push(`/auth/login`)
   }, [user, push])
+
+  const usersProp : userNameId[] = users.map((user) => {
+    return {
+      id: user.id,
+      name: user.first_name + " " + user.last_name
+    }
+  })
   return (
     <>
       <DateValueContext
@@ -479,6 +487,7 @@ export default function NewCountTable(props: {
                     assetTab={assetTab}
                     setAssetTab={setAssetTab}
                     tabValue={INLOCATION}
+                    users={usersProp}
                   />
                   <ListAssetMobile
                     data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
@@ -486,6 +495,7 @@ export default function NewCountTable(props: {
                     assetTab={assetTab}
                     setAssetTab={setAssetTab}
                     tabValue={OUTLOCATION}
+                    users={usersProp}
                   />
                 </> :
                 <>
@@ -495,6 +505,7 @@ export default function NewCountTable(props: {
                     assetTab={assetTab}
                     setAssetTab={setAssetTab}
                     tabValue={INLOCATION}
+                    users={usersProp}
                   />
                   <AssetTable
                     data={data.filter((loc) => loc.notInLocation == true) as unknown as TAssetRow[]}
@@ -502,6 +513,7 @@ export default function NewCountTable(props: {
                     assetTab={assetTab}
                     setAssetTab={setAssetTab}
                     tabValue={OUTLOCATION}
+                    users={usersProp}
                   />
                 </>
           }

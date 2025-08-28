@@ -22,7 +22,7 @@ import {
   handleChangeRowsPerPage,
   Order
 } from "@/_components/tables/utility";
-import { OUTLOCATION, TAssetRow, TAssetTab } from "@/_types/types";
+import { OUTLOCATION, TAssetRow, TAssetTab, userNameId } from "@/_types/types";
 import { JSX } from "@emotion/react/jsx-runtime";
 import Checkbox from "@mui/material/Checkbox";
 import { blue } from "@mui/material/colors";
@@ -42,8 +42,11 @@ import DialogContent from "@mui/material/DialogContent";
 import { useReportContext } from "@/_contexts/context";
 import ImageComponent from "@/_components/ImageComponent";
 import { decode } from 'html-entities'
-import { TextareaAutosize } from "@mui/material";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
 import { useSession } from "next-auth/react";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
 
 export function CreateAssetTableCell(
   props: {
@@ -52,24 +55,33 @@ export function CreateAssetTableCell(
     action: JSX.Element,
     actionLabel: string,
     isCheckTable: boolean,
-    user: any
+    user: any,
+    users: userNameId[]
   }) {
-  const { data, assetTab, actionLabel, action, isCheckTable,user } = props
-  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, image, remarks } = data;
+  const { data, assetTab, actionLabel, action, isCheckTable, user, users } = props
+  const { assetCode, assetName, assignedTo, countCheck, assignIncorrect, notInLocation, status, image, remarks, ownedBy } = data;
+  const ownedAsset = users.find((user) => user.id == ownedBy)
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [open, setOpen] = useState(false)
   const [remarkAsset, setRemarkAsset] = useState(remarks)
+  const [owner, setOwner] = useState<userNameId | undefined | null>(ownedAsset == undefined ? null : ownedAsset)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
   const reportContext = useReportContext()
+  // const readOnlyUsers: readonly User[] = users
+  const autoCompleteProps = {
+    options: users,
+    getOptionLabel: (option: userNameId) => option.name,
+    isOptionEqualToValue: (option: userNameId, value: userNameId) => option.id === value.id
+  }
 
   useEffect(() => {
     const updateRemark = async () => {
       if (reportContext.update) {
-        await UpdateAssetCountLine(data.id as string, 
-          { remarks: remarkAsset , checked_by: parseInt(user.id)}
+        await UpdateAssetCountLine(data.id as string,
+          { remarks: remarkAsset, checked_by: parseInt(user.id) }
         )
       }
     }
@@ -132,23 +144,26 @@ export function CreateAssetTableCell(
                 </TableCell>
                 : <></>
             }
-            <TableCell className="" align="center" padding="checkbox">
-              <Checkbox
-                checked={incorrect}
-                disabled={!isCheckTable}
-                onChange={async (event) => {
-                  const updateAssignNotCorrect = async () => {
-                    data.assignIncorrect = event.target.checked
-                    await UpdateAssetCountLine(data.id as string, {
-                      is_assigned_incorrectly: event.target.checked,
-                      checked_by: parseInt(user?.id)
-                    })
-                  }
+            <TableCell className="relative" align="center" padding="checkbox">
+              <>
+                <Checkbox
+                  checked={incorrect}
+                  disabled={!isCheckTable}
+                  onChange={async (event) => {
+                    const updateAssignNotCorrect = async () => {
+                      data.assignIncorrect = event.target.checked
+                      await UpdateAssetCountLine(data.id as string, {
+                        is_assigned_incorrectly: event.target.checked,
+                        checked_by: parseInt(user?.id)
+                      })
+                    }
 
-                  await updateAssignNotCorrect()
-                  setIncorrect(pre => !pre)
-                }}
-              />
+                    await updateAssignNotCorrect()
+                    setIncorrect(pre => !pre)
+                  }}
+                />
+
+              </>
             </TableCell>
             <TableCell className="" align="center" padding="checkbox">
               <Checkbox
@@ -191,6 +206,45 @@ export function CreateAssetTableCell(
               >
               </Checkbox>
             </TableCell>
+            <TableCell>
+              <Autocomplete
+                {...autoCompleteProps}
+                disabled={!incorrect || !isCheckTable}
+                id="employee name autocomplete"
+                className="w-[16rem] z-20 shadow-md focus:outline-none bg-white"
+                value={owner}
+                onChange={async (event: any, newValue: userNameId | null) => {
+                  setOwner(newValue!)
+                  if (newValue != null) {
+                    await UpdateAssetCountLine(data.id as string,
+                      { owned_by: newValue.id, checked_by: parseInt(user.id) }
+                    )
+                  } else {
+                    if (ownedBy) {
+                      await UpdateAssetCountLine(data.id as string,
+                        { owned_by: null, checked_by: parseInt(user.id) }
+                      )
+                    }
+                  }
+                }}
+                renderOption={(props, option) => {
+                  const { key, ...optionProps } = props
+                  return (
+                    <Box
+                      key={optionProps.id + key}
+                      component="li"
+                      sx={{ padding: 4 }}
+                      {...optionProps}
+                    >
+                      {option.name}
+                    </Box>
+                  )
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="employee name" />
+                )}
+              />
+            </TableCell>
             {
               tabType == OUTLOCATION ?
                 <TableCell align="center">
@@ -211,11 +265,11 @@ export function CreateAssetTableCell(
 }
 
 export default function ListAsset(props: {
-  data: TAssetRow[], isCheckTable: boolean, 
-  assetTab: TAssetTab,
+  data: TAssetRow[], isCheckTable: boolean,
+  assetTab: TAssetTab, users: userNameId[],
   page: number, rowsPerPage: number
 }) {
-  const { data, isCheckTable, assetTab, page, rowsPerPage } = props
+  const { data, isCheckTable, assetTab, page, rowsPerPage, users } = props
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof TAssetRow>('assetCode')
   const headers = assetTab == INLOCATION ? tableHeaders : tableHeadersAdditional
@@ -238,6 +292,8 @@ export default function ListAsset(props: {
     .sort(getComparator<TAssetRow, keyof TAssetRow>(order, orderBy)),
     [order, orderBy, data]
   )
+
+
   return (
     <>
       <TableHead>
@@ -268,6 +324,7 @@ export default function ListAsset(props: {
                   actionLabel={"[Del]"}
                   isCheckTable={isCheckTable}
                   user={session?.user}
+                  users={users}
                 />
               </TableRow>
             ) :
@@ -295,13 +352,15 @@ export function AssetTable(props: {
   isCheckTable: boolean,
   assetTab: TAssetTab,
   setAssetTab: (value: SetStateAction<TAssetTab>) => void,
-  tabValue?: TAssetTab
+  tabValue?: TAssetTab,
+  users: userNameId[]
 }) {
   const {
     data,
     isCheckTable,
     assetTab,
-    tabValue
+    tabValue,
+    users
   } = props
   const [tablePage, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(startRowsPerPage);
@@ -323,6 +382,7 @@ export function AssetTable(props: {
           assetTab={assetTab}
           page={tablePage}
           rowsPerPage={rowsPerPage}
+          users={users}
         />
         <TableFooter>
           <TableRow>
