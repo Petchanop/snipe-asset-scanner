@@ -70,8 +70,7 @@ function CreateSearchAssetTableCell(props: {
     const updateRemark = async () => {
       await UpdateAssetCountLine(id as string,
         { remarks: remarkAsset, checked_by: parseInt(user!.id) }
-      )
-    }
+      )}
     updateRemark()
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remarkAsset])
