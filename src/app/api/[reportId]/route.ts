@@ -10,6 +10,7 @@ import { GetAllUserPrisma } from "@/_repositories/user";
 import { getSession } from "auth";
 import { redirect } from "next/navigation";
 import { AssetStatusEnum } from "@/_constants/constants";
+import { decode } from "html-entities";
 
 export async function GET(
     request: NextRequest,
@@ -62,8 +63,10 @@ async function CreateAssetCountReportFile(
     dataSheet.getColumn(2).width = 30
     dataSheet.getColumn(3).width = 55
     dataSheet.getColumn(4).width = 30
-    dataSheet.getColumn(8).width = 40
-    dataSheet.getColumn(10).width = 40
+    dataSheet.getColumn(8).width = 20
+    dataSheet.getColumn(9).width = 35
+    dataSheet.getColumn(10).width = 35
+    dataSheet.getColumn(11).width = 30
     let assetQuantity = 0
     let assetNotCheck = 0
     let assetMalFunction = 0
@@ -84,10 +87,11 @@ async function CreateAssetCountReportFile(
         assetQuantity += assetCountLine.length
         for (const countLine of assetCountLine) {
             const getUser = users.find((user) => user.id == countLine.assigned_to)
-            const countCheck = countLine.asset_check ? "Yes" : "No"
-            const assingedInCorrect = countLine.is_assigned_incorrectly ? "Yes" : "No"
-            const isNotInLocation = countLine.is_not_asset_loc ? "Yes" : "No"
-            const useAble = countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "Yes" : "No"
+            const ownedByUser = users.find((user) => user.id == countLine.owned_by)
+            const countCheck = countLine.asset_check ? "\u2713" : ""
+            const assingedInCorrect = countLine.is_assigned_incorrectly ? "\u2713" : ""
+            const isNotInLocation = countLine.is_not_asset_loc ? "\u2713" : ""
+            const useAble = countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "\u2713" : ""
             if (!countLine.asset_check && !countLine.is_not_asset_loc)
                 assetNotCheck++
             if (countLine.is_not_asset_loc)
@@ -99,7 +103,7 @@ async function CreateAssetCountReportFile(
 
             dataSheet.getCell(`A${assetCodeCol}`).value = i + 1
             dataSheet.getCell(`B${assetCodeCol}`).value = countLine.asset_code
-            dataSheet.getCell(`C${assetCodeCol}`).value = countLine.asset_name
+            dataSheet.getCell(`C${assetCodeCol}`).value = decode(countLine.asset_name)
             dataSheet.getCell(`D${assetCodeCol}`).value = getUser ? `${getUser?.first_name}  ${getUser?.last_name}` : ""
             dataSheet.getCell(`E${assetCodeCol}`).value = countCheck
             dataSheet.getCell(`F${assetCodeCol}`).value = assingedInCorrect
@@ -107,6 +111,7 @@ async function CreateAssetCountReportFile(
             dataSheet.getCell(`I${assetCodeCol}`).value = getLocation!.name
             dataSheet.getCell(`H${assetCodeCol}`).value = isNotInLocation
             dataSheet.getCell(`J${assetCodeCol}`).value = locations.data?.rows.find((loc) => loc.id == countLine.previous_loc_id)?.name
+            dataSheet.getCell(`K${assetCodeCol}`).value = ownedByUser ? `${ownedByUser?.first_name}  ${ownedByUser?.last_name}` : ""
             createBorder(dataSheet, assetCodeCol)
             assetCodeCol += 1
             i++

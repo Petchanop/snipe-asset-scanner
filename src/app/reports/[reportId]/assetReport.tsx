@@ -74,16 +74,16 @@ export default function AssetReport(
         <Typography><strong>Asset Count:</strong> {assetCountLine.length} </Typography>
       </Box>
 
-      <Table sx={{ mt: 4 }}>
+      <Table stickyHeader sx={{ mt: 4 }}>
         <TableHead>
           <TableRow>
             <TableCell>No.</TableCell>
             <TableCell>Asset Code</TableCell>
             <TableCell>Asset Name</TableCell>
             <TableCell>Assign Name</TableCell>
-            <TableCell>Count Check</TableCell>
-            <TableCell>Assign Incorrect</TableCell>
-            <TableCell>Asset Damaged</TableCell>
+            <TableCell align='center'>Count Check</TableCell>
+            <TableCell align='center'>Assign Incorrect</TableCell>
+            <TableCell align='center'>Asset Damaged</TableCell>
             <TableCell>Location</TableCell>
           </TableRow>
         </TableHead>
@@ -94,9 +94,9 @@ export default function AssetReport(
               <TableCell>{row.asset_code}</TableCell>
               <TableCell>{row.asset_name}</TableCell>
               <TableCell>{getUser(row.assigned_to!)}</TableCell>
-              <TableCell>{row.asset_check ? "Yes" : "No"}</TableCell>
-              <TableCell>{row.is_assigned_incorrectly ? "Yes" : "No"}</TableCell>
-              <TableCell>{row.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "Yes" : "No"}</TableCell>
+              <TableCell align='center'>{row.asset_check ? "\u2713" : "" }</TableCell>
+              <TableCell align='center'>{row.is_assigned_incorrectly ? "\u2713" : "" }</TableCell>
+              <TableCell align='center' >{row.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "\u2713" : "" }</TableCell>
               <TableCell>{getLocation(row.asset_count_line_location_id!, locations)}</TableCell>
             </TableRow>
           ))}
