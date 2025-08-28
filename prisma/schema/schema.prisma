@@ -122,87 +122,87 @@ model asset_uploads {
 }
 
 model assets {
-  id                                                  Int       @id @default(autoincrement()) @db.UnsignedInt
-  name                                                String?
-  asset_tag                                           String?
-  model_id                                            Int?
-  serial                                              String?
-  purchase_date                                       DateTime? @db.Date
-  asset_eol_date                                      DateTime? @db.Date
-  eol_explicit                                        Boolean   @default(false)
-  purchase_cost                                       Decimal?  @db.Decimal(20, 2)
-  order_number                                        String?
-  assigned_to                                         Int?
-  notes                                               String?   @db.Text
-  image                                               String?   @db.Text
-  created_by                                          Int?
-  created_at                                          DateTime? @db.Timestamp(0)
-  updated_at                                          DateTime? @db.Timestamp(0)
-  physical                                            Boolean   @default(true)
-  deleted_at                                          DateTime? @db.Timestamp(0)
-  status_id                                           Int?
-  archived                                            Boolean?  @default(false)
-  warranty_months                                     Int?
-  depreciate                                          Boolean?
-  supplier_id                                         Int?
-  requestable                                         Int       @default(0) @db.TinyInt
-  rtd_location_id                                     Int?
-  snipeit_mac_address_1                               String?   @map("_snipeit_mac_address_1")
-  accepted                                            String?
-  last_checkout                                       DateTime? @db.DateTime(0)
-  last_checkin                                        DateTime? @db.DateTime(0)
-  expected_checkin                                    DateTime? @db.Date
-  company_id                                          Int?      @db.UnsignedInt
-  assigned_type                                       String?
-  last_audit_date                                     DateTime? @db.DateTime(0)
-  next_audit_date                                     DateTime? @db.Date
-  location_id                                         Int?
-  checkin_counter                                     Int       @default(0)
-  checkout_counter                                    Int       @default(0)
-  requests_counter                                    Int       @default(0)
-  byod                                                Boolean?  @default(false)
-  snipeit_ip_address_2                                String?   @map("_snipeit_ip_address_2") @db.Text
-  snipeit_computer_name_3                             String?   @map("_snipeit_computer_name_3") @db.Text
-  snipeit_ram_4                                       String?   @map("_snipeit_ram_4") @db.Text
-  snipeit_hddssd_5                                    String?   @map("_snipeit_hddssd_5") @db.Text
-  snipeit_vga_6                                       String?   @map("_snipeit_vga_6") @db.Text
-  snipeit_cpu_7                                       String?   @map("_snipeit_cpu_7") @db.Text
-  snipeit_display_size_8                              String?   @map("_snipeit_display_size_8") @db.Text
-  snipeit_raid_card_9                                 String?   @map("_snipeit_raid_card_9") @db.Text
-  snipeit_department_10                               String?   @map("_snipeit_department_10") @db.Text
-  snipeit_wifi_mac_address_11                         String?   @map("_snipeit_wifi_mac_address_11") @db.Text
-  snipeit_history_12                                  String?   @map("_snipeit_history_12") @db.Text
-  snipeit_installation_location_13                    String?   @map("_snipeit_installation_location_13") @db.Text
-  snipeit_ative_resolution_14                         String?   @map("_snipeit_ative_resolution_14") @db.Text
-  snipeit_brightness_15                               String?   @map("_snipeit_brightness_15") @db.Text
-  snipeit_contrast_ratio_16                           String?   @map("_snipeit_contrast_ratio_16") @db.Text
-  snipeit_projector_technology_17                     String?   @map("_snipeit_projector_technology_17") @db.Text
-  snipeit_aspect_ratio_18                             String?   @map("_snipeit_aspect_ratio_18") @db.Text
-  snipeit_lamp_life_19                                String?   @map("_snipeit_lamp_life_19") @db.Text
-  snipeit_input_20                                    String?   @map("_snipeit_input_20") @db.Text
-  snipeit_output_21                                   String?   @map("_snipeit_output_21") @db.Text
-  snipeit_size_2                                      String?   @map("_snipeit_size_2") @db.Text
-  snipeit_color_3                                     String?   @map("_snipeit_color_3") @db.Text
-  snipeit_material_4                                  String?   @map("_snipeit_material_4") @db.Text
-  snipeit_department_6                                String?   @map("_snipeit_department_6") @db.Text
-  snipeit_type_car_7                                  String?   @map("_snipeit_type_car_7") @db.Text
-  snipeit_brand_car_8                                 String?   @map("_snipeit_brand_car_8") @db.Text
-  snipeit_generation_9                                String?   @map("_snipeit_generation_9") @db.Text
-  snipeit_a1aaaa0a1asauaaaa_10                        String?   @map("_snipeit_a1aaaa0a1asauaaaa_10") @db.Text
-  snipeit_aa0asasa1aauaaa1oe_11                       String?   @map("_snipeit_aa0asasa1aauaaa1oe_11") @db.Text
-  snipeit_aaaa2aaaua1aaaaaa1a_12                      String?   @map("_snipeit_aaaa2aaaua1aaaaaa1a_12") @db.Text
-  snipeit_aaa0aaaaaa1aa_13                            String?   @map("_snipeit_aaa0aaaaaa1aa_13") @db.Text
-  snipeit_aaa_14                                      String?   @map("_snipeit_aaa_14") @db.Text
-  snipeit_installation_location_15                    String?   @map("_snipeit_installation_location_15") @db.Text
-  snipeit_support_by_36                               String?   @map("_snipeit_support_by_36") @db.Text
-  snipeit_possessioner_37                             String?   @map("_snipeit_possessioner_37") @db.Text
-  snipeit_support_by_1                                String?   @map("_snipeit_support_by_1") @db.Text
-  snipeit_possessor_2                                 String?   @map("_snipeit_possessor_2") @db.Text
-  snipeit_installation_location_3                     String?   @map("_snipeit_installation_location_3") @db.Text
-  snipeit_department_4                                String?   @map("_snipeit_department_4") @db.Text
-  snipeit_type_asset_5                                String?   @map("_snipeit_type_asset_5") @db.Text
-  snipeit_aaa0a1a_aa1aaaa1aa_7                        String?   @map("_snipeit_aaa0a1a_aa1aaaa1aa_7") @db.Text
-  snipeit_aaaa2aaaua1aaaa1aa1asaaaazaa1oeaaaaasa3aa_9 String?   @map("_snipeit_aaaa2aaaua1aaaa1aa1asaaaazaa1oeaaaaasa3aa_9") @db.Text
+  id                               Int       @id @default(autoincrement()) @db.UnsignedInt
+  name                             String?
+  asset_tag                        String?
+  model_id                         Int?
+  serial                           String?
+  purchase_date                    DateTime? @db.Date
+  asset_eol_date                   DateTime? @db.Date
+  eol_explicit                     Boolean   @default(false)
+  purchase_cost                    Decimal?  @db.Decimal(20, 2)
+  order_number                     String?
+  assigned_to                      Int?
+  notes                            String?   @db.Text
+  image                            String?   @db.Text
+  created_by                       Int?
+  created_at                       DateTime? @db.Timestamp(0)
+  updated_at                       DateTime? @db.Timestamp(0)
+  physical                         Boolean   @default(true)
+  deleted_at                       DateTime? @db.Timestamp(0)
+  status_id                        Int?
+  archived                         Boolean?  @default(false)
+  warranty_months                  Int?
+  depreciate                       Boolean?
+  supplier_id                      Int?
+  requestable                      Int       @default(0) @db.TinyInt
+  rtd_location_id                  Int?
+  snipeit_mac_address_1            String?   @map("_snipeit_mac_address_1")
+  accepted                         String?
+  last_checkout                    DateTime? @db.DateTime(0)
+  last_checkin                     DateTime? @db.DateTime(0)
+  expected_checkin                 DateTime? @db.Date
+  company_id                       Int?      @db.UnsignedInt
+  assigned_type                    String?
+  last_audit_date                  DateTime? @db.DateTime(0)
+  next_audit_date                  DateTime? @db.Date
+  location_id                      Int?
+  checkin_counter                  Int       @default(0)
+  checkout_counter                 Int       @default(0)
+  requests_counter                 Int       @default(0)
+  byod                             Boolean?  @default(false)
+  snipeit_ip_address_2             String?   @map("_snipeit_ip_address_2") @db.Text
+  snipeit_computer_name_3          String?   @map("_snipeit_computer_name_3") @db.Text
+  snipeit_ram_4                    String?   @map("_snipeit_ram_4") @db.Text
+  snipeit_hddssd_5                 String?   @map("_snipeit_hddssd_5") @db.Text
+  snipeit_vga_6                    String?   @map("_snipeit_vga_6") @db.Text
+  snipeit_cpu_7                    String?   @map("_snipeit_cpu_7") @db.Text
+  snipeit_display_size_8           String?   @map("_snipeit_display_size_8") @db.Text
+  snipeit_raid_card_9              String?   @map("_snipeit_raid_card_9") @db.Text
+  snipeit_department_10            String?   @map("_snipeit_department_10") @db.Text
+  snipeit_wifi_mac_address_11      String?   @map("_snipeit_wifi_mac_address_11") @db.Text
+  snipeit_history_12               String?   @map("_snipeit_history_12") @db.Text
+  snipeit_installation_location_13 String?   @map("_snipeit_installation_location_13") @db.Text
+  snipeit_ative_resolution_14      String?   @map("_snipeit_ative_resolution_14") @db.Text
+  snipeit_brightness_15            String?   @map("_snipeit_brightness_15") @db.Text
+  snipeit_contrast_ratio_16        String?   @map("_snipeit_contrast_ratio_16") @db.Text
+  snipeit_projector_technology_17  String?   @map("_snipeit_projector_technology_17") @db.Text
+  snipeit_aspect_ratio_18          String?   @map("_snipeit_aspect_ratio_18") @db.Text
+  snipeit_lamp_life_19             String?   @map("_snipeit_lamp_life_19") @db.Text
+  snipeit_input_20                 String?   @map("_snipeit_input_20") @db.Text
+  snipeit_output_21                String?   @map("_snipeit_output_21") @db.Text
+  snipeit_size_2                   String?   @map("_snipeit_size_2") @db.Text
+  snipeit_color_3                  String?   @map("_snipeit_color_3") @db.Text
+  snipeit_material_4               String?   @map("_snipeit_material_4") @db.Text
+  snipeit_department_6             String?   @map("_snipeit_department_6") @db.Text
+  snipeit_type_car_7               String?   @map("_snipeit_type_car_7") @db.Text
+  snipeit_brand_car_8              String?   @map("_snipeit_brand_car_8") @db.Text
+  snipeit_generation_9             String?   @map("_snipeit_generation_9") @db.Text
+  snipeit_a1aaaa0a1asauaaaa_10     String?   @map("_snipeit_a1aaaa0a1asauaaaa_10") @db.Text
+  snipeit_aa0asasa1aauaaa1oe_11    String?   @map("_snipeit_aa0asasa1aauaaa1oe_11") @db.Text
+  snipeit_aaaa2aaaua1aaaaaa1a_12   String?   @map("_snipeit_aaaa2aaaua1aaaaaa1a_12") @db.Text
+  snipeit_aaa0aaaaaa1aa_13         String?   @map("_snipeit_aaa0aaaaaa1aa_13") @db.Text
+  snipeit_aaa_14                   String?   @map("_snipeit_aaa_14") @db.Text
+  snipeit_installation_location_15 String?   @map("_snipeit_installation_location_15") @db.Text
+  snipeit_support_by_36            String?   @map("_snipeit_support_by_36") @db.Text
+  snipeit_possessioner_37          String?   @map("_snipeit_possessioner_37") @db.Text
+  snipeit_support_by_1             String?   @map("_snipeit_support_by_1") @db.Text
+  snipeit_possessor_2              String?   @map("_snipeit_possessor_2") @db.Text
+  snipeit_installation_location_3  String?   @map("_snipeit_installation_location_3") @db.Text
+  snipeit_department_4             String?   @map("_snipeit_department_4") @db.Text
+  snipeit_type_asset_5             String?   @map("_snipeit_type_asset_5") @db.Text
+  snipeit_branch_10                String?   @map("_snipeit_branch_10") @db.Text
+  snipeit_location_cititex_11      String?   @map("_snipeit_location_cititex_11") @db.Text
 
   @@index([assigned_type, assigned_to], map: "assets_assigned_type_assigned_to_index")
   @@index([company_id], map: "assets_company_id_index")
@@ -942,22 +942,22 @@ model throttle {
 }
 
 model users {
-  id                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  id                  Int                @id @default(autoincrement()) @db.UnsignedInt
   email               String?
   password            String
-  permissions         String?   @db.Text
-  activated           Boolean   @default(false)
+  permissions         String?            @db.Text
+  activated           Boolean            @default(false)
   created_by          Int?
   activation_code     String?
-  activated_at        DateTime? @db.Timestamp(0)
-  last_login          DateTime? @db.Timestamp(0)
+  activated_at        DateTime?          @db.Timestamp(0)
+  last_login          DateTime?          @db.Timestamp(0)
   persist_code        String?
   reset_password_code String?
   first_name          String?
   last_name           String?
-  created_at          DateTime? @db.Timestamp(0)
-  updated_at          DateTime? @db.Timestamp(0)
-  deleted_at          DateTime? @db.Timestamp(0)
+  created_at          DateTime?          @db.Timestamp(0)
+  updated_at          DateTime?          @db.Timestamp(0)
+  deleted_at          DateTime?          @db.Timestamp(0)
   website             String?
   country             String?
   gravatar            String?
@@ -965,39 +965,39 @@ model users {
   phone               String?
   jobtitle            String?
   manager_id          Int?
-  employee_num        String?   @db.Text
+  employee_num        String?            @db.Text
   avatar              String?
   username            String?
-  notes               String?   @db.Text
-  company_id          Int?      @db.UnsignedInt
-  remember_token      String?   @db.Text
-  ldap_import         Boolean   @default(false)
-  locale              String?   @default("en-US") @db.VarChar(10)
-  show_in_list        Boolean   @default(true)
-  two_factor_secret   String?   @db.VarChar(32)
-  two_factor_enrolled Boolean   @default(false)
-  two_factor_optin    Boolean   @default(false)
+  notes               String?            @db.Text
+  company_id          Int?               @db.UnsignedInt
+  remember_token      String?            @db.Text
+  ldap_import         Boolean            @default(false)
+  locale              String?            @default("en-US") @db.VarChar(10)
+  show_in_list        Boolean            @default(true)
+  two_factor_secret   String?            @db.VarChar(32)
+  two_factor_enrolled Boolean            @default(false)
+  two_factor_optin    Boolean            @default(false)
   department_id       Int?
   address             String?
   city                String?
   state               String?
-  zip                 String?   @db.VarChar(10)
+  zip                 String?            @db.VarChar(10)
   skin                String?
-  remote              Boolean?  @default(false)
-  start_date          DateTime? @db.Date
-  end_date            DateTime? @db.Date
+  remote              Boolean?           @default(false)
+  start_date          DateTime?          @db.Date
+  end_date            DateTime?          @db.Date
   scim_externalid     String?
-  autoassign_licenses Boolean   @default(true)
-  vip                 Boolean?  @default(false)
-  enable_sounds       Boolean   @default(false)
-  enable_confetti     Boolean   @default(false)
+  autoassign_licenses Boolean            @default(true)
+  vip                 Boolean?           @default(false)
+  enable_sounds       Boolean            @default(false)
+  enable_confetti     Boolean            @default(false)
+  asset_count_user    asset_count_user[]
 
   @@index([activation_code], map: "users_activation_code_index")
   @@index([company_id], map: "users_company_id_index")
   @@index([manager_id, deleted_at], map: "users_manager_id_deleted_at_index")
   @@index([reset_password_code], map: "users_reset_password_code_index")
   @@index([username, deleted_at], map: "users_username_deleted_at_index")
-  asset_count_user asset_count_user[]
 }
 
 model users_groups {

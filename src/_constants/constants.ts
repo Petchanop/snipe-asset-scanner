@@ -88,7 +88,14 @@ export const tableHeaders: HeadersAssetTable[] = [
         fontColor: ["black"],
         value: "status",
         mobile: true
-    }
+    },
+     {
+        label: "ผู้ถือครองที่ถูกต้อง",
+        isSelectBox: true,
+        fontColor: ["black"],
+        value: "ownedBy",
+        mobile: true
+    },
 ]
 
 export type AssetStatus =
@@ -153,6 +160,13 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         isSelectBox: true,
         fontColor: ["black"],
         value: "status",
+        mobile: true
+    },
+    {
+        label: "ผู้ถือครองที่ถูกต้อง",
+        isSelectBox: true,
+        fontColor: ["black"],
+        value: "ownedBy",
         mobile: true
     },
     {

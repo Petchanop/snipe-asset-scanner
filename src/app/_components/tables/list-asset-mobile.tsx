@@ -8,7 +8,7 @@ import {
   tableHeadersAdditional
 } from "@/_constants/constants"
 import { UpdateAssetCountLine } from "@/_repositories/assetCountLine";
-import { TAssetRow, TAssetTab } from "@/_types/types"
+import { TAssetRow, TAssetTab, userNameId } from "@/_types/types"
 import Checkbox from "@mui/material/Checkbox";
 import { grey } from "@mui/material/colors";
 import Paper from "@mui/material/Paper";
@@ -31,6 +31,9 @@ import EditNoteTwoToneIcon from '@mui/icons-material/EditNoteTwoTone'
 import IconButton from "@mui/material/IconButton";
 import { DialogActions } from "@mui/material";
 import ImageComponent from "@/_components/ImageComponent";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
 import { decode } from 'html-entities'
 import { useSession } from "next-auth/react";
 
@@ -57,10 +60,11 @@ function RenderCellValueByAssetKey(props: {
   isCheckTable: boolean,
   header: string,
   renderCellProps: TRenderCellProps,
-  user: any
+  user: any,
+  users: userNameId[]
 }) {
-  const { data, cellCase, isCheckTable, header, renderCellProps,user } = props
-  const { assetCode, assetName, assignedTo, image } = data;
+  const { data, cellCase, isCheckTable, header, renderCellProps, user, users } = props
+  const { assetCode, assetName, assignedTo, image, ownedBy } = data;
   const {
     count, setCount,
     incorrect, setIncorrect,
@@ -70,7 +74,13 @@ function RenderCellValueByAssetKey(props: {
     open, setOpen,
     openModal, setOpenModal
   } = renderCellProps
-
+  const ownedAsset = users.find((user) => user.id == ownedBy)
+  const [owner, setOwner] = useState<userNameId | undefined | null>(ownedAsset == undefined ? null : ownedAsset)
+  const autoCompleteProps = {
+    options: users,
+    getOptionLabel: (option: userNameId) => option.name,
+    isOptionEqualToValue: (option: userNameId, value: userNameId) => option.id === value.id
+  }
   switch (cellCase) {
     case "assetName":
       return (
@@ -203,8 +213,8 @@ function RenderCellValueByAssetKey(props: {
               >ยกเลิก</Button>
               <Button onClick={() => {
                 const updateRemark = async () => {
-                  await UpdateAssetCountLine(data.id as string, 
-                    { remarks: remarkAsset,  checked_by: parseInt(user?.id) })
+                  await UpdateAssetCountLine(data.id as string,
+                    { remarks: remarkAsset, checked_by: parseInt(user?.id) })
                 }
                 updateRemark()
                 setOpenModal((prev) => !prev)
@@ -214,6 +224,49 @@ function RenderCellValueByAssetKey(props: {
             </DialogActions>
           </Dialog>
         </div >
+      )
+    case "ownedBy":
+      return (
+        <div className="flex flex-col h-[3.2rem] mt-0 mb-6">
+          {header}
+          <Autocomplete
+            {...autoCompleteProps}
+            disabled={!incorrect || !isCheckTable}
+            id="employee name autocomplete"
+            className="w-[15rem] mt-2 shadow-md focus:outline-none bg-white"
+            value={owner}
+            onChange={async (event: any, newValue: userNameId | null) => {
+              setOwner(newValue!)
+              if (newValue != null) {
+                await UpdateAssetCountLine(data.id as string,
+                  { owned_by: newValue.id, checked_by: parseInt(user.id) }
+                )
+              } else {
+                if (ownedBy) {
+                  await UpdateAssetCountLine(data.id as string,
+                    { owned_by: null, checked_by: parseInt(user.id) }
+                  )
+                }
+              }
+            }}
+            renderOption={(props, option) => {
+              const { key, ...optionProps } = props
+              return (
+                <Box
+                  key={optionProps.id + key}
+                  component="li"
+                  sx={{ padding: 4 }}
+                  {...optionProps}
+                >
+                  {option.name}
+                </Box>
+              )
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="employee name" />
+            )}
+          />
+        </div>
       )
     default:
       return (
@@ -261,9 +314,10 @@ function AssetCard(props: {
   assetTab?: TAssetTab,
   tabValue?: TAssetTab,
   isCheckTable: boolean,
-  user: any
+  user: any,
+  users: userNameId[]
 }) {
-  const { data, assetTab, tabValue, isCheckTable,user } = props
+  const { data, assetTab, tabValue, isCheckTable, user, users } = props
   const headers = assetTab == INLOCATION ? tableHeaders : tableHeadersAdditional
   const { countCheck, assignIncorrect, notInLocation, status, remarks } = data;
   const [count, setCount] = useState(countCheck)
@@ -279,7 +333,7 @@ function AssetCard(props: {
   useEffect(() => {
     const updateRemark = async () => {
       if (reportContext.update) {
-        await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset, checked_by: parseInt(user?.id)})
+        await UpdateAssetCountLine(data.id as string, { remarks: remarkAsset, checked_by: parseInt(user?.id) })
       }
     }
     updateRemark()
@@ -315,7 +369,7 @@ function AssetCard(props: {
               <TableRow key={header.value} className=""
                 sx={{
                   minHeight: 50,
-                  maxHeight: 200,
+                  maxHeight: 400,
                   // height: 100,
                   justifyContent: 'center',
                   justifyItems: 'center'
@@ -337,6 +391,7 @@ function AssetCard(props: {
                     header={header.label}
                     renderCellProps={RenderCellValue}
                     user={user}
+                    users={users}
                   />
                 </TableCell>
               </TableRow>
@@ -354,8 +409,9 @@ export default function ListAssetMobile(props: {
   assetTab?: TAssetTab
   setAssetTab?: (value: SetStateAction<TAssetTab>) => void,
   tabValue?: TAssetTab,
+  users: userNameId[]
 }) {
-  const { data, isCheckTable, assetTab, tabValue } = props
+  const { data, isCheckTable, assetTab, tabValue, users } = props
   const [itemPerPage, setItemPerPage] = useState(startRowsPerPage)
   const [page, setPage] = useState<number>(1);
   const { data: session } = useSession()
@@ -391,6 +447,7 @@ export default function ListAssetMobile(props: {
                     isCheckTable={isCheckTable}
                     tabValue={tabValue}
                     user={session?.user}
+                    users={users}
                   />
                 </Paper>
               )

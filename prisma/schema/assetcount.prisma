@@ -7,54 +7,57 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model asset_count_user {
   id       Int    @id
-  user     users  @relation(fields: [user_id], references: [id])
   user_id  Int    @db.UnsignedInt
   username String
   password String
+  user     users  @relation(fields: [user_id], references: [id])
+
+  @@index([user_id], map: "asset_count_user_user_id_fkey")
 }
 
 model asset_count {
   id                 String                 @id @default(uuid()) @db.Char(36)
-  document_number    Int                    @unique @default(autoincrement())
-  document_name      String?
   document_date      DateTime               @default(now())
   rtd_location_id    Int?
   location_id        Int?
   state              String
   created_by         Int?
   created_at         DateTime               @default(now())
-  AssetCountLocation asset_count_location[]
+  document_number    Int                    @unique @default(autoincrement())
+  document_name      String?
   AssetCountLine     asset_count_line[]
+  AssetCountLocation asset_count_location[]
 }
 
 model asset_count_line {
   id                           String                @id @default(uuid()) @db.Char(36)
   asset_count_id               String                @db.Char(36)
-  count_id                     asset_count           @relation(fields: [asset_count_id], references: [id])
   asset_id                     Int
   asset_code                   String
   asset_name                   String
   assigned_to                  Int?
+  owned_by                     Int?
   asset_check                  Boolean
   checked_by                   Int?
   checked_on                   DateTime              @db.Timestamp(0)
   is_not_asset_loc             Boolean
   asset_name_not_correct       Boolean
-  is_assigned_incorrectly      Boolean               @default(false)
-  asset_count_line_location_id String?               @db.Char(36)
-  location_id                  asset_count_location? @relation(fields: [asset_count_line_location_id], references: [id])
   asset_count_line_status_id   Int                   @default(0)
-  status_id                    asset_status          @relation(fields: [asset_count_line_status_id], references: [id])
+  asset_count_line_location_id String?               @db.Char(36)
+  is_assigned_incorrectly      Boolean               @default(false)
   previous_loc_id              Int?
   image                        String?
   remarks                      String                @default("")
+  count_id                     asset_count           @relation(fields: [asset_count_id], references: [id])
+  location_id                  asset_count_location? @relation(fields: [asset_count_line_location_id], references: [id])
+  status_id                    asset_status          @relation(fields: [asset_count_line_status_id], references: [id])
 
   @@index([asset_count_id], map: "asset_count_line_asset_count_id_index")
   @@index([asset_count_line_status_id], map: "asset_count_line_status_id_index")
@@ -74,10 +77,11 @@ model asset_count_location {
   asset_count_id  String             @db.Char(36)
   rtd_location_id Int?
   location_id     Int                @db.UnsignedInt
-  location        locations          @relation(fields: [location_id], references: [id])
-  count_id        asset_count        @relation(fields: [asset_count_id], references: [id])
   AssetCountLine  asset_count_line[]
+  count_id        asset_count        @relation(fields: [asset_count_id], references: [id])
+  location        locations          @relation(fields: [location_id], references: [id])
 
   @@unique([asset_count_id, location_id])
   @@index([asset_count_id], map: "asset_count_location_asset_count_id_index")
+  @@index([location_id], map: "asset_count_location_location_id_fkey")
 }

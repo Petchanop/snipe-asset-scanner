@@ -104,7 +104,8 @@ export function mapAssetData(asset: AssetCountLine, data: User, prev_loc: TLocat
         status: asset.asset_count_line_status_id,
         prev_location: prev_loc?.name,
         image: ConvertImageUrl(baseUrl, asset.image as string),
-        remarks: asset.remarks
+        remarks: asset.remarks,
+        ownedBy: asset.owned_by
     } as unknown as TAssetRow
 }
 

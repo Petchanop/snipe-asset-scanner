@@ -98,7 +98,6 @@ export function ParentSelectComponent(props: {
       disabled={isCheckTable}
       onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const newParent = parentLocation.find((loc) => loc.name == event.target.value);
-        console.log("select parent", newParent)
         setParent(newParent!)
       }}
       >

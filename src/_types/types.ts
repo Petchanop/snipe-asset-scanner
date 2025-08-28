@@ -52,6 +52,7 @@ export type TAssetRow = {
     prev_location?: string;
     image?: string;
     remarks?: string;
+    ownedBy?: number;
 };
 
 export type ExtendAssetResponse = AssetResponse & {
@@ -91,7 +92,11 @@ export enum CFiltertype {
   ASSET = "ASSET",
   DATE = "DATE",
   STATUS = "STATUS"
-} 
+}
+export type userNameId = {
+  id: number,
+  name: string
+}
 
 export type AssetCount = asset_count;
 export type AssetCountLine = asset_count_line;
