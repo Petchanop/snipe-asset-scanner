@@ -150,6 +150,14 @@ function StepComponent(props: {
       setDisableButton(false)
   }, [documentLocation, setDisableButton, step])
 
+  useEffect(() => {
+    if (!CreateReportContext.report.document_date) {
+      CreateReportContext.setReport((prev) => ({
+        ...prev,
+        document_date: dayjs().toDate(),
+      }))
+    }
+  }, [])
   switch (step) {
     case CreateDocumentStep.CHOOSEDATE:
       return (
@@ -477,7 +485,7 @@ export default function CreatePlanComponent(props: {
                       </Button>
                     </>
                   ) :
-                    <Button onClick={() => replace('/')} variant="contained" disabled={disableButton}
+                    <Button onClick={() => replace('/')} variant="contained"
                       className="fixed bottom-20 max-md:bottom-10 left-3/4 transform -translate-x-1/2 z-50 w-40 h-10"
                     >
                       กลับหน้ารายงาน

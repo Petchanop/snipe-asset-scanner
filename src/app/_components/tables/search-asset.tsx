@@ -323,7 +323,7 @@ export default function SearchAsset(
               size="small"
               className="w-full"
               onChange={(event) => setSearchInput(event.target.value)}
-              disabled={show}
+              // disabled={show}
               value={searchInput}
               slotProps={{
                 input: {

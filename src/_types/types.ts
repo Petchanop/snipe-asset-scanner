@@ -27,6 +27,7 @@ export type TSnipeDocument = {
 }
 
 export type locationTableData = {
+    id: string;
     date: string;
     name: string;
     documentNumber: number;
