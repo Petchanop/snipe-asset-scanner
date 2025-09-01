@@ -67,7 +67,7 @@ export default function TableLayout({
           label="new count" />
       </Tabs>
       <Paper elevation={10}>
-        <TableContainer className="w-full max-md:w-full max-h-[75vh]">
+        <TableContainer className="w-full max-md:w-full max-h-[80vh]">
           <LocationUrlContext
             value={{
               locationId: locationId,

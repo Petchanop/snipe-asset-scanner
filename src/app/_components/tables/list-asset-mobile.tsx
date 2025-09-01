@@ -370,7 +370,6 @@ function AssetCard(props: {
                 sx={{
                   minHeight: 50,
                   maxHeight: 400,
-                  // height: 100,
                   justifyContent: 'center',
                   justifyItems: 'center'
                 }}
@@ -464,7 +463,14 @@ export default function ListAssetMobile(props: {
         )
           : <></>
       }
-      <div className='flex flex-row items-center space-x-2'>
+      <Box className='flex flex-row justify-center space-x-2'
+      sx={{ 
+        height: 130, 
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'baseline'
+      }}
+      >
         <Typography>items per page</Typography>
         <Select
           labelId="rowPerPage"
@@ -473,7 +479,7 @@ export default function ListAssetMobile(props: {
           onChange={(event) => {
             setItemPerPage(event.target.value)
           }}
-          size="medium"
+          sx={{ height: 50}}
         >
           {
             rowsPerPageOptions.map((row) => {
@@ -483,7 +489,7 @@ export default function ListAssetMobile(props: {
             })
           }
         </Select>
-      </div>
+      </Box>
     </div>
   )
 }

@@ -39,13 +39,15 @@ function ConfirmDeletetionDialog(props: {
           <Typography>ใช่หรือไม่ ?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsHidden((prev) => !prev)}>
+          <Button onClick={() => setIsHidden((prev) => !prev)} color='error'>
             ยกเลิก
           </Button>
           <Button onClick={async () => {
             await handleDeleteReport()
             setIsHidden((prev) => !prev)
-          }}>
+          }}
+          variant='contained'
+          >
             ยืนยัน
           </Button>
         </DialogActions>
@@ -70,8 +72,6 @@ export default function ReportMenuButton(props: {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
- 
 
   return (
     <div className="py-2">
