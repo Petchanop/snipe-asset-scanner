@@ -48,6 +48,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import EditIcon from '@mui/icons-material/Edit'
 import toast, { Toaster } from "react-hot-toast";
+import { CheckAssetGroupButtonprops, CountAssetButton } from "@/_components/countAssetButton";
 
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
@@ -273,12 +274,22 @@ export function NewCountInput(props: {
         {
           isCheckTable ?
             assetTab ?
-              <CheckAssetButton
-                setIsCheckTable={setIsCheckTable}
+              // <CheckAssetButton
+              //   setIsCheckTable={setIsCheckTable}
+              //   childId={childId!}
+              // />
+              <CheckAssetGroupButtonprops 
+              setIsCheckTable={setIsCheckTable}
                 childId={childId!}
               />
               : <></>
-            : <SelectCountButton
+            :
+            // <SelectCountButton
+            //   selectedLocation={location}
+            //   setLocation={setLocation}
+            //   setIsCheckTable={setIsCheckTable}
+            // />
+            <CountAssetButton
               selectedLocation={location}
               setLocation={setLocation}
               setIsCheckTable={setIsCheckTable}
@@ -419,7 +430,7 @@ export default function NewCountTable(props: {
       push(`/auth/login`)
   }, [user, push])
 
-  const usersProp : userNameId[] = users.map((user) => {
+  const usersProp: userNameId[] = users.map((user) => {
     return {
       id: user.id,
       name: user.first_name + " " + user.last_name

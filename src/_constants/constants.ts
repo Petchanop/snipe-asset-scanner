@@ -69,13 +69,6 @@ export const tableHeaders: HeadersAssetTable[] = [
         mobile: true
     },
     {
-        label: "Assign Incorrect",
-        isSelectBox: true,
-        fontColor: ["black"],
-        value: "assignIncorrect",
-        mobile: true
-    },
-    {
         label: "Not in Location",
         isSelectBox: true,
         fontColor: ["black"],
@@ -89,13 +82,27 @@ export const tableHeaders: HeadersAssetTable[] = [
         value: "status",
         mobile: true
     },
-     {
+    {
+        label: "Assign Incorrect",
+        isSelectBox: true,
+        fontColor: ["black"],
+        value: "assignIncorrect",
+        mobile: true
+    },
+    {
         label: "ผู้ถือครองที่ถูกต้อง",
         isSelectBox: true,
         fontColor: ["black"],
         value: "ownedBy",
         mobile: true
     },
+    {
+        label: "remarks",
+        isSelectBox: true,
+        fontColor: ["black"],
+        value: "prev_location",
+        mobile: true
+    }
 ]
 
 export type AssetStatus =
@@ -142,13 +149,6 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         mobile: true
     },
     {
-        label: "Assign Incorrect",
-        isSelectBox: true,
-        fontColor: ["black"],
-        value: "assignIncorrect",
-        mobile: true
-    },
-    {
         label: "Not in Location",
         isSelectBox: true,
         fontColor: ["black"],
@@ -160,6 +160,13 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         isSelectBox: true,
         fontColor: ["black"],
         value: "status",
+        mobile: true
+    },
+    {
+        label: "Assign Incorrect",
+        isSelectBox: true,
+        fontColor: ["black"],
+        value: "assignIncorrect",
         mobile: true
     },
     {

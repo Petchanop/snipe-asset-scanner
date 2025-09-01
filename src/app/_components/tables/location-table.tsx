@@ -21,10 +21,8 @@ import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import {
-  MapActionColor,
   MapColor,
   ReportState,
   rowsPerPageOptions,
@@ -34,7 +32,6 @@ import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
 import { AssetCount } from "@/_types/types";
 import { HiddenCellContext, useLocationUrlContext } from "@/_contexts/context";
-import { useRouter } from "next/navigation";
 import { TableSortLabel } from "@mui/material";
 import { useWindowSize } from "../loading";
 import IconButton from "@mui/material/IconButton";

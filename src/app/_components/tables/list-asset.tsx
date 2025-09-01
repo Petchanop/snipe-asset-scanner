@@ -70,7 +70,6 @@ export function CreateAssetTableCell(
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
   const reportContext = useReportContext()
-  // const readOnlyUsers: readonly User[] = users
   const autoCompleteProps = {
     options: users,
     getOptionLabel: (option: userNameId) => option.name,
@@ -245,18 +244,14 @@ export function CreateAssetTableCell(
                 )}
               />
             </TableCell>
-            {
-              tabType == OUTLOCATION ?
-                <TableCell align="center">
-                  <TextareaAutosize
-                    id="remark"
-                    onChange={(event) => setRemarkAsset(event.target.value)}
-                    value={remarkAsset}
-                    className="w-full"
-                  />
-                </TableCell>
-                : <></>
-            }
+            <TableCell align="center">
+              <TextareaAutosize
+                id="remark"
+                onChange={(event) => setRemarkAsset(event.target.value)}
+                value={remarkAsset}
+                className="w-full"
+              />
+            </TableCell>
           </>
           : <></>
       }

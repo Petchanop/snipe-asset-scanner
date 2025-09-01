@@ -6,7 +6,6 @@ import { useState } from 'react'
 export default function ImageComponent(props: { src: string | undefined , alt: string, width : number, height : number }) {
   const { src, alt, width, height } = props
   const [imageError, setImageError] = useState(false)
-
   const handleImageError = () => {
     setImageError(true)
   }
