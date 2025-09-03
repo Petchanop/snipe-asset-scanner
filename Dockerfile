@@ -18,8 +18,8 @@ RUN npm run build
 FROM base AS production
 # COPY --from=development snipeit/.next/standalone .
 COPY --from=development snipeit/ .
-# ENTRYPOINT ["node", "server.js"]
-ENTRYPOINT ["npm", "run", "start"]
+ENTRYPOINT ["node", "server.js"]
+# ENTRYPOINT ["npm", "run", "start"]
 
 FROM node:22.16.0-bookworm-slim AS test
 
