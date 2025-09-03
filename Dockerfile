@@ -16,8 +16,8 @@ RUN npm run build
 # ENTRYPOINT ["npm", "start"]
 
 FROM base AS production
-# COPY --from=development snipeit/.next/standalone .
-COPY --from=development snipeit/ .
+COPY --from=development snipeit/.next/standalone .
+# COPY --from=development snipeit/ .
 ENTRYPOINT ["node", "server.js"]
 # ENTRYPOINT ["npm", "run", "start"]
 
