@@ -177,45 +177,6 @@ export function CreateAssetTableCell(
               >
               </Checkbox>
             </TableCell>
-            <TableCell>
-              <Autocomplete
-                {...autoCompleteProps}
-                disabled={!incorrect || !isCheckTable}
-                id="employee name autocomplete"
-                className="w-[16rem] z-20 shadow-md focus:outline-none bg-white"
-                value={owner}
-                onChange={async (event: any, newValue: userNameId | null) => {
-                  setOwner(newValue!)
-                  if (newValue != null) {
-                    await UpdateAssetCountLine(data.id as string,
-                      { owned_by: newValue.id, checked_by: parseInt(user.id) }
-                    )
-                  } else {
-                    if (ownedBy) {
-                      await UpdateAssetCountLine(data.id as string,
-                        { owned_by: null, checked_by: parseInt(user.id) }
-                      )
-                    }
-                  }
-                }}
-                renderOption={(props, option) => {
-                  const { key, ...optionProps } = props
-                  return (
-                    <Box
-                      key={optionProps.id + key}
-                      component="li"
-                      sx={{ padding: 4 }}
-                      {...optionProps}
-                    >
-                      {option.name}
-                    </Box>
-                  )
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="employee name" />
-                )}
-              />
-            </TableCell>
             {
               !assetTab ?
                 <TableCell>
