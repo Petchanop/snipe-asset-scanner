@@ -21,19 +21,17 @@ import TableFooter from "@mui/material/TableFooter";
 import TablePagination from "@mui/material/TablePagination";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { MapActionColor, 
-  MapColor, 
-  ReportState, 
-  rowsPerPageOptions, 
-  startRowsPerPage 
+import {
+  MapColor,
+  ReportState,
+  rowsPerPageOptions,
+  startRowsPerPage
 } from "@/_constants/constants";
 import { locationTableData } from "@/_types/types";
 import { tableHeaders } from "@/_constants/mockData";
 import { AssetCount } from "@/_types/types";
 import { HiddenCellContext, useLocationUrlContext } from "@/_contexts/context";
-import { useRouter } from "next/navigation";
 import { TableSortLabel } from "@mui/material";
 import { useWindowSize } from "../loading";
 import IconButton from "@mui/material/IconButton";
@@ -46,6 +44,8 @@ import DialogActions from "@mui/material/DialogActions";
 import FilterReportComponent from "@/reports/_components/filterReportComponent";
 import SortReportComponent from "@/reports/_components/sortReportComponent";
 import { filterReportBytype } from "@/_libs/assetCount";
+import ReportMenuButton from "@/_components/reportMenuButton";
+import CloseIcon from '@mui/icons-material/Close';
 
 function processAction(state: string): { label: string, value: string } {
   switch (state) {
@@ -67,18 +67,20 @@ function HiddenMenuDialog(props: {
   setIsHidden: Dispatch<SetStateAction<boolean>>,
   reportState: { label: string, value: string }
 }) {
-  const { push } = useRouter()
-  const { data, isHidden, setIsHidden, reportState } = props
-  const { date, documentNumber, state, name } = data;
+  const { data, isHidden, setIsHidden } = props
+  const { date, documentNumber, state, name, id } = data;
   const context = useLocationUrlContext()
   return (
     <>
       <Dialog open={isHidden}
-        onClick={() => setIsHidden((prev) => !prev)}
+        // onClick={() => setIsHidden((prev) => !prev)}
         maxWidth="xl"
         fullWidth={true}
       >
         <DialogContent>
+          <div className="flex flex-row justify-end">
+            <CloseIcon onClick={() => setIsHidden((prev) => !prev)} />
+          </div>
           <Typography>Document no: {documentNumber}</Typography>
           <Typography>Name: {name}</Typography>
           <Typography>Date: {date}</Typography>
@@ -87,7 +89,12 @@ function HiddenMenuDialog(props: {
           >State: {state}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={() => {
+          <ReportMenuButton
+            context={context}
+            documentNumber={documentNumber}
+            id={id}
+          />
+          {/* <Button variant="text" onClick={() => {
             if (reportState.value == "count") {
               context.selected.current = `/reports/count-assets/${documentNumber}`
               push(`/reports/count-assets/${documentNumber}`)
@@ -95,7 +102,7 @@ function HiddenMenuDialog(props: {
               context.selected.current = ""
               push(`/setup/${documentNumber}`)
             } else if (reportState.value == "view") {
-              push(`/reports/${documentNumber}`)
+              push(`/reports/${documentNumber}`) 
             }
           }}> <Typography sx={{
             color: MapActionColor[reportState.label]!,
@@ -103,7 +110,7 @@ function HiddenMenuDialog(props: {
           }}>
               [{reportState.label}]
             </Typography>
-          </Button>
+          </Button> */}
         </DialogActions>
       </Dialog>
     </>
@@ -118,12 +125,10 @@ function CreateLocationTableCell(props: {
   data: locationTableData
 }) {
   const { data } = props
-  const { date, documentNumber, state, name } = data;
-  const { push } = useRouter()
+  const { date, documentNumber, state, name, id } = data;
   const reportState = processAction(state);
   const windowSize = useWindowSize()
   const [hidden, setHidden] = useState<boolean>(true);
-
   const context = useLocationUrlContext()
   //change location to document name
   return (
@@ -146,21 +151,11 @@ function CreateLocationTableCell(props: {
         </Typography>
       </TableCell>
       <TableCell hidden={isCellHiddnen(windowSize.width!)}>
-        <Button variant="text" onClick={() => {
-          if (reportState.value == "count") {
-            context.selected.current = `/reports/count-assets/${documentNumber}`
-            push(`/reports/count-assets/${documentNumber}`)
-          } else if (reportState.value == "edit") {
-            context.selected.current = ""
-            push(`/setup/${documentNumber}`)
-          } else if (reportState.value == "view") {
-            push(`/reports/${documentNumber}`)
-          }
-        }}>
-          <Typography sx={{ color: MapActionColor[reportState.label] }}>
-            [{reportState.label}]
-          </Typography>
-        </Button>
+        <ReportMenuButton
+          context={context}
+          documentNumber={documentNumber}
+          id={id}
+        />
       </TableCell>
       {
         isCellHiddnen(windowSize.width!) && (
@@ -188,7 +183,7 @@ export default function LocationTable(props: {
   reports: AssetCount[]
 }) {
   const { reports } = props
-  const [order, setOrder] = useState<Order>('asc')
+  const [order, setOrder] = useState<Order>('desc')
   const [orderBy, setOrderBy] = useState<keyof AssetCount>('document_number')
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(startRowsPerPage);
@@ -274,6 +269,7 @@ export default function LocationTable(props: {
               filterData.length ?
                 dataPerPage(filterData, page, rowsPerPage).map((mockData: AssetCount) => {
                   const mapData: locationTableData = {
+                    id: mockData.id,
                     date: mockData.document_date.toLocaleDateString('th-BK'),
                     name: mockData.document_name as string,
                     documentNumber: mockData.document_number,

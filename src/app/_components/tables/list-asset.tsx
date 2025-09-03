@@ -70,7 +70,6 @@ export function CreateAssetTableCell(
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const tabType = !notInLocation ? INLOCATION : OUTLOCATION
   const reportContext = useReportContext()
-  // const readOnlyUsers: readonly User[] = users
   const autoCompleteProps = {
     options: users,
     getOptionLabel: (option: userNameId) => option.name,
@@ -145,6 +144,47 @@ export function CreateAssetTableCell(
                 : <></>
             }
             <TableCell className="relative" align="center" padding="checkbox">
+              <Checkbox
+                checked={wrongLocation}
+                disabled={!isCheckTable}
+                onChange={async (event) => {
+                  const updateIncorrectLocation = async () => {
+                    data.notInLocation = event.target.checked
+                    await UpdateAssetCountLine(data.id as string, {
+                      is_not_asset_loc: event.target.checked,
+                      checked_by: parseInt(user?.id)
+                    })
+                  }
+                  await updateIncorrectLocation()
+                  setWrongLocation(pre => !pre)
+                }} />
+            </TableCell>
+            <TableCell className="" align="center" padding="checkbox">
+              <Checkbox
+                checked={assetStatus}
+                onChange={async (event) => {
+                  const updateAssetStatus = async () => {
+                    data.status = event.target.checked ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
+                    await UpdateAssetCountLine(data.id as string, {
+                      asset_count_line_status_id: data.status,
+                      checked_by: parseInt(user?.id)
+                    })
+                  }
+                  await updateAssetStatus()
+                  setAssetStatus(pre => !pre)
+                }}
+                disabled={!isCheckTable}
+              >
+              </Checkbox>
+            </TableCell>
+            {
+              !assetTab ?
+                <TableCell>
+                  {action} {actionLabel}
+                </TableCell>
+                : <></>
+            }
+            <TableCell align="center" padding="checkbox">
               <>
                 <Checkbox
                   checked={incorrect}
@@ -164,47 +204,6 @@ export function CreateAssetTableCell(
                 />
 
               </>
-            </TableCell>
-            <TableCell className="" align="center" padding="checkbox">
-              <Checkbox
-                checked={wrongLocation}
-                disabled={!isCheckTable}
-                onChange={async (event) => {
-                  const updateIncorrectLocation = async () => {
-                    data.notInLocation = event.target.checked
-                    await UpdateAssetCountLine(data.id as string, {
-                      is_not_asset_loc: event.target.checked,
-                      checked_by: parseInt(user?.id)
-                    })
-                  }
-                  await updateIncorrectLocation()
-                  setWrongLocation(pre => !pre)
-                }} />
-            </TableCell>
-            {
-              !assetTab ?
-                <TableCell>
-                  {action} {actionLabel}
-                </TableCell>
-                : <></>
-            }
-            <TableCell align="center" padding="checkbox">
-              <Checkbox
-                checked={assetStatus}
-                onChange={async (event) => {
-                  const updateAssetStatus = async () => {
-                    data.status = event.target.checked ? AssetStatusEnum.MALFUNCTIONING : AssetStatusEnum.DEPLOYABLE
-                    await UpdateAssetCountLine(data.id as string, {
-                      asset_count_line_status_id: data.status,
-                      checked_by: parseInt(user?.id)
-                    })
-                  }
-                  await updateAssetStatus()
-                  setAssetStatus(pre => !pre)
-                }}
-                disabled={!isCheckTable}
-              >
-              </Checkbox>
             </TableCell>
             <TableCell>
               <Autocomplete
@@ -245,18 +244,14 @@ export function CreateAssetTableCell(
                 )}
               />
             </TableCell>
-            {
-              tabType == OUTLOCATION ?
-                <TableCell align="center">
-                  <TextareaAutosize
-                    id="remark"
-                    onChange={(event) => setRemarkAsset(event.target.value)}
-                    value={remarkAsset}
-                    className="w-full"
-                  />
-                </TableCell>
-                : <></>
-            }
+            <TableCell align="center">
+              <TextareaAutosize
+                id="remark"
+                onChange={(event) => setRemarkAsset(event.target.value)}
+                value={remarkAsset}
+                className="w-full"
+              />
+            </TableCell>
           </>
           : <></>
       }
@@ -292,7 +287,6 @@ export default function ListAsset(props: {
     .sort(getComparator<TAssetRow, keyof TAssetRow>(order, orderBy)),
     [order, orderBy, data]
   )
-
 
   return (
     <>
@@ -384,9 +378,13 @@ export function AssetTable(props: {
           rowsPerPage={rowsPerPage}
           users={users}
         />
-        <TableFooter>
-          <TableRow>
+        <TableFooter className="h-20">
+          <TableRow className="mb-2">
             <TablePagination
+              sx={{
+                height: 120,
+              }}
+              className="top-0"
               showFirstButton
               showLastButton
               rowsPerPageOptions={

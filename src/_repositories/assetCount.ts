@@ -120,3 +120,12 @@ export async function getAssetCountByDocumentNumber(documentNumber: string) : Pr
         }
       }) as AssetCountWithAssetLocation
 }
+
+export async function DeleteAssetCountReport(id: string) {
+    const deleteReport = await prisma.asset_count.delete({
+        where : {
+            id: id
+        }
+    })
+    return deleteReport
+}

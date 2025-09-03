@@ -55,7 +55,7 @@ model asset_count_line {
   previous_loc_id              Int?
   image                        String?
   remarks                      String                @default("")
-  count_id                     asset_count           @relation(fields: [asset_count_id], references: [id])
+  count_id                     asset_count           @relation(fields: [asset_count_id], references: [id], onDelete: Cascade)
   location_id                  asset_count_location? @relation(fields: [asset_count_line_location_id], references: [id])
   status_id                    asset_status          @relation(fields: [asset_count_line_status_id], references: [id])
 
@@ -78,7 +78,7 @@ model asset_count_location {
   rtd_location_id Int?
   location_id     Int                @db.UnsignedInt
   AssetCountLine  asset_count_line[]
-  count_id        asset_count        @relation(fields: [asset_count_id], references: [id])
+  count_id        asset_count        @relation(fields: [asset_count_id], references: [id], onDelete: Cascade)
   location        locations          @relation(fields: [location_id], references: [id])
 
   @@unique([asset_count_id, location_id])

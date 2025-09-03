@@ -25,7 +25,7 @@ import {
   useDateContext,
   useReportContext
 } from "@/_contexts/context";
-import { usePathname, useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine";
 import { CheckAllDataCount } from "@/_libs/assetCount";
 import { updateAssetCountReport } from "@/_repositories/assetCount";
@@ -38,17 +38,19 @@ import { LoadingTableSkeleton, useWindowSize } from "@/_components/loading";
 import { ReportState } from "@/_constants/constants";
 import ListAssetMobile from "@/_components/tables/list-asset-mobile";
 import { mapAssetData } from "@/_components/tables/utility";
-import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import SpeedDialAction from "@mui/material/SpeedDialAction";
-import SearchIcon from '@mui/icons-material/Search';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
-import DoneIcon from '@mui/icons-material/Done';
-import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
-import EditIcon from '@mui/icons-material/Edit'
 import toast, { Toaster } from "react-hot-toast";
-
+import { CheckAssetGroupButtonprops, CountAssetButton } from "@/_components/countAssetButton";
+import Box from "@mui/material/Box";
+// import SpeedDial from "@mui/material/SpeedDial";
+// import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+// import SpeedDialAction from "@mui/material/SpeedDialAction";
+// import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
+// import SearchIcon from '@mui/icons-material/Search';
+// import SaveIcon from '@mui/icons-material/Save';
+// import CancelIcon from '@mui/icons-material/Cancel';
+// import DoneIcon from '@mui/icons-material/Done';
+// import EditIcon from '@mui/icons-material/Edit'
+/*
 function CheckAssetButton(props: {
   setIsCheckTable: (value: SetStateAction<boolean>) => void,
   childId: number
@@ -119,38 +121,6 @@ function CheckAssetButton(props: {
   )
 }
 
-function SelectCountInput(props: {
-  isCheckTable: boolean,
-}) {
-  const {
-    isCheckTable,
-  } = props
-  const dateContext = useDateContext()
-
-  const handleDateOnChange = (value: SetStateAction<dayjs.Dayjs | null>) => {
-    if (value) {
-      dateContext.setDateValue(value)
-    }
-  }
-  return (
-    <>
-      <div className="flex md:flex-row flex-col md:items-center">
-        <Typography className="w-22 max-lg:w-25">Date</Typography>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker label="Select Date"
-            value={dateContext.dateValue}
-            format="DD/MM/YYYY"
-            className="lg:w-2/3 w-4/5 max-md:mt-4 max-md:p-4"
-            slotProps={{ textField: { size: 'small' } }}
-            onChange={handleDateOnChange}
-            disabled={isCheckTable}
-          />
-        </LocalizationProvider>
-      </div>
-    </>
-  )
-}
-
 function SelectCountButton(props: {
   selectedLocation: PNewCountTableProps,
   setLocation: (value: PNewCountTableProps) => void,
@@ -207,6 +177,39 @@ function SelectCountButton(props: {
     </SpeedDial>
   )
 }
+  */
+
+function SelectCountInput(props: {
+  isCheckTable: boolean,
+}) {
+  const {
+    isCheckTable,
+  } = props
+  const dateContext = useDateContext()
+
+  const handleDateOnChange = (value: SetStateAction<dayjs.Dayjs | null>) => {
+    if (value) {
+      dateContext.setDateValue(value)
+    }
+  }
+  return (
+    <>
+      <div className="flex md:flex-row flex-col md:items-center">
+        <Typography className="w-22 max-lg:w-25">Date</Typography>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker label="Select Date"
+            value={dateContext.dateValue}
+            format="DD/MM/YYYY"
+            className="lg:w-2/3 w-4/5 max-md:mt-4 max-md:p-4"
+            slotProps={{ textField: { size: 'small' } }}
+            onChange={handleDateOnChange}
+            disabled={isCheckTable}
+          />
+        </LocalizationProvider>
+      </div>
+    </>
+  )
+}
 
 export function NewCountInput(props: {
   parentLocation: TLocation[],
@@ -240,52 +243,66 @@ export function NewCountInput(props: {
     //eslint-disable-next-line react-hooks/exhaustive-deps 
   }, [childId, parent?.id, locations])
   return (
-    <div className="flex md:flex-row flex-col w-full py-2 pl-2 lg:pl-10 content-center">
-      <div className="flex flex-col md:basis-lg space-y-2">
-        {
-          isCheckTable ?
-            <Typography className="mt-2 mb-4">
-              รายงานหมายเลข {documentContext.DocumentNumber}
-            </Typography>
-            : <></>
-        }
-        <div className="flex md:flex-row flex-col md:items-center">
-          <SelectCountInput
-            isCheckTable={isCheckTable}
-          />
-        </div>
-        <div className="flex md:flex-row flex-col md:items-center w-full">
-          <Typography className="w-25 max-lg:w-21">Location</Typography>
-          <ParentSelectComponent
-            parentLocation={parentLocation}
-            parentProp={parent!}
-            isCheckTable={isCheckTable}
-            setParent={setParent} />
-          <ChildrenSelectComponent
-            parent={parent!}
-            locationByParent={childrenLocation}
-            isCheckTable={isCheckTable}
-            childId={childId!}
-            setChildId={setChildId} />
+    <>
+      <div className="flex md:flex-row flex-col w-full py-2 pl-2 lg:pl-10 content-center">
+        <div className="flex flex-col md:basis-lg space-y-2">
+          {
+            isCheckTable ?
+              <Typography className="mt-2 mb-4">
+                รายงานหมายเลข {documentContext.DocumentNumber}
+              </Typography>
+              : <></>
+          }
+          <div className="flex md:flex-row flex-col md:items-center">
+            <SelectCountInput
+              isCheckTable={isCheckTable}
+            />
+          </div>
+          <div className="flex md:flex-row flex-col md:items-center w-full">
+            <Typography className="w-25 max-lg:w-21">Location</Typography>
+            <ParentSelectComponent
+              parentLocation={parentLocation}
+              parentProp={parent!}
+              isCheckTable={isCheckTable}
+              setParent={setParent} />
+            <ChildrenSelectComponent
+              parent={parent!}
+              locationByParent={childrenLocation}
+              isCheckTable={isCheckTable}
+              childId={childId!}
+              setChildId={setChildId} />
+          </div>
         </div>
       </div>
-      <div className="flex flex-row md:flex-col md:basis-md md:pt-10">
+      <Box
+        className="flex flex-row md:flex-col md:pt-10 w-full"
+      >
         {
           isCheckTable ?
             assetTab ?
-              <CheckAssetButton
+              // <CheckAssetButton
+              //   setIsCheckTable={setIsCheckTable}
+              //   childId={childId!}
+              // />
+              <CheckAssetGroupButtonprops
                 setIsCheckTable={setIsCheckTable}
                 childId={childId!}
               />
               : <></>
-            : <SelectCountButton
+            :
+            // <SelectCountButton
+            //   selectedLocation={location}
+            //   setLocation={setLocation}
+            //   setIsCheckTable={setIsCheckTable}
+            // />
+            <CountAssetButton
               selectedLocation={location}
               setLocation={setLocation}
               setIsCheckTable={setIsCheckTable}
             />
         }
-      </div>
-    </div>
+      </Box>
+    </>
   )
 }
 
@@ -419,7 +436,7 @@ export default function NewCountTable(props: {
       push(`/auth/login`)
   }, [user, push])
 
-  const usersProp : userNameId[] = users.map((user) => {
+  const usersProp: userNameId[] = users.map((user) => {
     return {
       id: user.id,
       name: user.first_name + " " + user.last_name
