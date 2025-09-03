@@ -161,7 +161,7 @@ export function CountAssetButton(props: {
   }
 
   const windowSize = useWindowSize()
-  const dialPosition = windowSize.width as number < 500 ? 0 : 60
+  const dialPosition = windowSize.width as number < 500 ? 0 : 30
   const dialPoistionRight = windowSize.width as number < 500 ? 16 : 50
 
   return (

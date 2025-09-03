@@ -211,8 +211,6 @@ function SelectCountInput(props: {
   )
 }
 
-
-
 export function NewCountInput(props: {
   parentLocation: TLocation[],
   childrenLocation: TLocation[],

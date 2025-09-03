@@ -39,8 +39,8 @@ export async function CreatAssetCountLine(
         assetName: assetCountLine.asset_name,
         assignedTo: {
             id: data?.id,
-            first_name: data.assigned_to!.first_name,
-            last_name: data.assigned_to!.last_name
+            first_name: data.assigned_to?.first_name ? data.assigned_to.first_name : "",
+            last_name: data.assigned_to?.last_name ? data.assigned_to.last_name : ""
         },
         countCheck: assetCountLine.asset_check,
         assignIncorrect: assetCountLine.is_assigned_incorrectly,

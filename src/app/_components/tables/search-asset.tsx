@@ -36,30 +36,42 @@ import InputAdornment from "@mui/material/InputAdornment"
 import { decode } from "html-entities";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import { useSession } from "next-auth/react";
+import Autocomplete from "@mui/material/Autocomplete";
+import Box from "@mui/material/Box";
 
 function CreateSearchAssetTableCell(props: {
   assetData: TAssetRow,
+  users: userNameId[]
 }) {
-  const { assetData } = props
+  const { assetData, users } = props
   const { id, assetCode, assetName, assignedTo,
     countCheck, assignIncorrect, notInLocation,
-    status, prev_location, remarks
+    status, prev_location, ownedBy, remarks
   } = assetData;
+   const ownedAsset = users.find((user) => user.id == ownedBy)
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [remarkAsset, setRemarkAsset] = useState(remarks ? remarks : prev_location)
+  const [owner, setOwner] = useState<userNameId | undefined | null>(ownedAsset == undefined ? null : ownedAsset)
   const [assetStatus, setAssetStatus] = useState(
     assetStatusOptions.find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const assignedToName = assignedTo.first_name != undefined ? assignedTo?.first_name + " " + assignedTo?.last_name : ""
   const { data: session } = useSession()
   const user = session?.user
 
+  const autoCompleteProps = {
+    options: users,
+    getOptionLabel: (option: userNameId) => option.name,
+    isOptionEqualToValue: (option: userNameId, value: userNameId) => option.id === value.id
+  }
+
   useEffect(() => {
     const updateRemark = async () => {
       await UpdateAssetCountLine(id as string,
         { remarks: remarkAsset, checked_by: parseInt(user!.id) }
-      )}
+      )
+    }
     updateRemark()
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remarkAsset])
@@ -79,14 +91,6 @@ function CreateSearchAssetTableCell(props: {
           onChange={async (event) => {
             UpdateAssetCountLine(id!, { asset_check: event.target.checked })
             setCount((prev) => !prev)
-          }}
-        />
-      </TableCell>
-      <TableCell align="center" padding="checkbox">
-        <Checkbox checked={incorrect}
-          onChange={async (event) => {
-            UpdateAssetCountLine(id!, { is_assigned_incorrectly: event.target.checked })
-            setIncorrect((prev) => !prev)
           }}
         />
       </TableCell>
@@ -111,6 +115,53 @@ function CreateSearchAssetTableCell(props: {
           }}
         ></Checkbox>
       </TableCell>
+      <TableCell align="center" padding="checkbox">
+        <Checkbox checked={incorrect}
+          onChange={async (event) => {
+            UpdateAssetCountLine(id!, { is_assigned_incorrectly: event.target.checked })
+            setIncorrect((prev) => !prev)
+          }}
+        />
+      </TableCell>
+      <TableCell>
+        <Autocomplete
+          {...autoCompleteProps}
+          disabled={!incorrect}
+          id="employee name autocomplete"
+          className="w-[16rem] z-20 shadow-md focus:outline-none bg-white"
+          value={owner}
+          onChange={async (event: any, newValue: userNameId | null) => {
+            setOwner(newValue!)
+            if (newValue != null) {
+              await UpdateAssetCountLine(id as string,
+                { owned_by: newValue.id, checked_by: parseInt(user!.id) }
+              )
+            } else {
+              if (ownedBy) {
+                await UpdateAssetCountLine(id as string,
+                  { owned_by: null, checked_by: parseInt(user!.id) }
+                )
+              }
+            }
+          }}
+          renderOption={(props, option) => {
+            const { key, ...optionProps } = props
+            return (
+              <Box
+                key={optionProps.id + key}
+                component="li"
+                sx={{ padding: 4 }}
+                {...optionProps}
+              >
+                {option.name}
+              </Box>
+            )
+          }}
+          renderInput={(params) => (
+            <TextField {...params} label="employee name" />
+          )}
+        />
+      </TableCell>
       <TableCell align="center">
         <TextareaAutosize
           id="remark"
@@ -128,9 +179,10 @@ function SearchAssetTable(props: {
   isCheckTable: boolean,
   assetTab: boolean,
   assetCountReport: AssetCount,
-  assetInReport: AssetCountLine[]
+  assetInReport: AssetCountLine[],
+  users: userNameId[]
 }) {
-  const { data } = props
+  const { data, users } = props
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(startRowsPerPage);
   const headers = tableHeadersAdditional
@@ -151,7 +203,7 @@ function SearchAssetTable(props: {
             dataPerPage(data, page, rowsPerPage).map((asset: TAssetRow) => {
               return (
                 <TableRow key={`${asset.assetCode}${asset.assetName}`} >
-                  <CreateSearchAssetTableCell assetData={asset} />
+                  <CreateSearchAssetTableCell assetData={asset} users={users}/>
                 </TableRow>
               )
             })
@@ -207,7 +259,7 @@ export default function SearchAsset(
   const { push } = useRouter()
   const pathname = usePathname()
   const searchData: string[] = []
-  const usersProp : userNameId[] = users.map((user) => {
+  const usersProp: userNameId[] = users.map((user) => {
     return {
       id: user.id,
       name: user.first_name + " " + user.last_name
@@ -376,6 +428,7 @@ export default function SearchAsset(
                     assetTab={false}
                     assetCountReport={assetCountReport}
                     assetInReport={assetInReport}
+                    users={usersProp}
                   />
                 </Table>
           }

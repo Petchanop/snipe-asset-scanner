@@ -54,7 +54,6 @@ export default function SetupPlanComponent(
         otherLocation.find((loc) => loc.id === countLocation.location_id) as TLocation
     }))
 
-
   const [reportForm, setReportForm] = useState<TReportForm>({
     document_date: document_date,
     document_name: document_name as string,

@@ -25,6 +25,7 @@ function ConfirmDeletetionDialog(props: {
   id: string
 }) {
   const { isHidden, setIsHidden, documentNumber,id } = props
+  const { push } = useRouter()
    const handleDeleteReport = async () => {
     await DeleteAssetCountReport(id)
   }
@@ -32,7 +33,6 @@ function ConfirmDeletetionDialog(props: {
     <>
       <Dialog open={isHidden}
         maxWidth="xl"
-        fullWidth={true}
       >
         <DialogContent>
           <Typography>ต้องการลบ รายงานตรวจนับหมายเลข {documentNumber}</Typography>
@@ -45,6 +45,7 @@ function ConfirmDeletetionDialog(props: {
           <Button onClick={async () => {
             await handleDeleteReport()
             setIsHidden((prev) => !prev)
+           push('/') 
           }}
           variant='contained'
           >

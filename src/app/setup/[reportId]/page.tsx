@@ -21,10 +21,11 @@ export default async function SetUpPage(
     }
     const assetCountLocation = await GetAssetCountLocationByAssetCountReport(report.id)
     const locations = await fetchLocations();
-    const parentLocation = getParentLocation(locations.data!.rows)
+    let parentLocation = getParentLocation(locations.data!.rows)
     const childrenLocation = getChildrenLocation(locations.data!.rows)
     const otherLocation = getOtherLocation(locations.data!.rows)
     const parentProp = parentLocation[0] as TLocation
+    parentLocation = [...parentLocation, ...otherLocation ]
     return <>
         <SetupPlanComponent
             assetCountLocation={assetCountLocation}
