@@ -202,7 +202,6 @@ export function CreateAssetTableCell(
                     setIncorrect(pre => !pre)
                   }}
                 />
-
               </>
             </TableCell>
             <TableCell>
@@ -210,8 +209,12 @@ export function CreateAssetTableCell(
                 {...autoCompleteProps}
                 disabled={!incorrect || !isCheckTable}
                 id="employee name autocomplete"
-                className="w-[16rem] z-20 shadow-md focus:outline-none bg-white"
+                className="w-[16rem] shadow-md focus:outline-none bg-white"
                 value={owner}
+                sx={{
+                  position: 'relative',
+                  zIndex: 1
+                }}
                 onChange={async (event: any, newValue: userNameId | null) => {
                   setOwner(newValue!)
                   if (newValue != null) {

@@ -107,6 +107,7 @@ export function CheckAssetGroupButtonprops(props: {
           borderRadius: '4%',
           borderColor: grey[400],
           backgroundColor: grey[200],
+          zIndex: 9999,
         }}
         className="flex flex-row w-86 h-14"
       >
@@ -119,6 +120,8 @@ export function CheckAssetGroupButtonprops(props: {
               color={action.color as "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined}
               startIcon={action.icon}
               sx={(t) => ({
+                position: 'relative',
+                zIndex: 9998,
                 "& .MuiButton-startIcon": { margin: 0 },
                 "&:hover": {
                   backgroundColor: lighten((t.palette as any)[action.color].main, 0.5),
@@ -174,6 +177,7 @@ export function CountAssetButton(props: {
         display: 'flex',
         alignItems: 'end',       // vertical center
         justifyContent: 'flex-end', // horizontal right
+        zIndex: 9999
       }}
       className="w-86 h-14"
     >

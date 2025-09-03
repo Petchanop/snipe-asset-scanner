@@ -23,7 +23,7 @@ export default function ImageComponent(props: { src: string | undefined , alt: s
             width={width}
             height={height}
             onError={handleImageError}
-            className="w-full h-auto"
+            className="relative z-10 w-full h-auto"
           />
           : "No image display"
       }
