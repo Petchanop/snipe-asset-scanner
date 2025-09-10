@@ -44,7 +44,8 @@ import DialogActions from "@mui/material/DialogActions";
 import FilterReportComponent from "@/reports/_components/filterReportComponent";
 import SortReportComponent from "@/reports/_components/sortReportComponent";
 import { filterReportBytype } from "@/_libs/assetCount";
-import ReportMenuButton from "@/_components/reportMenuButton";
+import Button from '@mui/material/Button';
+import ReportMenuButton, { ConfirmDeletetionDialog } from "@/_components/reportMenuButton";
 import CloseIcon from '@mui/icons-material/Close';
 
 function processAction(state: string): { label: string, value: string } {
@@ -121,6 +122,8 @@ function isCellHiddnen(value: number): boolean {
   return value < maxWindowSize;
 }
 
+import DeleteIcon from '@mui/icons-material/Delete';
+
 function CreateLocationTableCell(props: {
   data: locationTableData
 }) {
@@ -129,6 +132,7 @@ function CreateLocationTableCell(props: {
   const reportState = processAction(state);
   const windowSize = useWindowSize()
   const [hidden, setHidden] = useState<boolean>(true);
+  const [hiddenDelete, setHiddenDelete] = useState<boolean>(true);
   const context = useLocationUrlContext()
   //change location to document name
   return (
@@ -150,12 +154,17 @@ function CreateLocationTableCell(props: {
           {state}
         </Typography>
       </TableCell>
-      <TableCell hidden={isCellHiddnen(windowSize.width!)}>
+      <TableCell hidden={isCellHiddnen(windowSize.width!)} className="flex flex-row ">
         <ReportMenuButton
           context={context}
           documentNumber={documentNumber}
           id={id}
         />
+        <Button color='error' onClick={() => {
+          setHiddenDelete((prev) => !prev)
+        }}>
+          <DeleteIcon />
+        </Button>
       </TableCell>
       {
         isCellHiddnen(windowSize.width!) && (
@@ -170,6 +179,13 @@ function CreateLocationTableCell(props: {
         isHidden={!hidden}
         setIsHidden={setHidden}
         reportState={reportState} />
+      <ConfirmDeletetionDialog
+        documentName={name}
+        isHidden={!hiddenDelete}
+        setIsHidden={setHiddenDelete}
+        documentNumber={documentNumber}
+        id={id}
+      />
     </>
   )
 }

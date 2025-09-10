@@ -92,6 +92,7 @@ async function CreateAssetCountReportFile(
             const assingedInCorrect = countLine.is_assigned_incorrectly ? "\u2713" : ""
             const isNotInLocation = countLine.is_not_asset_loc ? "\u2713" : ""
             const useAble = countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "\u2713" : ""
+            const remarks = countLine.remarks
             if (!countLine.asset_check && !countLine.is_not_asset_loc)
                 assetNotCheck++
             if (countLine.is_not_asset_loc)
@@ -112,6 +113,7 @@ async function CreateAssetCountReportFile(
             dataSheet.getCell(`H${assetCodeCol}`).value = isNotInLocation
             dataSheet.getCell(`J${assetCodeCol}`).value = locations.data?.rows.find((loc) => loc.id == countLine.previous_loc_id)?.name
             dataSheet.getCell(`K${assetCodeCol}`).value = ownedByUser ? `${ownedByUser?.first_name}  ${ownedByUser?.last_name}` : ""
+            dataSheet.getCell(`L${assetCodeCol}`).value = remarks
             createBorder(dataSheet, assetCodeCol)
             assetCodeCol += 1
             i++

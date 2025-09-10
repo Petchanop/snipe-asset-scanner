@@ -55,14 +55,14 @@ export const tableHeaders: HeadersAssetTable[] = [
         mobile: false
     },
     {
-        label: "Assigned to",
+        label: "ผู้ถือครองที่ถูกต้อง",
         isSelectBox: false,
         fontColor: ["black"],
         value: "assignedTo",
         mobile: true
     },
     {
-        label: "Count Check",
+        label: "ตรวจพบ",
         isSelectBox: true,
         fontColor: ["black"],
         value: "countCheck",
@@ -83,21 +83,21 @@ export const tableHeaders: HeadersAssetTable[] = [
         mobile: true
     },
     {
-        label: "Assign Incorrect",
+        label: "ผู้ถือครองไม่ถูกต้อง",
         isSelectBox: true,
         fontColor: ["black"],
         value: "assignIncorrect",
         mobile: true
     },
     {
-        label: "ผู้ถือครองที่ถูกต้อง",
+        label: "ผู้ถือครอง",
         isSelectBox: true,
         fontColor: ["black"],
         value: "ownedBy",
         mobile: true
     },
     {
-        label: "remarks",
+        label: "บันทึกข้อความ",
         isSelectBox: true,
         fontColor: ["black"],
         value: "prev_location",
@@ -135,7 +135,7 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         mobile: false
     },
     {
-        label: "Assigned to",
+        label: "ผู้ถือครองที่ถูกต้อง",
         isSelectBox: false,
         fontColor: ["black"],
         value: "assignedTo",
@@ -163,21 +163,21 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         mobile: true
     },
     {
-        label: "Assign Incorrect",
+        label: "ผู้ถือครองไม่ถูกต้อง",
         isSelectBox: true,
         fontColor: ["black"],
         value: "assignIncorrect",
         mobile: true
     },
     {
-        label: "ผู้ถือครองที่ถูกต้อง",
+        label: "ผู้ถือครอง",
         isSelectBox: true,
         fontColor: ["black"],
         value: "ownedBy",
         mobile: true
     },
     {
-        label: "remarks",
+        label: "บันทึกข้อความ",
         isSelectBox: true,
         fontColor: ["black"],
         value: "prev_location",

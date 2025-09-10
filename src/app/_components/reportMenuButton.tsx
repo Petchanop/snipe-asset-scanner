@@ -7,24 +7,25 @@ import Typography from '@mui/material/Typography';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import DeleteIcon from '@mui/icons-material/Delete';
+// import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import Divider from '@mui/material/Divider';
+// import Divider from '@mui/material/Divider';
 import { blue } from '@mui/material/colors';
 import { DeleteAssetCountReport } from '@/_repositories/assetCount';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 
-function ConfirmDeletetionDialog(props: {
+export function ConfirmDeletetionDialog(props: {
+  documentName: string,
   documentNumber: number,
   isHidden: boolean,
   setIsHidden: Dispatch<SetStateAction<boolean>>,
   id: string
 }) {
-  const { isHidden, setIsHidden, documentNumber,id } = props
+  const { isHidden, setIsHidden, documentNumber, documentName ,id } = props
   const { push } = useRouter()
    const handleDeleteReport = async () => {
     await DeleteAssetCountReport(id)
@@ -35,7 +36,9 @@ function ConfirmDeletetionDialog(props: {
         maxWidth="xl"
       >
         <DialogContent>
-          <Typography>ต้องการลบ รายงานตรวจนับหมายเลข {documentNumber}</Typography>
+          <Typography>ต้องการลบ</Typography>
+          <Typography>รายงานตรวจนับ {documentName}</Typography>
+          <Typography>หมายเลข {documentNumber}</Typography>
           <Typography>ใช่หรือไม่ ?</Typography>
         </DialogContent>
         <DialogActions>
@@ -65,7 +68,7 @@ export default function ReportMenuButton(props: {
   const { context, documentNumber, id } = props
   const { push } = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [hidden, setHidden] = useState<boolean>(true);
+  // const [hidden, setHidden] = useState<boolean>(true);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -136,8 +139,8 @@ export default function ReportMenuButton(props: {
             ดูรายงาน
           </Typography>
         </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={() => {
+        {/* <Divider sx={{ my: 0.5 }} /> */}
+        {/* <MenuItem onClick={() => {
           setHidden((prev) => !prev)
         }}
           className="space-x-2"
@@ -146,14 +149,14 @@ export default function ReportMenuButton(props: {
           <Typography className="text-red-500">
             ลบ
           </Typography>
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
-      <ConfirmDeletetionDialog 
+      {/* <ConfirmDeletetionDialog 
         isHidden={!hidden}
         setIsHidden={setHidden} 
         documentNumber={documentNumber} 
         id={id}
-      />
+      /> */}
     </div>
   );
 }

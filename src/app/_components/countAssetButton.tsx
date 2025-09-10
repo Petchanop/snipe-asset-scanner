@@ -81,6 +81,7 @@ export function CheckAssetGroupButtonprops(props: {
   const windowSize = useWindowSize()
   const dialPosition = windowSize.width as number < 500 ? 0 : 20
   const dialPoistionRight = windowSize.width as number < 500 ? 16 : 50
+  const dialPoistionLeft = windowSize.width as number < 500 ? 16 : 100
 
   const actions = [
     {
@@ -90,9 +91,10 @@ export function CheckAssetGroupButtonprops(props: {
       color: 'primary'
     },
     { icon: <CancelIcon />, name: 'ยกเลิก', onClick: () => setIsCheckTable((pre) => !pre), color: 'error' },
-    { icon: <SaveIcon />, name: 'บันทึก', onClick: handleSavebutton, color: 'success' },
-    { icon: <DoneIcon />, name: 'จบการตรวจนับ', onClick: () => setHidden((prev) => !prev), color: 'primary' },
-  ];
+    { icon: <SaveIcon />, name: 'บันทึก', onClick: handleSavebutton, color: 'success' }
+  ]
+
+  const finishButton = { icon: <DoneIcon />, name: 'จบการตรวจนับ', onClick: () => setHidden((prev) => !prev), color: 'primary' }
   return (
     <>
       <Box
@@ -137,6 +139,44 @@ export function CheckAssetGroupButtonprops(props: {
           ))
         }
       </Box>
+      {/* <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 1,
+          position: 'fixed',
+          bottom: dialPosition,
+          right: dialPoistionRight,
+          borderStyle: 'inset solid',
+          borderRadius: '4%',
+          borderColor: grey[400],
+          backgroundColor: grey[200],
+          zIndex: 9999,
+        }}
+        className="flex-row h-14"
+      >
+        <Button
+          key={finishButton.name}
+          onClick={finishButton.onClick}
+          variant="text"
+          color={finishButton.color as "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined}
+          startIcon={finishButton.icon}
+          sx={(t) => ({
+            position: 'relative',
+            zIndex: 9998,
+            "& .MuiButton-startIcon": { margin: 0 },
+            "&:hover": {
+              backgroundColor: lighten((t.palette as any)[finishButton.color].main, 0.5),
+            },
+            "&:active": {
+              backgroundColor: lighten((t.palette as any)[finishButton.color].main, 0.5), // press = even darker
+            },
+          })}
+          className="flex-col gap-1 py-4"
+        >
+          {finishButton.name}
+        </Button>
+      </Box> */}
       <ConfirmCompleteReportDialog
         isHidden={!hidden}
         setIsHidden={setHidden}

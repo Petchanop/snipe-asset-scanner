@@ -47,6 +47,7 @@ import { useSession } from "next-auth/react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import { Typography } from "@mui/material";
 
 export function CreateAssetTableCell(
   props: {
@@ -123,7 +124,7 @@ export function CreateAssetTableCell(
             </TableCell>
             {
               assetTab ?
-                <TableCell className="" align="center" padding="checkbox">
+                <TableCell className="" align="center">
                   <Checkbox checked={count}
                     disabled={!isCheckTable}
                     onChange={async (event) => {
@@ -143,7 +144,7 @@ export function CreateAssetTableCell(
                 </TableCell>
                 : <></>
             }
-            <TableCell className="relative" align="center" padding="checkbox">
+            <TableCell className="relative" align="center">
               <Checkbox
                 checked={wrongLocation}
                 disabled={!isCheckTable}
@@ -159,7 +160,7 @@ export function CreateAssetTableCell(
                   setWrongLocation(pre => !pre)
                 }} />
             </TableCell>
-            <TableCell className="" align="center" padding="checkbox">
+            <TableCell className="" align="center">
               <Checkbox
                 checked={assetStatus}
                 onChange={async (event) => {
@@ -184,7 +185,7 @@ export function CreateAssetTableCell(
                 </TableCell>
                 : <></>
             }
-            <TableCell align="center" padding="checkbox">
+            <TableCell align="center">
               <>
                 <Checkbox
                   checked={incorrect}
@@ -297,13 +298,15 @@ export default function ListAsset(props: {
         <TableRow className="place-content-center">
           {headers.map((header) => (
             <TableCell key={header.label}
-              className="bg-blue-300 font-medium"
+              className="bg-blue-300 font-medium "
             >
               <TableSortLabel
                 active={orderBy === header.value}
                 direction={orderBy === header.value ? order : 'asc'}
                 onClick={createSortHandler(header.value)}>
-                {header.label}
+                <Typography>
+                  {header.label}
+                </Typography>
               </TableSortLabel>
             </TableCell>
           ))}

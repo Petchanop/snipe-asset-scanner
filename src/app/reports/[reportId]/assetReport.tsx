@@ -17,6 +17,7 @@ import Image from 'next/image';
 import DownloadIcon from '@mui/icons-material/Download';
 import { blue } from '@mui/material/colors';
 import { decode } from 'html-entities'
+import { useWindowSize } from '@/_components/loading';
 
 export default function AssetReport(
   props: {
@@ -27,7 +28,8 @@ export default function AssetReport(
     listOfUser: User[]
   }) {
   const { assetCountReport, locations, assetCountLine, listOfUser } = props
-  const { document_number, document_date } = assetCountReport
+  const { document_name, document_number, document_date } = assetCountReport
+  const windowSize = useWindowSize()
   let reportLocation = ""
   for (const location of locations) {
     reportLocation += decode(location.name)
@@ -56,8 +58,18 @@ export default function AssetReport(
         ></Image>
         <Button href={`/api/${document_number}`} sx={{
           maxHeight: '5rem'
-        }}><DownloadIcon sx={{ fontSize: '2.5rem', color: blue[400] }}/></Button>
-        
+        }}
+        variant={windowSize.width as number > 500 ? "contained" : "text"}
+        >
+          {
+            windowSize.width as number > 500 ?
+              <Typography sx={{ fontSize: '1.5rem' }}>
+                Download
+              </Typography>
+              : <DownloadIcon sx={{ fontSize: '2.5rem', color: blue[400] }} />
+          }
+        </Button>
+
       </div>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
         CITITEX Group
@@ -67,6 +79,7 @@ export default function AssetReport(
       </Typography>
 
       <Box sx={{ mt: 2 }}>
+        <Typography><strong>Document name:</strong> {document_name}</Typography>
         <Typography><strong>Document No:</strong> {document_number} </Typography>
         <Typography><strong>Date Count:</strong> {document_date.toLocaleDateString('th-BK')} </Typography>
         <Typography><strong>Asset Check Name:</strong> {getUser(assetCountReport.created_by!)} </Typography>
@@ -80,11 +93,11 @@ export default function AssetReport(
             <TableCell>No.</TableCell>
             <TableCell>Asset Code</TableCell>
             <TableCell>Asset Name</TableCell>
-            <TableCell>Assign Name</TableCell>
-            <TableCell align='center'>Count Check</TableCell>
-            <TableCell align='center'>Assign Incorrect</TableCell>
-            <TableCell align='center'>Asset Damaged</TableCell>
-            <TableCell>Location</TableCell>
+            <TableCell>ผู้ถือครอง</TableCell>
+            <TableCell align='center'>ตรวจพบ</TableCell>
+            <TableCell align='center'>ผู้ครอบครองไม่ถูกต้อง</TableCell>
+            <TableCell align='center'>ชำรุด</TableCell>
+            <TableCell>สถานที่</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -94,9 +107,9 @@ export default function AssetReport(
               <TableCell>{row.asset_code}</TableCell>
               <TableCell>{row.asset_name}</TableCell>
               <TableCell>{getUser(row.assigned_to!)}</TableCell>
-              <TableCell align='center'>{row.asset_check ? "\u2713" : "" }</TableCell>
-              <TableCell align='center'>{row.is_assigned_incorrectly ? "\u2713" : "" }</TableCell>
-              <TableCell align='center' >{row.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "\u2713" : "" }</TableCell>
+              <TableCell align='center'>{row.asset_check ? "\u2713" : ""}</TableCell>
+              <TableCell align='center'>{row.is_assigned_incorrectly ? "\u2713" : ""}</TableCell>
+              <TableCell align='center' >{row.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "\u2713" : ""}</TableCell>
               <TableCell>{getLocation(row.asset_count_line_location_id!, locations)}</TableCell>
             </TableRow>
           ))}
