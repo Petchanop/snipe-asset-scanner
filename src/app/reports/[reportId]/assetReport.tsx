@@ -19,15 +19,23 @@ import { blue } from '@mui/material/colors';
 import { decode } from 'html-entities'
 import { useWindowSize } from '@/_components/loading';
 
+export type TReportData = {
+  assetNotCheck : number,
+  assetAdditional: number,
+  assetAssignedIncorrect: number,
+  assetMalFunction: number
+}
+
 export default function AssetReport(
   props: {
     assetCountReport: AssetCountWithLineAndLocation,
     locations: TLocation[],
     assetCountLine: AssetCountLine[],
     user: User,
-    listOfUser: User[]
+    listOfUser: User[],
+    reportData: TReportData
   }) {
-  const { assetCountReport, locations, assetCountLine, listOfUser } = props
+  const { assetCountReport, locations, assetCountLine, listOfUser, reportData } = props
   const { document_name, document_number, document_date } = assetCountReport
   const windowSize = useWindowSize()
   let reportLocation = ""
@@ -47,6 +55,8 @@ export default function AssetReport(
     return location ? location.name as unknown as string : ''
   }
 
+  const sortAssetCountLine = assetCountLine.sort((a, b) =>
+    getLocation(b?.asset_count_line_location_id!, locations).localeCompare(getLocation(a?.asset_count_line_location_id!, locations)))
   return (
     <div className="p-4 space-y-2">
       <div className="flex flex-row justify-between">
@@ -59,7 +69,7 @@ export default function AssetReport(
         <Button href={`/api/${document_number}`} sx={{
           maxHeight: '5rem'
         }}
-        variant={windowSize.width as number > 500 ? "contained" : "text"}
+          variant={windowSize.width as number > 500 ? "contained" : "text"}
         >
           {
             windowSize.width as number > 500 ?
@@ -84,7 +94,11 @@ export default function AssetReport(
         <Typography><strong>Date Count:</strong> {document_date.toLocaleDateString('th-BK')} </Typography>
         <Typography><strong>Asset Check Name:</strong> {getUser(assetCountReport.created_by!)} </Typography>
         <Typography><strong>Location:</strong> {reportLocation} </Typography>
-        <Typography><strong>Asset Count:</strong> {assetCountLine.length} </Typography>
+        <Typography><strong>ทรัพย์สินในระบบทั้งหมด:</strong> {assetCountLine.length} </Typography>
+        <Typography><strong>ทรัพย์สินที่ไม่พบ:</strong> {reportData.assetNotCheck} </Typography>
+        <Typography><strong>ทรัพย์สินที่พบเพิ่มเติม:</strong> {reportData.assetAdditional} </Typography>
+        <Typography><strong>ทรัพย์สินที่ผู้ครอบครองไม่ถูกต้อง:</strong> {reportData.assetAssignedIncorrect} </Typography>
+        <Typography><strong>ทรัพย์สินชำรุด:</strong> {reportData.assetMalFunction} </Typography>
       </Box>
 
       <Table stickyHeader sx={{ mt: 4 }}>
@@ -101,15 +115,27 @@ export default function AssetReport(
           </TableRow>
         </TableHead>
         <TableBody>
-          {assetCountLine.map((row, index) => (
+          {sortAssetCountLine.map((row, index) => (
             <TableRow key={row.id}>
               <TableCell>{index + 1}</TableCell>
               <TableCell>{row.asset_code}</TableCell>
-              <TableCell>{row.asset_name}</TableCell>
+              <TableCell>{decode(row.asset_name)}</TableCell>
               <TableCell>{getUser(row.assigned_to!)}</TableCell>
-              <TableCell align='center'>{row.asset_check ? "\u2713" : ""}</TableCell>
-              <TableCell align='center'>{row.is_assigned_incorrectly ? "\u2713" : ""}</TableCell>
-              <TableCell align='center' >{row.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "\u2713" : ""}</TableCell>
+              <TableCell align='center'>
+                <Typography sx={{ fontSize: 20 }}>
+                  {row.asset_check ? "\u2713" : ""}
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography sx={{ fontSize: 20 }}>
+                  {row.is_assigned_incorrectly ? "\u2713" : ""}
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography sx={{ fontSize: 20 }}>
+                  {row.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "\u2713" : ""}
+                </Typography>
+              </TableCell>
               <TableCell>{getLocation(row.asset_count_line_location_id!, locations)}</TableCell>
             </TableRow>
           ))}

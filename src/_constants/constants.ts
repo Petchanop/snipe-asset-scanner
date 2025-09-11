@@ -142,7 +142,7 @@ export const tableHeadersAdditional: HeadersAssetTable[] = [
         mobile: true
     },
     {
-        label: "Count Check",
+        label: "ตรวจพบ",
         isSelectBox: true,
         fontColor: ["black"],
         value: "countCheck",

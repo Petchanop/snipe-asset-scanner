@@ -6,7 +6,7 @@ import { getLocationByIdSnipeIt } from "@/api/location.api";
 import { GetAllUserPrisma } from "@/_repositories/user"
 import { GetAssetCountLocationByAssetCountReport } from "@/_repositories/assetCountLocation";
 import { findAssetCount, getAssetCountReport, updateAssetCountReport } from "@/_repositories/assetCount";
-import { ReportState } from "@/_constants/constants";
+import { AssetStatusEnum, ReportState } from "@/_constants/constants";
 import { notFound } from "next/navigation";
 import { hasOwnProperty, Location } from "@/_types/types"
 import { getSession } from "auth";
@@ -24,6 +24,12 @@ export default async function AssetsTablePage({
     const assetCountReport = await getAssetCountReport(parseInt(reportId))
     if (!assetCountReport)
         notFound()
+    if (assetCountReport.state == ReportState.COMPLETED)
+        return (
+            <>
+                This report have been finished.
+            </>
+        )
     const locationIds = await GetAssetCountLocationByAssetCountReport(assetCountReport.id)
     const locations = await fetchLocations();
     const parentLocation = getParentLocation(locations.data!.rows)
