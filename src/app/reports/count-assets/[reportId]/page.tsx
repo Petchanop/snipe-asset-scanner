@@ -6,7 +6,7 @@ import { getLocationByIdSnipeIt } from "@/api/location.api";
 import { GetAllUserPrisma } from "@/_repositories/user"
 import { GetAssetCountLocationByAssetCountReport } from "@/_repositories/assetCountLocation";
 import { findAssetCount, getAssetCountReport, updateAssetCountReport } from "@/_repositories/assetCount";
-import { ReportState } from "@/_constants/constants";
+import { AssetStatusEnum, ReportState } from "@/_constants/constants";
 import { notFound } from "next/navigation";
 import { hasOwnProperty, Location } from "@/_types/types"
 import { getSession } from "auth";
@@ -24,12 +24,18 @@ export default async function AssetsTablePage({
     const assetCountReport = await getAssetCountReport(parseInt(reportId))
     if (!assetCountReport)
         notFound()
-    const locationId = await GetAssetCountLocationByAssetCountReport(assetCountReport.id)
+    if (assetCountReport.state == ReportState.COMPLETED)
+        return (
+            <>
+                This report have been finished.
+            </>
+        )
+    const locationIds = await GetAssetCountLocationByAssetCountReport(assetCountReport.id)
     const locations = await fetchLocations();
     const parentLocation = getParentLocation(locations.data!.rows)
     const locationData: Location[] = []
     const listOfParent: Location[] = []
-    for (const loc of locationId) {
+    for (const loc of locationIds) {
         const { data, error } = await getLocationByIdSnipeIt(loc.location_id)
         if (data?.status === 'error' || error) {
             return notFound()
@@ -60,7 +66,7 @@ export default async function AssetsTablePage({
     }
     const parent = parentLocation.find((loc) => (
         loc.children as unknown as { id: number, name: string }[])
-        .find((child: { id: number, name: string }) => locationId.find((loc) => child.id == loc.location_id))
+        .find((child: { id: number, name: string }) => locationIds.find((loc) => child.id == loc.location_id))
     ) as TLocation
     const baseUrl = process.env.SNIPE_URL
     const defaultLocation = location ?
@@ -75,7 +81,7 @@ export default async function AssetsTablePage({
                 locations={locationData as PNewCountTableProps[]}
                 defaultLocation={defaultLocation as unknown as TLocation}
                 locationId={defaultLocation?.id as number}
-                assetCountLocation={locationId}
+                assetCountLocation={locationIds}
                 parentProp={parent}
                 users={users}
                 report={report}

@@ -306,18 +306,18 @@ export default function CreatePlanComponent(props: {
           const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
           for (const locationId of (reportForm as unknown as TReportForm).asset_count_location) {
             const assetCountLocation = await CreateAssetCountLocation(locationId, assetCountReport.id)
-            const { data, error } = await getAssetByLocationId(locationId)
-            if (error || !data) {
-              toast.error(`${assetCountReport.document_name} cannot been created.`)
-            }
-            const assetLocation = location.find((loc) => loc.id == locationId) as TLocation
-            const assetCountLineList = data?.map((asset) => {
-              return parseDataForCreateAssetCountLine(
-                asset, assetLocation as unknown as PNewCountTableProps,
-                user, assetCountLocation as AssetCountLocation, location, assetCountReport
-              )
-            })
-            await BulkCreateAssetCountLine(assetCountLineList!)
+            // const { data, error } = await getAssetByLocationId(locationId)
+            // if (error || !data) {
+            //   toast.error(`${assetCountReport.document_name} cannot been created.`)
+            // }
+            // const assetLocation = location.find((loc) => loc.id == locationId) as TLocation
+            // const assetCountLineList = data?.map((asset) => {
+            //   return parseDataForCreateAssetCountLine(
+            //     asset, assetLocation as unknown as PNewCountTableProps,
+            //     user, assetCountLocation as AssetCountLocation, location, assetCountReport
+            //   )
+            // })
+            // await BulkCreateAssetCountLine(assetCountLineList!)
           }
           const newReport: TReportForm = {
             id: assetCountReport.id,

@@ -26,10 +26,10 @@ import {
   useReportContext
 } from "@/_contexts/context";
 import { useRouter } from "next/navigation";
-import { getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine";
+import { BulkCreateAssetCountLine, getAssetCountLineByAssetCount } from "@/_repositories/assetCountLine";
 import { CheckAllDataCount } from "@/_libs/assetCount";
 import { updateAssetCountReport } from "@/_repositories/assetCount";
-import { getAssetById } from "@/_intergrations/snipeit/assets";
+import { getAssetById, getAssetByLocationId } from "@/_intergrations/snipeit/assets";
 import { TLocation } from "@/_types/snipe-it.type";
 import { ChildrenSelectComponent, ParentSelectComponent } from "@/_components/tables/selectLocationBox";
 import Tabs from "@mui/material/Tabs";
@@ -37,7 +37,7 @@ import Tab from "@mui/material/Tab";
 import { LoadingTableSkeleton, useWindowSize } from "@/_components/loading";
 import { ReportState } from "@/_constants/constants";
 import ListAssetMobile from "@/_components/tables/list-asset-mobile";
-import { mapAssetData } from "@/_components/tables/utility";
+import { mapAssetData, parseDataForCreateAssetCountLine } from "@/_components/tables/utility";
 import toast, { Toaster } from "react-hot-toast";
 import { CheckAssetGroupButtonprops, CountAssetButton } from "@/_components/countAssetButton";
 import Box from "@mui/material/Box";
@@ -351,7 +351,22 @@ export default function NewCountTable(props: {
   const { push } = useRouter()
 
   const getSortMapData = async (assetLocationId: AssetCountLocation) => {
-    const assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
+    let assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
+    if (!assetCountLineReport.length) {
+      const { data, error } = await getAssetByLocationId(location.id)
+      if (error || !data) {
+        toast.error(`${report?.document_name} cannot been created.`)
+      }
+      const assetLocation = allLocation.find((loc) => loc.id == location.id) as TLocation
+      const assetCountLineList = data?.map((asset) => {
+        return parseDataForCreateAssetCountLine(
+          asset, assetLocation as unknown as PNewCountTableProps,
+          user, assetLocationId as AssetCountLocation, allLocation, report!
+        )
+      })
+      await BulkCreateAssetCountLine(assetCountLineList!)
+      assetCountLineReport = await getAssetCountLineByAssetCount(report!.id, assetLocationId?.id as string)
+    }
     const AssetData = await Promise.all(
       assetCountLineReport.map(async (asset) => {
         const data = users.find((user) => user.id as number == asset.assigned_to)

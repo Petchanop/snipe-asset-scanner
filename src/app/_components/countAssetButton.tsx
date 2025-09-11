@@ -81,6 +81,7 @@ export function CheckAssetGroupButtonprops(props: {
   const windowSize = useWindowSize()
   const dialPosition = windowSize.width as number < 500 ? 0 : 20
   const dialPoistionRight = windowSize.width as number < 500 ? 16 : 50
+  const dialPoistionLeft = windowSize.width as number < 500 ? 16 : 50
 
   const actions = [
     {
@@ -92,51 +93,140 @@ export function CheckAssetGroupButtonprops(props: {
     { icon: <CancelIcon />, name: 'ยกเลิก', onClick: () => setIsCheckTable((pre) => !pre), color: 'error' },
     { icon: <SaveIcon />, name: 'บันทึก', onClick: handleSavebutton, color: 'success' },
     { icon: <DoneIcon />, name: 'จบการตรวจนับ', onClick: () => setHidden((prev) => !prev), color: 'primary' },
-  ];
+  ]
+
+  const searchButton = actions[0]
+  const cancelButton = actions[1]
+  const saveButton = actions[2]
+  const finishButton = actions[3]
+
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: 1,
-          position: 'fixed',
-          bottom: dialPosition,
-          right: dialPoistionRight,
-          borderStyle: 'inset solid',
-          borderRadius: '4%',
-          borderColor: grey[400],
-          backgroundColor: grey[200],
-          zIndex: 9999,
-        }}
-        className="flex flex-row w-86 h-14"
-      >
-        {
-          actions.map((action) => (
-            <Button
-              key={action.name}
-              onClick={action.onClick}
-              variant="text"
-              color={action.color as "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined}
-              startIcon={action.icon}
-              sx={(t) => ({
-                position: 'relative',
-                zIndex: 9998,
-                "& .MuiButton-startIcon": { margin: 0 },
-                "&:hover": {
-                  backgroundColor: lighten((t.palette as any)[action.color].main, 0.5),
-                },
-                "&:active": {
-                  backgroundColor: lighten((t.palette as any)[action.color].main, 0.5), // press = even darker
-                },
-              })}
-              className="flex-col gap-1 py-4"
+      {
+        windowSize.width as number < 500 ?
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: 1,
+              position: 'fixed',
+              bottom: dialPosition,
+              right: dialPoistionRight,
+              borderStyle: 'inset solid',
+              borderRadius: '4%',
+              borderColor: grey[400],
+              backgroundColor: grey[200],
+              zIndex: 9999,
+            }}
+            className="flex flex-row w-86 h-14"
+          >
+            {
+              actions.map((action) => (
+                <Button
+                  key={action.name}
+                  onClick={action.onClick}
+                  variant="text"
+                  color={action.color as "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined}
+                  startIcon={action.icon}
+                  sx={(t) => ({
+                    position: 'relative',
+                    zIndex: 9998,
+                    "& .MuiButton-startIcon": { margin: 0 },
+                    "&:hover": {
+                      backgroundColor: lighten((t.palette as any)[action.color].main, 0.5),
+                    },
+                    "&:active": {
+                      backgroundColor: lighten((t.palette as any)[action.color].main, 0.5), // press = even darker
+                    },
+                  })}
+                  className="flex-col gap-1 py-4"
+                >
+                  {action.name}
+                </Button>
+              ))
+            }
+          </Box>
+          :
+          <div className="flex flex-row justify-between">
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: 1,
+                position: 'fixed',
+                bottom: dialPosition,
+                left: dialPoistionLeft,
+                borderStyle: 'inset solid',
+                borderRadius: '4%',
+                zIndex: 9999,
+              }}
+              className="flex-row w-100 h-8"
             >
-              {action.name}
-            </Button>
-          ))
-        }
-      </Box>
+              <Button
+                key={searchButton?.name}
+                onClick={searchButton?.onClick}
+                variant="contained"
+                color={searchButton?.color as "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined}
+                className="w-30"
+              >
+                {searchButton?.name}
+              </Button>
+              <Button
+                key={cancelButton?.name}
+                onClick={cancelButton?.onClick}
+                variant="contained"
+                color={cancelButton?.color as "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined}
+                className="w-30"
+              >
+                {cancelButton?.name}
+              </Button>
+              <Button
+                key={saveButton?.name}
+                onClick={saveButton?.onClick}
+                variant="contained"
+                color={saveButton?.color as "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined}
+                className="w-30"
+              >
+                {saveButton?.name}
+              </Button>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: 1,
+                position: 'fixed',
+                bottom: dialPosition,
+                right: dialPoistionRight,
+                borderStyle: 'inset solid',
+                borderRadius: '4%',
+                zIndex: 9999,
+              }}
+              className="flex-row h-8"
+            >
+              <Button
+                key={finishButton?.name}
+                onClick={finishButton?.onClick}
+                variant="contained"
+                color={finishButton?.color as "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined}
+                // startIcon={finishButton?.icon}
+                sx={(t) => ({
+                  position: 'relative',
+                  zIndex: 9998,
+                  "& .MuiButton-startIcon": { margin: 0 },
+                  "&:hover": {
+                    backgroundColor: lighten((t.palette as any)[finishButton!.color].main, 0.5),
+                  },
+                  "&:active": {
+                    backgroundColor: lighten((t.palette as any)[finishButton!.color].main, 0.5), // press = even darker
+                  },
+                })}
+              >
+                {finishButton?.name}
+              </Button>
+            </Box>
+          </div>
+      }
       <ConfirmCompleteReportDialog
         isHidden={!hidden}
         setIsHidden={setHidden}

@@ -18,12 +18,12 @@ export async function GET(
 ) {
     const session = await getSession()
     if (!session)
-        return redirect('/unauthorized') 
+        return redirect('/unauthorized')
     try {
         const { reportId } = await params
         if (!reportId) throw new Error('Report id required')
         const assetCountReport = await getAssetCountReport(parseInt(reportId), true) as AssetCountWithLineAndLocation
-        const filePath = path.join(process.cwd(), 'src/app/api/[reportId]/Asset_Report.xlsx')
+        const filePath = path.join(process.cwd(), 'src/app/api/[reportId]/Asset_Report_rev02.xlsx')
         const newWorkBook = new Excel.Workbook();
         await newWorkBook.xlsx.readFile(filePath)
         const sheet = newWorkBook.getWorksheet(1)
@@ -58,7 +58,7 @@ async function CreateAssetCountReportFile(
     dataSheet.getCell(`B9`).alignment = { horizontal: 'left', vertical: 'middle' }
     dataSheet.getCell(`B5`).value = assetCountReport.document_number
     dataSheet.getCell(`B6`).value = assetCountReport.document_date.toLocaleDateString('th-BK')
-    dataSheet.getCell(`B7`).value = user ?  user?.first_name + " " + user?.last_name : ""
+    dataSheet.getCell(`B7`).value = user ? user?.first_name + " " + user?.last_name : ""
     dataSheet.getColumn(1).width = 25
     dataSheet.getColumn(2).width = 30
     dataSheet.getColumn(3).width = 55
@@ -79,7 +79,7 @@ async function CreateAssetCountReportFile(
     for (let j = 0; j < assetCountReport.AssetCountLocation.length; j++) {
         const location = assetCountReport.AssetCountLocation[j]
         const assetCountLine = (await getAssetCountLineByAssetCount(assetCountReport.id, location!.id))
-                                    .sort((a,b) => b.assigned_to! - a.assigned_to!)
+            .sort((a, b) => b.assigned_to! - a.assigned_to!)
         const getLocation = locations.data?.rows.find((loc) => loc.id == location?.location_id)
         locationData += getLocation?.name
         if (j < assetCountReport.AssetCountLocation.length - 1)
@@ -92,11 +92,12 @@ async function CreateAssetCountReportFile(
             const assingedInCorrect = countLine.is_assigned_incorrectly ? "\u2713" : ""
             const isNotInLocation = countLine.is_not_asset_loc ? "\u2713" : ""
             const useAble = countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING ? "\u2713" : ""
+            const remarks = countLine.remarks
             if (!countLine.asset_check && !countLine.is_not_asset_loc)
                 assetNotCheck++
             if (countLine.is_not_asset_loc)
                 assetAdditional++
-            if (countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING && !countLine.is_not_asset_loc) 
+            if (countLine.asset_count_line_status_id == AssetStatusEnum.MALFUNCTIONING && !countLine.is_not_asset_loc)
                 assetMalFunction++
             if (countLine.is_assigned_incorrectly)
                 assetAssignedIncorrect++
@@ -106,12 +107,29 @@ async function CreateAssetCountReportFile(
             dataSheet.getCell(`C${assetCodeCol}`).value = decode(countLine.asset_name)
             dataSheet.getCell(`D${assetCodeCol}`).value = getUser ? `${getUser?.first_name}  ${getUser?.last_name}` : ""
             dataSheet.getCell(`E${assetCodeCol}`).value = countCheck
+            dataSheet.getCell(`E${assetCodeCol}`).font = {
+                size: 18,
+                bold: true
+            }
             dataSheet.getCell(`F${assetCodeCol}`).value = assingedInCorrect
+            dataSheet.getCell(`F${assetCodeCol}`).font = {
+                size: 18,
+                bold: true
+            }
             dataSheet.getCell(`G${assetCodeCol}`).value = useAble
+            dataSheet.getCell(`G${assetCodeCol}`).font = {
+                size: 18,
+                bold: true
+            }
             dataSheet.getCell(`I${assetCodeCol}`).value = getLocation!.name
             dataSheet.getCell(`H${assetCodeCol}`).value = isNotInLocation
+            dataSheet.getCell(`H${assetCodeCol}`).font = {
+                size: 18,
+                bold: true
+            }
             dataSheet.getCell(`J${assetCodeCol}`).value = locations.data?.rows.find((loc) => loc.id == countLine.previous_loc_id)?.name
             dataSheet.getCell(`K${assetCodeCol}`).value = ownedByUser ? `${ownedByUser?.first_name}  ${ownedByUser?.last_name}` : ""
+            dataSheet.getCell(`L${assetCodeCol}`).value = remarks
             createBorder(dataSheet, assetCodeCol)
             assetCodeCol += 1
             i++
