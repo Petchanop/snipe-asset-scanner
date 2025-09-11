@@ -319,13 +319,13 @@ function AssetCard(props: {
 }) {
   const { data, assetTab, tabValue, isCheckTable, user, users } = props
   const headers = assetTab == INLOCATION ? tableHeaders : tableHeadersAdditional
-  const { countCheck, assignIncorrect, notInLocation, status, remarks } = data;
+  const { countCheck, assignIncorrect, notInLocation, status, remarks, prev_location } = data;
   const [count, setCount] = useState(countCheck)
   const [incorrect, setIncorrect] = useState(assignIncorrect)
   const [wrongLocation, setWrongLocation] = useState(notInLocation)
   const [open, setOpen] = useState(false)
   const [openModal, setOpenModal] = useState(false)
-  const [remarkAsset, setRemarkAsset] = useState(remarks)
+  const [remarkAsset, setRemarkAsset] = useState(remarks ? remarks : prev_location)
   const [assetStatus, setAssetStatus] = useState(assetStatusOptions
     .find((option) => option.id == status)?.id == AssetStatusEnum.MALFUNCTIONING)
   const reportContext = useReportContext()
