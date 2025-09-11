@@ -6,7 +6,7 @@ import { getLocationByIdSnipeIt } from "@/api/location.api";
 import { GetAllUserPrisma } from "@/_repositories/user"
 import { GetAssetCountLocationByAssetCountReport } from "@/_repositories/assetCountLocation";
 import { findAssetCount, getAssetCountReport, updateAssetCountReport } from "@/_repositories/assetCount";
-import { AssetStatusEnum, ReportState } from "@/_constants/constants";
+import { ReportState } from "@/_constants/constants";
 import { notFound } from "next/navigation";
 import { hasOwnProperty, Location } from "@/_types/types"
 import { getSession } from "auth";

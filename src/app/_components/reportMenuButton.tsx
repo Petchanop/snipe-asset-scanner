@@ -65,7 +65,7 @@ export default function ReportMenuButton(props: {
   documentNumber: number,
   id: string
 }) {
-  const { context, documentNumber, id } = props
+  const { context, documentNumber } = props
   const { push } = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   // const [hidden, setHidden] = useState<boolean>(true);
