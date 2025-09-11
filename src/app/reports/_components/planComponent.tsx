@@ -25,19 +25,20 @@ import Divider from "@mui/material/Divider";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { createAssetCountReport } from "@/_repositories/assetCount";
 import { CreateDocumentStep, ReportState } from "@/_constants/constants";
-import { BulkCreateAssetCountLine } from "@/_repositories/assetCountLine";
 import { CreateAssetCountLocation } from "@/_repositories/assetCountLocation";
-import { getAssetByLocationId } from "@/_intergrations/snipeit/assets";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
-import { AssetCountLocation, TReportForm } from "@/_types/types";
 import { decode } from 'html-entities'
-import { toast } from "react-hot-toast";
-import { parseDataForCreateAssetCountLine } from "@/_components/tables/utility";
-import { PNewCountTableProps } from "@/_components/tables/new-count-table";
-import { CreateReportContext, useCreateReportContext } from "@/_contexts/context";
 import MobileStepper from "@mui/material/MobileStepper";
 import { useWindowSize } from "@/_components/loading";
+import { CreateReportContext, useCreateReportContext } from "@/_contexts/context";
+import { TReportForm } from '@/_types/types'
+// import { AssetCountLocation, TReportForm } from "@/_types/types";
+// import { getAssetByLocationId } from "@/_intergrations/snipeit/assets";
+// import { toast } from "react-hot-toast";
+// import { parseDataForCreateAssetCountLine } from "@/_components/tables/utility";
+// import { BulkCreateAssetCountLine } from "@/_repositories/assetCountLine";
+// import { PNewCountTableProps } from "@/_components/tables/new-count-table";
 
 const steps = ["เลือกวันที่", "ตั้งชื่อรายงานตรวจนับ", "เพิ่มสถานที่", "ยืนยัน"];
 
@@ -281,7 +282,7 @@ export default function CreatePlanComponent(props: {
   childProp: TLocation | null,
   user: any
 }) {
-  const { location, parentLocation, childrenLocation, parentProp, childProp, user } = props
+  const { parentLocation, childrenLocation, parentProp, childProp, user } = props
   const [reportForm, setReportForm] = useState<TReportForm>({
     document_date: null,
     document_name: "",
@@ -305,7 +306,7 @@ export default function CreatePlanComponent(props: {
         if (reportForm !== null && typeof reportForm !== 'undefined') {
           const assetCountReport = await createAssetCountReport(reportForm as unknown as TReportForm)
           for (const locationId of (reportForm as unknown as TReportForm).asset_count_location) {
-            const assetCountLocation = await CreateAssetCountLocation(locationId, assetCountReport.id)
+            await CreateAssetCountLocation(locationId, assetCountReport.id)
             // const { data, error } = await getAssetByLocationId(locationId)
             // if (error || !data) {
             //   toast.error(`${assetCountReport.document_name} cannot been created.`)
